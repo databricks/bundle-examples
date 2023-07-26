@@ -1,0 +1,30 @@
+bundle:
+  name: job_with_python_wheel_task
+
+artifacts:
+    common:
+      type: whl
+      path: "./common"
+    example:
+      type: whl
+      path: "./example"
+
+workspace:
+  host: <<fill in your workspace host>>
+
+resources:
+  jobs:
+    test_job:
+      name: "[${bundle.environment}] Job With Wheel Task"
+      tasks:
+        - task_key: TestTask
+          new_cluster:
+            num_workers: 1
+            spark_version: 13.2.x-snapshot-scala2.12
+            node_type_id: r5.xlarge
+          python_wheel_task:
+            package_name: "example"
+            entry_point: "run"
+          libraries:
+          - whl: ./common/dist/*.whl
+          - whl: ./example/dist/*.whl

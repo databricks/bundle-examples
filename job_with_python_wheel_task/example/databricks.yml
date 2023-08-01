@@ -4,13 +4,13 @@ bundle:
 artifacts:
     common:
       type: whl
-      path: "./common"
+      path: "../common"
     example:
       type: whl
-      path: "./example"
+      path: "./" 
 
 workspace:
-  host: <<fill in your workspace host>>
+  host: https://e2-dogfood.staging.cloud.databricks.com/
 
 resources:
   jobs:
@@ -21,10 +21,10 @@ resources:
           new_cluster:
             num_workers: 1
             spark_version: 13.2.x-snapshot-scala2.12
-            node_type_id: r5.xlarge
+            node_type_id: i3.xlarge
           python_wheel_task:
             package_name: "example"
             entry_point: "run"
           libraries:
-          - whl: ./common/dist/*.whl
-          - whl: ./example/dist/*.whl
+          - whl: ../common/dist/*.whl
+          - whl: ./dist/*.whl

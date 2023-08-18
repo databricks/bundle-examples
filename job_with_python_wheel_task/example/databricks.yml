@@ -7,7 +7,6 @@ artifacts:
       path: "../common"
     example:
       type: whl
-      path: "./" 
 
 workspace:
   host: https://e2-dogfood.staging.cloud.databricks.com/

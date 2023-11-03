@@ -2,8 +2,7 @@ bundle:
   name: python_wheel_poetry
 
 workspace:
-  #host: <PLEASE ENTER YOUR DATABRICKS WORKSPACE HOST HERE>
-  host: https://e2-dogfood.staging.cloud.databricks.com
+  host: <PLEASE ENTER YOUR DATABRICKS WORKSPACE HOST HERE>
 
 artifacts:
   default:

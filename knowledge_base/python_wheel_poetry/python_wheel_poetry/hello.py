@@ -1,3 +1,5 @@
+import cowsay
+
 """
 This is the entry point for the wheel file.
 
@@ -9,4 +11,4 @@ The value is the path to the function that is called when the command is run.
 The key is referred to in the `python_wheel_task` section in `databricks.yml`.
 """
 def hello():
-    print("Hello, world!")
+    cowsay.cow("Hello, world!")

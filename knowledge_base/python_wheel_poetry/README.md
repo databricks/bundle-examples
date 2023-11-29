@@ -12,7 +12,7 @@ This example demonstrates how to use Poetry with a Databricks Asset Bundle.
 
 Update the `host` field under `workspace` in `databricks.yml` to the Databricks workspace you wish to deploy to.
 
-Optional: update the `node_type_id` to the node type relevant to your cloud.
+Optional: update the `node_type_id` to the node type relevant to your cloud in `resources/job.yml`.
 
 Run `databricks bundle deploy` to build the wheel, upload the wheel, and deploy the job.
 

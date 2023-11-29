@@ -22,17 +22,17 @@ targets:
     default: true
     workspace:
       # TODO: add dev workspace URL
-      host:
+      host: https://adb-984752964297111.11.azuredatabricks.net/
 
   staging:
     workspace:
-      host: https://adb-xxxx.xx.azuredatabricks.net
+      host: 
 
   prod:
     workspace:
-      host: https://adb-xxxx.xx.azuredatabricks.net
+      host: 
 
   test:
     workspace:
-      host: https://adb-xxxx.xx.azuredatabricks.net
+      host: 
 

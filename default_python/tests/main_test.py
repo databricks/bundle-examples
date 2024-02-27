@@ -1,14 +1,15 @@
-from databricks.connect import DatabricksSession
-from pyspark.sql import SparkSession
+from databricks.connect import DatabricksSession as SparkSession
+from pytest import fixture
 from default_python import main
+from pytest import fixture
 
-# Create a new Databricks Connect session. If this fails,
-# check that you have configured Databricks Connect correctly.
-# See https://docs.databricks.com/dev-tools/databricks-connect.html.
+@fixture(scope="session")
+def spark():
+    spark = SparkSession.builder.getOrCreate()
+    yield spark
+    spark.stop()
 
-SparkSession.builder = DatabricksSession.builder
-SparkSession.builder.getOrCreate()
 
-def test_main():
-    taxis = main.get_taxis()
+def test_main(spark: SparkSession):
+    taxis = main.get_taxis(spark)
     assert taxis.count() > 5

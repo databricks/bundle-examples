@@ -10,11 +10,7 @@ For more information, please refer to the [documentation](https://docs.databrick
 
 ## Usage
 
-Configure the Databricks CLI profile to use:
-
-```bash
-export DATABRICKS_CONFIG_PROFILE=<my profile>
-```
+Update the `host` field under `workspace` in `databricks.yml` to the Databricks workspace you wish to deploy to.
 
 Run `databricks bundle deploy` to deploy the job.
 

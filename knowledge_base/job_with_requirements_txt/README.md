@@ -20,7 +20,7 @@ Example output:
 $ databricks bundle run job_with_requirements_txt
 Run URL: https://...
 
-2024-06-21 13:38:12 "[dev pieter_noordhuis] Example job that uses a requirements.txt file" TERMINATED SUCCESS
+2024-06-21 14:48:09 "[dev pieter_noordhuis] Example job that uses a requirements.txt file" TERMINATED SUCCESS
   _____________
 | Hello, world! |
   =============

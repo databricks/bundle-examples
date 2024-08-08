@@ -14,7 +14,7 @@ Update the `artifact_path` field under `workspace` in `databricks.yml` to the Da
 
 Run `databricks bundle deploy` to deploy the job.
 
-Run `databricks bundle run serverless_job` to run the job.
+Run `databricks bundle run spark_jar_job` to run the job.
 
 Example output:
 

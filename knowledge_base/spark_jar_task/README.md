@@ -10,7 +10,7 @@ This example demonstrates how to define and use a Spark JAR Task.
 
 Update the `host` field under `workspace` in `databricks.yml` to the Databricks workspace you wish to deploy to.
 
-Update the `artifact_path` field under `workspace` in `databricks.yml` to the Databricks Volumes paths where JAR artifact needs to be deployed to.
+Update the `artifact_path` field under `workspace` in `databricks.yml` to the Databricks Volume path where the JAR artifact needs to be deployed.
 
 Run `databricks bundle deploy` to deploy the job.
 

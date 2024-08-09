@@ -1,4 +1,4 @@
-# SBT example
+# sbt example
 
 This example demonstrates how to build a Scala JAR with [sbt](https://www.scala-sbt.org/) and use it from a job.
 

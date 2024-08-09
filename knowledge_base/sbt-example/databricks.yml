@@ -1,0 +1,28 @@
+bundle:
+  name: sbt_example
+
+include:
+  - ./resources/job.yml
+
+workspace:
+  host: https://myworkspace.cloud.databricks.com
+
+  # JARs must be stored in a Unity Catalog Volume.
+  # Uncomment the line below and replace the path with the path to your Unity Catalog Volume.
+  #
+  # artifact_path: /Volumes/my_catalog/my_schema/my_volume/some_path
+
+artifacts:
+  sbt_example:
+    type: jar
+    build: sbt package
+    files:
+      - source: ./target/scala-2.12/sbt-example*.jar
+
+permissions:
+  - group_name: users
+    level: CAN_VIEW
+
+targets:
+  dev:
+    default: true

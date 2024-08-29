@@ -3,6 +3,7 @@ import sys
 
 # Traverse to the sync root path.
 # The working directory is equal to the directory containing the notebook.
+# Note: this requires DBR >= 14 or serverless.
 shared_path = os.getcwd() + "/../../shared"
 
 # Add the shared directory to the Python path.

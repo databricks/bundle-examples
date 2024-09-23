@@ -35,3 +35,7 @@ targets:
               "spark.master": "local[*, 4]"
           custom_tags:
               "ResourceClass": "SingleNode"
+
+  prod: {
+    # No overrides
+  }

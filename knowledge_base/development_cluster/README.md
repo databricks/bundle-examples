@@ -7,7 +7,7 @@ This bundle defines an `example_job` which is run on a job cluster in production
 For the development mode (default `dev` target) the job is overriden to use a development cluster which is provisioned 
 as part of the bundle deployment as well.
 
-For more information, please refer to the [documentation](TBD).
+For more information, please refer to the [documentation](https://docs.databricks.com/en/dev-tools/bundles/settings.html#clusters).
 
 ## Prerequisites
 

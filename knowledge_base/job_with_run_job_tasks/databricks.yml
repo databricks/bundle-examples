@@ -1,13 +1,12 @@
 bundle:
   name: job_with_run_job_tasks
 
-variables:
-  instance_pool_id:
-    lookup:
-      instance_pool: "shared test pool"
-
 workspace:
   host: https://e2-dogfood.staging.cloud.databricks.com
+
+permissions:
+  - level: CAN_VIEW
+    group_name: users
 
 resources:
   jobs:
@@ -22,6 +21,7 @@ resources:
         - task_key: run_leaf2
           depends_on:
             - task_key: run_leaf1
+
           run_job_task:
             job_id: ${resources.jobs.leaf2.id}
 
@@ -29,59 +29,51 @@ resources:
         - name: input
           default: test_propagation
 
+
     leaf1:
       name: leaf job 1
 
-      job_clusters:
-        - job_cluster_key: job_cluster
-          new_cluster:
-            instance_pool_id: ${var.instance_pool_id}
-            num_workers: 0
-            spark_version: 14.3.x-scala2.12
-            spark_conf:
-              "spark.master": "local[*, 4]"
-              "spark.databricks.cluster.profile": "singleNode"
-            custom_tags:
-              ResourceClass: SingleNode
-
       tasks:
         - task_key: leaf
+          environment_key: default
           spark_python_task:
             python_file: ./argv.py
             parameters:
+              - "leaf1"
               - "{{ job.parameters.[input] }}"
-          job_cluster_key: job_cluster
-
       parameters:
-        - name: input
+        - # This parameter is passed by the primary job.
+          name: input
           default: ""
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
+
 
     leaf2:
       name: leaf job 2
 
-      job_clusters:
-        - job_cluster_key: job_cluster
-          new_cluster:
-            instance_pool_id: ${var.instance_pool_id}
-            num_workers: 0
-            spark_version: 14.3.x-scala2.12
-            spark_conf:
-              "spark.master": "local[*, 4]"
-              "spark.databricks.cluster.profile": "singleNode"
-            custom_tags:
-              ResourceClass: SingleNode
-
       tasks:
         - task_key: leaf
+          environment_key: default
           spark_python_task:
             python_file: ./argv.py
             parameters:
+              - "leaf2"
               - "{{ job.parameters.[input] }}"
-          job_cluster_key: job_cluster
 
       parameters:
-        - name: input
+        - # This parameter is passed by the primary job.
+          name: input
           default: ""
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
+
 
 targets:
   dev:

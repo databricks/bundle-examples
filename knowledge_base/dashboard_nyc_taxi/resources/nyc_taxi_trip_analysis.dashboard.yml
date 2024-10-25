@@ -5,8 +5,9 @@ resources:
       file_path: ../src/nyc_taxi_trip_analysis.lvdash.json
       warehouse_id: ${var.warehouse_id}
 
-      # If "embed_credentials" is set to true, then all viewers of the dashboard
-      # will use the credentials of the bundle deployment identity to run queries.
+      # If "embed_credentials" is set to true, the bundle deployment identity's credentials
+      # are used to execute queries for all dashboard viewers.
+      # If it is set to false, each viewer's own credentials will be used instead.
       #
       # It defaults to false.
       #

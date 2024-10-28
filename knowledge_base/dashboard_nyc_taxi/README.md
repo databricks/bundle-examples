@@ -21,3 +21,30 @@ Run `databricks bundle deploy` to deploy the dashboard.
 Run `databricks bundle open` to open the deployed dashboard in your browser.
 
 Alternatively, run `databricks bundle summary` to display its URL.
+
+### Visual modification
+
+Dashboards are inherently visual, so you may want to use the web interface to modify the dashboard.
+Any modifications that are done through the web interface won't automatically be reflected in the `.lvdash.json` file.
+You can, however, run a dedicated bundle command to retrieve these changes and update your `.lvdash.json` file.
+
+To retrieve the updated `.lvdash.json` file, run:
+
+```sh
+databricks bundle generate dashboard --resource nyc_taxi_trip_analysis --force
+```
+
+To continuously poll and retrieve the updated `.lvdash.json` file when it changes, run:
+
+```sh
+databricks bundle generate dashboard --resource nyc_taxi_trip_analysis --force --watch
+```
+
+Any remote modifications of a dashboard are noticed by the `deploy` command and require
+you to explicitly acknowledge that remote changes are overwritten by local changes.
+It is therefore recommended to run the `generate` command before running the `deploy` command.
+Otherwise, you may lose your remote changes.
+
+### Manual modification
+
+You can modify the `.lvdash.json` file directly and redeploy to observe your changes.

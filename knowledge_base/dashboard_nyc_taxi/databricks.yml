@@ -12,7 +12,7 @@ variables:
       warehouse: "Shared Unity Catalog Severless"
 
 workspace:
-  host: https://myworkspace.databricks.com
+  host: https://e2-dogfood.staging.cloud.databricks.com
 
 targets:
   dev:

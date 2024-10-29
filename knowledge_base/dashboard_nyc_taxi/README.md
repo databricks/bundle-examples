@@ -22,9 +22,7 @@ Run `databricks bundle open` to navigate to the deployed dashboard in your brows
 
 ### Visual modification
 
-Dashboards are inherently visual, so you may want to use the web interface to modify the dashboard.
-Any modifications that are done through the web interface won't automatically be reflected in the `.lvdash.json` file.
-You can, however, run a dedicated bundle command to retrieve these changes and update your `.lvdash.json` file.
+You can use the Databricks UI to modify the dashboard, but any modifications made through the UI will not be applied to the bundle `.lvdash.json` file unless you explicitly update it. 
 
 To retrieve the updated `.lvdash.json` file, run:
 

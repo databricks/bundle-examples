@@ -14,7 +14,7 @@ For more information about AI/BI dashboards, please refer to the [documentation]
 
 Modify `databricks.yml`:
 * Update the `host` field under `workspace` to the Databricks workspace to deploy to.
-* Update the `warehouse` field under the `warehouse_id` variable to match the SQL warehouse you wish to use.
+* Update the `warehouse` field under `warehouse_id` to the name of the SQL warehouse to use.
 
 Run `databricks bundle deploy` to deploy the dashboard.
 

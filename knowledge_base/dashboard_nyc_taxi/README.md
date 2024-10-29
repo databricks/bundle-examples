@@ -1,6 +1,6 @@
 # Dashboard for NYC Taxi Trip Analysis
 
-This example demonstrates how to model an AI/BI dashboard in a Databricks Asset Bundle.
+This example demonstrates how to define an AI/BI dashboard in a Databricks Asset Bundle.
 
 It includes and deploys the sample __NYC Taxi Trip Analysis__ dashboard to a Databricks workspace.
 

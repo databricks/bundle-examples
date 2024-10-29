@@ -18,9 +18,7 @@ Modify `databricks.yml`:
 
 Run `databricks bundle deploy` to deploy the dashboard.
 
-Run `databricks bundle open` to open the deployed dashboard in your browser.
-
-Alternatively, run `databricks bundle summary` to display its URL.
+Run `databricks bundle open` to navigate to the deployed dashboard in your browser. Alternatively, run `databricks bundle summary` to display its URL.
 
 ### Visual modification
 

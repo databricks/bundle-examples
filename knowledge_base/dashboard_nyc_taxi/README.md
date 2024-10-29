@@ -24,7 +24,7 @@ Run `databricks bundle open` to navigate to the deployed dashboard in your brows
 
 You can use the Databricks UI to modify the dashboard, but any modifications made through the UI will not be applied to the bundle `.lvdash.json` file unless you explicitly update it. 
 
-To retrieve the updated `.lvdash.json` file, run:
+To update the local bundle `.lvdash.json` file, run:
 
 ```sh
 databricks bundle generate dashboard --resource nyc_taxi_trip_analysis --force

@@ -37,7 +37,7 @@ databricks bundle generate dashboard --resource nyc_taxi_trip_analysis --force -
 ```
 
 Any remote modifications of a dashboard are noticed by the `deploy` command and require
-you to explicitly acknowledge that remote changes are overwritten by local changes.
+you to acknowledge that remote changes can be overwritten by local changes.
 It is therefore recommended to run the `generate` command before running the `deploy` command.
 Otherwise, you may lose your remote changes.
 

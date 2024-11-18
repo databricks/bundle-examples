@@ -42,5 +42,5 @@
             "order": 4
         }
     },
-    "success_message": "\n\nYour new project has been created in the '{{.project_name}}' directory!\n\nTo add an example asset to your project, use\n\n $ cd ${{.project_name}}\n  $ databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/data-engineering/assets/etl-pipeline\n\nRefer to the README.md file for full \"getting started\" instructions!"
+    "success_message": "\n\nYour new project has been created in the '{{.project_name}}' directory!\n\nTo add an example asset to your project, use\n\n $ cd ${{.project_name}}\n  $ databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/data-engineering/assets/etl-pipeline --branch data-engineering\n\nRefer to the README.md file for full \"getting started\" instructions!"
 }

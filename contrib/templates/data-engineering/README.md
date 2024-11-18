@@ -6,5 +6,5 @@ assets in DABs.
 Install it using
 
 ```
-databricks bundle init https://github.com/databricks/bundle-examples/tree/main/contrib/templates/data-engineering/base
+databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/data-engineering/base
 ```

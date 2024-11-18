@@ -38,6 +38,13 @@ By default, the data-engineering template does not include any assets.
    $ uv run add-asset
    ```
 
+   or, if you don't use UV, use
+   
+   ```
+   $ export TYPE=etl-pipeline
+   $ databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/data-engineering/assets/$TYPE
+   ```
+
 2. Optionally, run all tests on serverless compute after adding an asset:
    ```
    $ uv run test

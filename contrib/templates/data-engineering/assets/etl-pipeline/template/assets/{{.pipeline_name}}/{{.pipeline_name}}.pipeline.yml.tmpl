@@ -5,11 +5,11 @@ resources:
       serverless: true
       {{- if or (eq default_catalog "") (eq default_catalog "hive_metastore")}}
       ## Specify the 'catalog' field to configure this pipeline to make use of Unity Catalog:
-      # catalog: catalog_name
+      # catalog: ${var.catalog}
       {{- else}}
-      catalog: {{default_catalog}}
+      catalog: ${var.catalog}
       {{- end}}
-      target: {{.pipeline_name}}_${bundle.environment}
+      target: ${var.schema}
       libraries:
         - file:
             path: sources/${bundle.target}/*.py

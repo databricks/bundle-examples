@@ -1,4 +1,5 @@
-# conftest.py is used to configure pytest
+# conftest.py is used to configure pytest.
+# This file is in the root since it affects all tests through this bundle.
 import os
 import sys
 import dlt
@@ -9,7 +10,7 @@ from pyspark.sql import SparkSession
 from databricks.connect import DatabricksSession
 
 # Dynamically find and add all `assets/*` directories to `sys.path`
-for path in pathlib.Path("assets").glob("*"):
+for path in pathlib.Path(pathlib.Path(__file__).parent / "assets").glob("*"):
     resolved_path = str(path.resolve())
     if resolved_path not in sys.path:
         sys.path.append(resolved_path)

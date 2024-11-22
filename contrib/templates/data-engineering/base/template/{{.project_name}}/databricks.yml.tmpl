@@ -12,6 +12,8 @@ variables:
     description: The catalog to use
   schema:
     description: The schema to use
+  notifications:
+    description: The email addresses to use for failure notifications
 
 {{- $dev_schema := .shared_schema }}
 {{- $prod_schema := .shared_schema }}
@@ -33,7 +35,7 @@ targets:
     variables:
       catalog: {{.default_catalog}}
       schema: {{$dev_schema}}
-
+      notifications: []
   prod:
     mode: production
     workspace:
@@ -48,3 +50,4 @@ targets:
     variables:
       catalog: {{.default_catalog}}
       schema: {{$prod_schema}}
+      notifications: [{{user_name}}]

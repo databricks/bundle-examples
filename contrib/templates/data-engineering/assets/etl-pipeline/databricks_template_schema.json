@@ -28,7 +28,7 @@
             },
             "default": "ignored",
             "type": "string",
-            "description": "{{fail Only Python files are supported in this template at this time.}}",
+            "description": "{{fail \"Only Python files are supported in this template at this time.\"}}",
             "order": 3
         },
         "include_job": {

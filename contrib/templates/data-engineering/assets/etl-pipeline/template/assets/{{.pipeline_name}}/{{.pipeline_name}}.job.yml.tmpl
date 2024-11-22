@@ -13,8 +13,7 @@ resources:
       {{- if not is_service_principal}}
 
       email_notifications:
-        on_failure:
-          - {{user_name}}
+        on_failure: ${var.notifications}
 
       {{- end}}
 

@@ -6,5 +6,8 @@ assets in DABs.
 Install it using
 
 ```
-databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/data-engineering/base --branch data-engineering
+databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/data-engineering --branch data-engineering
 ```
+
+Note that by default this template doesn't come with any assets such as jobs or pipelines.
+Follow the instructions in the template setup and README to add them.

@@ -17,6 +17,11 @@ test = "scripts.test:main"
 
 [tool.uv]
 package = true
+override-dependencies = [
+    # work around conflict with older databricks-dlt libraries
+    # pyspark is already installed by databricks-connect
+    "pyspark; sys_platform == 'never'",
+]
 
 [tool.setuptools.packages.find]
 include = ["scripts"]

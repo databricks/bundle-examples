@@ -1,8 +1,8 @@
 # Contrib/Templates directory
 
-This directory community-contributed templates.
+This directory contains community-contributed templates.
 
-See https://github.com/databricks/bundle-examples/blob/main/contrib/README.md for
+See https://github.com/databricks/bundle-examples/blob/main/contrib/README.md to learn more
 about community contributions.
 
 Looking to contribute? See https://github.com/databricks/cli/tree/main/libs/template/templates

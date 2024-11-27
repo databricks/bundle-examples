@@ -19,7 +19,7 @@ resources:
           #
           # This value is automatically rewritten to the fully qualified remote path.
           libraries:
-            - whl: ../dist/example_private_wheel-0.1.0-py3-none-any.whl
+            - whl: ../dist/cowsay-6.1-*.whl
 
       job_clusters:
         - job_cluster_key: default

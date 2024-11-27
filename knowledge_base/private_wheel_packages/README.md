@@ -9,18 +9,18 @@ This example demonstrates how to use a private wheel package from a job in a Dat
 
 # Usage
 
-Typically, private wheels are hosted in a private repository and are not built inline.
-To emulate this, we will build a local copy of an example wheel that does not exist on PyPI and copy it to the `dist` directory.
+Databricks does not natively support referring to wheels hosted on a private repository.
 
-## Building the example wheel
+We can work around this by downloading the wheel and including it in the Databricks Asset Bundle.
 
-First, build a local copy of `example_private_wheel` and copy the resulting wheel file to the local `dist` directory.
+To emulate this for this example, we will download a wheel from PyPI, include it in deployment, and refer to it from job configuration.
+
+## Downloading a wheel
+
+First, download the wheel to the `dist` directory:
 
 ```shell
-cd example_private_wheel
-python3 -m build
-cd ..
-cp example_private_wheel/dist/example_private_wheel-0.1.0-py3-none-any.whl dist/
+pip download -d dist cowsay==6.1
 ```
 
 ## Deploying the example
@@ -36,6 +36,15 @@ Example output:
 $ databricks bundle run
 Run URL: https://...
 
-2024-11-22 16:18:50 "[dev pieter_noordhuis] Example to demonstrate using a private wheel package on serverless" TERMINATED SUCCESS
-Hello from example-private-wheel!
+2024-11-27 13:23:01 "[dev pieter_noordhuis] Example to demonstrate using a private wheel package on serverless" TERMINATED SUCCESS
+  _____________
+| Hello, world! |
+  =============
+             \
+              \
+                ^__^
+                (oo)\_______
+                (__)\       )\/\
+                    ||----w |
+                    ||     ||
 ```

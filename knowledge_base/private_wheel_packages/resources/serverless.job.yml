@@ -24,4 +24,4 @@ resources:
               # or a Unity Catalog Volume.
               #
               # This value is automatically rewritten to the fully qualified remote path.
-              - ../dist/example_private_wheel-0.1.0-py3-none-any.whl
+              - ../dist/cowsay-6.1-*.whl

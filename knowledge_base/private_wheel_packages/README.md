@@ -2,6 +2,11 @@
 
 This example demonstrates how to use a private wheel package from a job in a Databricks Asset Bundle.
 
+If you are using notebooks, you can use the approach documented in [Notebook-scoped Python libraries][doc] to install
+wheels from a private repository in a notebook. You can use the workaround documented here if you are not using notebooks.
+
+[doc]: https://docs.databricks.com/en/libraries/notebooks-python-libraries.html#install-a-private-package-with-credentials-managed-by-databricks-secrets-with-pip
+
 ## Prerequisites
 
 * Databricks CLI v0.235.0 or above
@@ -9,9 +14,8 @@ This example demonstrates how to use a private wheel package from a job in a Dat
 
 # Usage
 
-Databricks does not natively support referring to wheels hosted on a private repository.
-
-We can work around this by downloading the wheel and including it in the Databricks Asset Bundle.
+You can refer to private wheel files from job libraries or serverless environments by downloading the wheel
+and making it part of your Databricks Asset Bundle deployment.
 
 To emulate this for this example, we will download a wheel from PyPI, include it in deployment, and refer to it from job configuration.
 

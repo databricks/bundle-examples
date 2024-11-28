@@ -1,5 +1,7 @@
 # conftest.py is used to configure pytest.
 # This file is in the root since it affects all tests through this bundle.
+# It makes sure all 'assets/*' directories are added to `sys.path` so that
+# tests can import them.
 import os
 import sys
 import dlt
@@ -15,7 +17,8 @@ for path in pathlib.Path(pathlib.Path(__file__).parent / "assets").glob("*"):
     if resolved_path not in sys.path:
         sys.path.append(resolved_path)
 
-# Work around issues in older databricks-connect
+# For older databricks-connect, work around issues importing SparkSession
+# and errors when SPARK_REMOTE is set.
 SparkSession.builder = DatabricksSession.builder
 os.environ.pop("SPARK_REMOTE", None)
 

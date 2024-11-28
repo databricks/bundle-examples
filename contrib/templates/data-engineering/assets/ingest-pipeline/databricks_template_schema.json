@@ -3,7 +3,7 @@
     "properties": {
         "pipeline_name": {
             "type": "string",
-            "description": "\n{{fail \"The ingest-pipeline is not yet implemented.\"}}",
+            "description": "\n{{fail \"The ingest-pipeline template is not yet implemented.\"}}",
             "order": 3
         }
     }

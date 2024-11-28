@@ -6,8 +6,6 @@ requires-python = "==3.10.*"
 dependencies = [
     "databricks-dlt",
     "pytest",
-    "setuptools",
-    "wheel",
     "databricks-connect==15.1.*",
 ]
 

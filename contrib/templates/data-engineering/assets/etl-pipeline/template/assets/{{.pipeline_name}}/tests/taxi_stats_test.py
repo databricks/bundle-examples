@@ -1,5 +1,5 @@
-from sources.dev.taxis import taxis
-from transformations import taxi_stats
+from ..sources.dev.taxis import taxis
+from ..transformations import taxi_stats
 
 
 def test_taxi_stats():

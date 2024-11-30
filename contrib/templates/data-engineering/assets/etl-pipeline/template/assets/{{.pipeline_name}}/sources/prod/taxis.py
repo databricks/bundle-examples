@@ -1,8 +1,8 @@
 import dlt
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame
+from databricks.sdk.runtime import spark
 
 
 @dlt.view
 def taxis() -> DataFrame:
-    spark = SparkSession.builder.getOrCreate()
     return spark.sql("SELECT * FROM samples.nyctaxi.trips")

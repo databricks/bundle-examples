@@ -18,8 +18,8 @@
    "outputs": [],
    "source": [
     "import sys\n",
-    "sys.path.append('../transformations')\n",
-    "from transformations import taxi_stats\n",
+    "sys.path.append('..')\n",
+    "from {{.pipeline_name}}.transformations import taxi_stats\n",
     "\n",
     "\n",
     "spark = SparkSession.builder.getOrCreate()\n",

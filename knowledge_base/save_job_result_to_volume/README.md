@@ -5,7 +5,7 @@ This example demonstrates how to define and use a Unity Catalog Volume in a Data
 Specifically we'll define a `top_ten_trips` job which computes the top ten NYC trips with the highest
 fares and stores the result in a Unity Catalog Volume.
 
-The bundle also defines a Volume and the associated schema to which we'll store the results to.
+The bundle also defines a Volume and the associated Schema in which we store the results.
 
 ## Prerequisites
 

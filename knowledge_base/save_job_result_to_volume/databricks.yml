@@ -1,7 +1,7 @@
 # This is a Databricks asset bundle definition for my_project.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: nyc_top_trips_project
+  name: save_job_result_to_volume
 
 include:
   - resources/*.yml

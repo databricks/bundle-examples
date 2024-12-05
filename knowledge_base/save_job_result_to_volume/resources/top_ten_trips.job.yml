@@ -10,7 +10,7 @@ resources:
           unit: DAYS
 
       # No job cluster is configured. The job will run on serverless compute. 
-      # You can explictly configure job compute here if your workspace does
+      # You can explicitly configure job compute here if your workspace does
       # not have serverless compute enabled.
       tasks:
         - task_key: top_ten_trips_task

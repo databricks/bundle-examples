@@ -1,0 +1,26 @@
+resources:
+  jobs:
+    top_ten_trips:
+      name: top_ten_trips
+
+      trigger:
+        # Run this job every day to update all time the top ten trips report.
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      # No job cluster is configured. The job will run on serverless compute. 
+      # You can explictly configure job compute here if your workspace does
+      # not have serverless compute enabled.
+      tasks:
+        - task_key: top_ten_trips_task
+          notebook_task:
+            notebook_path: ../src/query.ipynb
+
+      parameters: 
+        - name: schema_name
+          default: ${resources.schemas.trips.name}
+      
+
+        
+      

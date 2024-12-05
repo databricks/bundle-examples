@@ -1,0 +1,14 @@
+# This is a Databricks asset bundle definition for my_project.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: nyc_top_trips_project
+
+include:
+  - resources/*.yml
+
+workspace:
+  host: https://e2-dogfood.staging.cloud.databricks.com
+
+targets:
+  dev:
+    default: true

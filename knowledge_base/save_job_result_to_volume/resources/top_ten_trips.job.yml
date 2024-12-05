@@ -4,8 +4,8 @@ resources:
       name: top_ten_trips
 
       trigger:
-        # Run this job every day to update all time the top ten trips report.
-        periodic:
+        # Run this job every day to update all time the top ten trips recorded top
+        # 10 trips in the UC Volume.
           interval: 1
           unit: DAYS
 

@@ -2,10 +2,10 @@
 
 This example demonstrates how to define and use a Unity Catalog Volume in a Databricks Asset Bundle.
 
-Specifically we'll define a `top_ten_trips` job which computes the top ten NYC trips with the highest
-fares and stores the result in a Unity Catalog Volume.
+Specifically we'll define a `hello_world_job` job which writes "Hello, World!"
+to a file in a Unity Catalog Volume.
 
-The bundle also defines a Volume and the associated Schema in which we store the results.
+The bundle also defines a Volume and the associated Schema in which the Job writes text to.
 
 ## Prerequisites
 
@@ -17,4 +17,4 @@ Update the `host` field under `workspace` in `databricks.yml` to the Databricks 
 
 Run `databricks bundle deploy` to deploy the job.
 
-Run `databricks bundle run top_ten_trips` to run the job and store the results in UC volume.
+Run `databricks bundle run hello_world_job` to run the job and store the results in UC volume.

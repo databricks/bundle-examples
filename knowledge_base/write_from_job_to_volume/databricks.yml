@@ -1,5 +1,5 @@
 bundle:
-  name: save_job_result_to_volume
+  name: write_from_job_to_volume
 
 include:
   - resources/*.yml

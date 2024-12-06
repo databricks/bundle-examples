@@ -1,5 +1,0 @@
-resources: 
-  schemas: 
-    trips:
-      catalog_name: main
-      name: ${workspace.current_user.short_name}_trips

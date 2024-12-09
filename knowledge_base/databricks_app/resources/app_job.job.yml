@@ -1,0 +1,16 @@
+resources:
+  jobs:
+    app_job:
+      name: Serverless job
+      tasks:
+        - task_key: task
+          spark_python_task:
+            python_file: ../src/job/main.py
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
+            dependencies:
+              - cowsay

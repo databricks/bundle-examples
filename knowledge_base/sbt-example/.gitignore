@@ -1,0 +1,4 @@
+/.bsp/
+target/
+.databricks
+.vscode

@@ -16,7 +16,11 @@ targets:
     # - Deployed resources get prefixed with '[dev my_user_name]'
     # - Any job schedules and triggers are paused by default.
     # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+<<<<<<< Updated upstream
     #Hello
+=======
+    #HelloDB
+>>>>>>> Stashed changes
     mode: development
     workspace:
       host: https://company.databricks.com

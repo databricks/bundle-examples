@@ -24,6 +24,36 @@ Example
                         
 sh dashboard_deploy.sh 01efbbade84416dc984927ca794fd768 'Shared Endpoint' '{"samples": "shared", "nyctaxi": "ru_nyctaxi"}' test_group client_dashboard
 ```
+Output
 
+Clean up the temporary files if any
+********************************************
+============================================
+Running script with the provided arguments...
+Get the Dev Dashboard metadata json
+********************************************
+============================================
+modify Query in Dashboard metadata json of catalog and schema names of target workspace
+Namespace(file_path='dev_dashboard.json', replacements='{"samples": "shared", "nyctaxi": "ru_nyctaxi"}', target_file='./src/dashboard.json')
+{"samples": "shared", "nyctaxi": "ru_nyctaxi"}
+********************************************
+============================================
+Validate DAB bundle dashboard to the target workspace
+Name: client_dashboard
+Target: target
+Workspace:
+User: rushabh.mehta@databricks.com
+Path: /Workspace/Users/rushabh.mehta@databricks.com/.bundle/client_dashboard/target
 
+Validation OK!
+********************************************
+============================================
+Deploy the modified dashboard to the target workspace
+Uploading bundle files to /Workspace/Users/rushabh.mehta@databricks.com/.bundle/client_dashboard/target/files...
+Deploying resources...
+Updating deployment state...
+Deployment complete!
+********************************************
+============================================
+Optional-Clean up the temporary files
 

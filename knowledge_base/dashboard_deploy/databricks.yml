@@ -1,0 +1,28 @@
+bundle:
+  name: ${var.dashboard_name}
+
+include:
+  - resources/*.yml
+
+variables:
+  # The "warehouse_id" variable is used to reference the warehouse used by the dashboard.
+  warehouse_id:
+    lookup:
+      # Replace this with the name of your SQL warehouse.
+      warehouse: ${var.warehouse_name}
+  dev_workspace:
+    default: "host"
+  target_workspace:
+    default: "target_workspace"
+  dashboard_name:
+    default: "def"
+  access_group:
+    default: "def group"
+  warehouse_name:
+    default: "warehouse"
+
+
+targets:
+  target:
+    default: true
+

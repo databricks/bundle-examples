@@ -20,12 +20,9 @@ def parse_json_file(file_path, replacements, target_file_path):
 
     dashboard_json = json.loads(data['serialized_dashboard'])
     modified_data = query_in_datasets(dashboard_json, replacements)
-    #target_file_path ="./src/dashboard.json"
+
     with open(target_file_path, 'w') as file:
         json.dump(modified_data, file, indent=4)
-
-# Example usage
-#replacements = '{\"rushabh_mehta_catalog\": \"rushabh_mehta_catalog_new\", \"ru_nyctaxi\": \"ru_nyctaxi_new\"}'
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Parse JSON file')

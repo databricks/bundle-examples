@@ -18,12 +18,12 @@ resources:
           - --debug
         env:
           - name: JOB_ID
-            valueFrom: "app-job"
+            value: ${resources.jobs.hello_world.id}
 
       # The resources which this app have an access to.
       resources:
         - name: "app-job"
           description: "A job for app to be able to work with"
           job:
-            id: ${resources.jobs.app_job.id}
+            id: ${resources.jobs.hello_world.id}
             permission: "CAN_MANAGE_RUN"

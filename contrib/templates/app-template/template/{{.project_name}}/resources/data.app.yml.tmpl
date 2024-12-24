@@ -14,10 +14,10 @@ resources:
           - name: STREAMLIT_BROWSER_GATHER_USAGE_STATS
             value: "false"
     
-    resources:
-      - name: "sql-warehouse"
-        description: "A SQL warehouse for app to be able to work with"
-        sql_warehouse:
-          id: "{{.sql_warehouse_id}}"
-          permission: "CAN_USE"
+      resources:
+        - name: "sql-warehouse"
+          description: "A SQL warehouse for app to be able to work with"
+          sql_warehouse:
+            id: "{{.sql_warehouse_id}}"
+            permission: "CAN_USE"
 

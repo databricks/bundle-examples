@@ -1,17 +1,18 @@
 resources:
-  data_app:
-    name: "data-app"
-    source_code_path: ../app
-    config:
-      command:
-        - "streamlit"
-        - "run"
-        - "app.py"
-      env:
-        - name: "DATABRICKS_WAREHOUSE_ID"
-          value: "{{.sql_warehouse_id}}"
-        - name: STREAMLIT_BROWSER_GATHER_USAGE_STATS
-          value: "false"
+  apps:
+    data_app:
+      name: "data-app"
+      source_code_path: ../app
+      config:
+        command:
+          - "streamlit"
+          - "run"
+          - "app.py"
+        env:
+          - name: "DATABRICKS_WAREHOUSE_ID"
+            value: "{{.sql_warehouse_id}}"
+          - name: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+            value: "false"
     
     resources:
       - name: "sql-warehouse"

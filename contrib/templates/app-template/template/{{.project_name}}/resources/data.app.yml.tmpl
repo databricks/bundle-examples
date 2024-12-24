@@ -15,8 +15,8 @@ resources:
     
     resources:
       - name: "sql-warehouse"
-          description: "A SQL warehouse for app to be able to work with"
-          job:
-            id: "{{.sql_warehouse_id}}"
-            permission: "CAN_USE"
+        description: "A SQL warehouse for app to be able to work with"
+        sql_warehouse:
+          id: "{{.sql_warehouse_id}}"
+          permission: "CAN_USE"
 

@@ -1,0 +1,8 @@
+[format]
+exclude = [
+    # Databricks notebooks with % magic commands don't parse as valid Python.
+    "mlops_stacks/mlops_stacks/deployment/batch_inference/notebooks/BatchInference.py",
+    "mlops_stacks/mlops_stacks/deployment/model_deployment/notebooks/ModelDeployment.py",
+    "mlops_stacks/mlops_stacks/training/notebooks/Train.py",
+    "mlops_stacks/mlops_stacks/validation/notebooks/ModelValidation.py",
+]

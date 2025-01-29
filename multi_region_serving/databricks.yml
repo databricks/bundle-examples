@@ -1,0 +1,26 @@
+# This is a Databricks asset bundle definition for manage_serving.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: manage_serving
+
+include:
+  - resources/*.yml
+
+targets:
+  main:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://e2-dogfood.staging.cloud.databricks.com
+
+  remote1:
+    # The remote workspace that serves the model
+    mode: development
+    workspace:
+      host: https://e2-dogfood-feature-store.staging.cloud.databricks.com
+
+    

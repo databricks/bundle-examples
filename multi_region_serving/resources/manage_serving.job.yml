@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    manage_serving_job:
+      name: manage_serving_job
+      email_notifications:
+        on_failure:
+          - mingyang.ge@databricks.com
+      tasks:
+        - task_key: notebook_task
+          notebook_task:
+            notebook_path: ../src/manage_endpoint.ipynb
+      parameters: 
+        - name: endpoint_name
+          default: my-share-endpoint
+        - name: model_name
+          default: mingyang_share.sharing_bugbash_a7ce.fs_model
+        - name: model_version
+          default: "2"

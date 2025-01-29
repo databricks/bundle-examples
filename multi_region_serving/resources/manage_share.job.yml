@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    manage_share_job:
+      name: manage_share_job
+      email_notifications:
+        on_failure:
+          - mingyang.ge@databricks.com
+      tasks:
+        - task_key: notebook_task
+          notebook_task:
+            notebook_path: ../src/manage_share.ipynb
+      parameters: 
+        - name: model_name
+          default: 'feature_store.sharing_bugbash_a7ce.fs_model'
+        - name: max_number_of_versions_to_sync
+          default: '10'
+        - name: share_name
+          default: 'mingyang-test-share'

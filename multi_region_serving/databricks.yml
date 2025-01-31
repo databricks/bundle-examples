@@ -3,6 +3,20 @@
 bundle:
   name: manage_serving
 
+variables:
+  notification_email:
+    description: Experiment name for the model training.
+  model_name:
+    description: Model name for the model training.
+  remote_model_name:
+    description: The model name in receipient workspace. This might be similar with the origional model name with a new catalog name in the receipient workspace.
+  model_version:
+    description: Model name for the model training.
+  endpoint_name:
+    description: Name of the endpoint to deploy.
+  share_name:
+    description: Name of the share.
+
 include:
   - resources/*.yml
 
@@ -15,12 +29,12 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://e2-dogfood.staging.cloud.databricks.com
+      host: https://myworkspace.databricks.com
 
   remote1:
     # The remote workspace that serves the model
     mode: development
     workspace:
-      host: https://e2-dogfood-feature-store.staging.cloud.databricks.com
+      host: https://myworkspace-remote.databricks.com
 
     

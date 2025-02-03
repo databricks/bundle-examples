@@ -192,3 +192,4 @@ if updates:
     workspace.shares.update(name=share_name, updates=updates)
 else:
     print("The share is already up-to-date.")
+

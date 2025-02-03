@@ -77,3 +77,4 @@ elif (
     print(f"Updated endpoint {endpoint_name}")
 else:
     print("Endpoint already up-to-date")
+

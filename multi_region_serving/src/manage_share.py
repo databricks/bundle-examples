@@ -7,7 +7,7 @@
 # MAGIC Prerequisit:
 # MAGIC
 # MAGIC * Create a share in [delta-sharing](https://docs.databricks.com/en/delta-sharing/create-share.html).
-# MAGIC * Config the default parameters in resources/manage_share.job.yml 
+# MAGIC * Config the default parameters in resources/manage_share.job.yml
 
 # COMMAND ----------
 
@@ -49,6 +49,7 @@ print(f"Max number of versions to sync: {max_number_of_versions_to_sync}")
 
 # COMMAND ----------
 
+
 def getLatestVersions(model_name: str, max_number_of_versions: int):
     versions = workspace.model_versions.list(
         full_name=model_name,
@@ -71,6 +72,7 @@ def getDependencies(model_versions):
             elif dependency.function is not None:
                 functions.add(dependency.function.function_full_name)
     return tables, functions
+
 
 # COMMAND ----------
 
@@ -130,6 +132,7 @@ if "objects" in shareInfo:
 
 # COMMAND ----------
 
+
 def getSchema(full_name):
     name_sections = full_name.split(".")
     return f"{name_sections[0]}.{name_sections[1]}"
@@ -138,6 +141,7 @@ def getSchema(full_name):
 def getObjectsToAdd(dependencies, sharedObjects, sharedSchemas):
     newDependencies = dependencies - sharedObjects
     return list(filter(lambda x: getSchema(x) not in sharedSchemas, newDependencies))
+
 
 # COMMAND ----------
 
@@ -192,4 +196,3 @@ if updates:
     workspace.shares.update(name=share_name, updates=updates)
 else:
     print("The share is already up-to-date.")
-

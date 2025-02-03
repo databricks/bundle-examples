@@ -5,7 +5,7 @@
 # MAGIC Create or Update the deployed serving endpoints with a new model version.
 # MAGIC
 # MAGIC * Make sure you've created online tables for all the required feature tables.
-# MAGIC * Run this job on the workspace where you want to serve the model. 
+# MAGIC * Run this job on the workspace where you want to serve the model.
 
 # COMMAND ----------
 
@@ -77,4 +77,3 @@ elif (
     print(f"Updated endpoint {endpoint_name}")
 else:
     print("Endpoint already up-to-date")
-

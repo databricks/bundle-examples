@@ -1,0 +1,54 @@
+# This is a Databricks asset bundle definition for {{.project_name}}.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: {{.project_name}}
+
+workspace:
+  host: {{workspace_host}}
+  artifact_path: {{.jar_dest_path}}
+
+{{- $version := "0.1" }}
+
+artifacts:
+  default:
+    type: jar
+    build: sbt package && sbt assembly
+    path: .
+    files:
+      - source: ./target/scala-{{.scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
+
+resources:
+  jobs:
+    {{.project_name}}:
+      name: {{.project_name}}
+      tasks:
+        - task_key: main_task
+          {{- if .cluster_key }}
+          existing_cluster_id: {{.cluster_key}}
+          {{- else }}
+          job_cluster_key: {{.project_name}}_job_cluster
+          {{- end }}
+          spark_jar_task:
+            main_class_name: {{.main_class_name}}
+          libraries:
+            - jar: ./target/scala-{{.scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
+      {{- if not .cluster_key }}
+      job_clusters:
+        - job_cluster_key: {{.project_name}}_job_cluster
+          new_cluster:
+            spark_version: {{.dbr_version}}.x-scala{{.scala_version}}
+            node_type_id: i3.xlarge  # Default instance type (can be changed)
+            autoscale:
+              max_workers: 2
+              min_workers: 2
+            {{- if eq .cluster_type "Standard" }}
+            data_security_mode: USER_ISOLATION
+            {{- end }}
+      {{- end }}
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: {{workspace_host}}

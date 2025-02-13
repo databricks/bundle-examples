@@ -1,0 +1,72 @@
+{
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "default": "project_name",
+      "description": "Name of project (press enter to use default name)",
+      "order": 1
+    },
+    "jar_dest_path": {
+      "type": "string",
+      "description": "Destination path in Databricks where the JAR will be stored. TODO: instructions on creating /Volumes",
+      "default": "/Volumes/main/nija/dabs-scala/${workspace.current_user.short_name}",
+      "order": 3
+    },
+    "cluster_key": {
+      "type": "string",
+      "description": "Enter the cluster key for an existing cluster or leave empty to create a new cluster",
+      "default": "",
+      "order": 5
+    },
+    "cluster_type": {
+      "type": "string",
+      "enum": ["Standard", "Dedicated"],
+      "default": "Standard",
+      "description": "Select cluster type: Dedicated or Standard",
+      "order": 8
+    },
+    "jar_allowlisted": {
+      "skip_prompt_if": {
+        "properties": {
+          "cluster_type": {
+            "const": "Dedicated"
+          }
+        }
+      },
+      "type": "boolean",
+      "description": "If Standard, is the JAR allowlisted by the admin for your workspace? (If not, inform admin: https://docs.databricks.com/en/data-governance/unity-catalog/manage-privileges/allowlist.html, otherwise type true)",
+      "default": true,
+      "order": 9
+    },
+    "main_class_name": {
+      "type": "string",
+      "description": "Main class name including package (entry point of the JAR execution)",
+      "default": "at.nija.Main",
+      "order": 10
+    },
+    "dbr_version": {
+      "type": "string",
+      "description": "Databricks Runtime (DBR) version (e.g., 15.4)",
+      "default": "15.4",
+      "order": 11
+    },
+    "scala_version": {
+      "type": "string",
+      "description": "Scala version (e.g., 2.12). Run scala -version to find it. Note: Only support 2.12 and 2.13",
+      "default": "2.12",
+      "order": 12
+    },
+    "scala_maintenance_version": {
+      "type": "string",
+      "description": "Scala maintenance version (e.g., 12). Run scala -version to find it.",
+      "default": "18",
+      "order": 13
+    },
+    "organization": {
+      "type": "string",
+      "description": "Organization name",
+      "default": "at.nija",
+      "order": 14
+    }
+  }
+}

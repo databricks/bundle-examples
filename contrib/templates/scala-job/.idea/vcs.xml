@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="IssueNavigationConfiguration">
+    <option name="links">
+      <list>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="(?&lt;dbCompanionJiraLink&gt;)\b[A-Z]{2,10}\-\d{2,10}" />
+          <option name="linkRegexp" value="https://databricks.atlassian.net/browse/$0" />
+        </IssueNavigationLink>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="(?&lt;dbCompanionGoLink&gt;)\b(go\/[\w\.:@&amp;~\-\/]+)" />
+          <option name="linkRegexp" value="https://$0" />
+        </IssueNavigationLink>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="(?&lt;dbCompanionUniversePrLink&gt;)\bdatabricks(?&gt;-eng)?\/universe#(\d+)" />
+          <option name="linkRegexp" value="https://github.com/databricks-eng/universe/pull/$2" />
+        </IssueNavigationLink>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="(?&lt;dbCompanionRuntimePrLink&gt;)\bdatabricks(?&gt;-eng)?\/runtime#(\d+)" />
+          <option name="linkRegexp" value="https://github.com/databricks-eng/runtime/pull/$2" />
+        </IssueNavigationLink>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="(?&lt;dbCompanionKubeContextLink&gt;)\b(?:dev|staging|prod)-(?:aws|azure|gcp)-[\w-]+" />
+          <option name="linkRegexp" value="https://db-inspect.cloud.databricks.com/clusters/?query=%22$0%22" />
+        </IssueNavigationLink>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="(?&lt;dbCompanionFeatureFlagLink&gt;)(\bflag )([\w\.-]+)\b" />
+          <option name="linkRegexp" value="https://config-manager.cloud.databricks.com/?filter=$3&amp;topLevelView=Owned+by+Anyone" />
+        </IssueNavigationLink>
+      </list>
+    </option>
+  </component>
+</project>

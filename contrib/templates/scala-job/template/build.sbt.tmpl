@@ -1,0 +1,17 @@
+scalaVersion := "{{.scala_version}}.{{.scala_maintenance_version}}"
+
+name := "{{.project_name}}"
+organization := "{{.organization}}"
+version := "0.1"
+
+libraryDependencies += "com.databricks" % "databricks-connect" % "{{.dbr_version}}.+"
+
+assembly / assemblyOption ~= { _.withIncludeScala(false) }
+assembly / assemblyExcludedJars := {
+  val cp = (assembly / fullClasspath).value
+  cp filter { _.data.getName.matches("scala-.*") } // remove Scala libraries
+}
+
+assemblyMergeStrategy := {
+  case _ => MergeStrategy.preferProject
+}

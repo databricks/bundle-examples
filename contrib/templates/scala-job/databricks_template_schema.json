@@ -8,7 +8,7 @@
     },
     "artifacts_dest_path": {
       "type": "string",
-      "description": "Destination path in Databricks where the JAR and other artifacts will be stored (e.g.; /Volumes/main/{{short_name}}/scala_job_test) . Note: You must create a Volumes first",
+      "description": "Destination path in Databricks where the JAR and other artifacts will be stored (e.g.; /Volumes/main/{{short_name}}/scala_job_test). Note: You must create a Volumes first",
       "order": 2
     },
     "existing_cluster_id": {

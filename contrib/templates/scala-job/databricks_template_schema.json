@@ -6,9 +6,9 @@
       "description": "Name of project (press enter to use default name)",
       "order": 1
     },
-    "jar_dest_path": {
+    "artifacts_dest_path": {
       "type": "string",
-      "description": "Destination path in Databricks where the JAR will be stored. Note: You must create a Volumes first if you plan to store the JAR there.",
+      "description": "Destination path in Databricks where the JAR and other artifacts will be stored. Note: You must create a Volumes first",
       "order": 3
     },
     "cluster_key": {
@@ -21,37 +21,8 @@
       "type": "string",
       "enum": ["Standard", "Dedicated"],
       "default": "Standard",
-      "description": "Select cluster type: Dedicated or Standard",
+      "description": "Select cluster type: Dedicated or Standard. If Standard, is the JAR allowlisted by the admin for your workspace? (If not, inform admin: https://docs.databricks.com/en/data-governance/unity-catalog/manage-privileges/allowlist.html)",
       "order": 8
-    },
-    "jar_allowlisted": {
-      "skip_prompt_if": {
-        "properties": {
-          "cluster_type": {
-            "const": "Dedicated"
-          }
-        }
-      },
-      "type": "boolean",
-      "description": "If Standard, is the JAR allowlisted by the admin for your workspace? (If not, inform admin: https://docs.databricks.com/en/data-governance/unity-catalog/manage-privileges/allowlist.html, otherwise type true)",
-      "default": true,
-      "order": 9
-    },
-    "main_class_name": {
-      "type": "string",
-      "description": "Main class name including package (entry point of the JAR execution)",
-      "order": 10
-    },
-    "scala_version": {
-      "type": "string",
-      "description": "Scala version (e.g., 2.12). Run scala -version to find it. Note: Only support 2.12 and 2.13",
-      "default": "2.12",
-      "order": 12
-    },
-    "scala_maintenance_version": {
-      "type": "string",
-      "description": "Scala maintenance version. Run scala -version to find it.",
-      "order": 13
     }
   }
 }

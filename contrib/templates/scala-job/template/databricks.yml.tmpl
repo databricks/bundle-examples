@@ -5,10 +5,11 @@ bundle:
 
 workspace:
   host: {{workspace_host}}
-  artifact_path: {{.jar_dest_path}}
+  artifact_path: {{.artifacts_dest_path}}
 
 {{- $version := "0.1" }}
 {{- $dbr_version := "16.1" }}
+{{- $scala_version := "2.13" }}
 
 artifacts:
   default:
@@ -16,7 +17,7 @@ artifacts:
     build: sbt package && sbt assembly
     path: .
     files:
-      - source: ./target/scala-{{.scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
+      - source: ./target/scala-{{$scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
 
 resources:
   jobs:
@@ -32,12 +33,12 @@ resources:
           spark_jar_task:
             main_class_name: {{.main_class_name}}
           libraries:
-            - jar: ./target/scala-{{.scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
+            - jar: ./target/scala-{{$scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
       {{- if not .cluster_key }}
       job_clusters:
         - job_cluster_key: {{.project_name}}_job_cluster
           new_cluster:
-            spark_version: {{$dbr_version}}.x-scala{{.scala_version}}
+            spark_version: {{$dbr_version}}.x-scala{{$scala_version}}
             node_type_id: i3.xlarge  # Default instance type (can be changed)
             autoscale:
               max_workers: 2

@@ -1,8 +1,8 @@
-scalaVersion := "2.12.20"
+scalaVersion := "{{template `scala_version` .}}"
 
 name := "{{.project_name}}"
 organization := "com.examples"
-version := "0.1"
+version := "{{template `version` .}}"
 
 libraryDependencies += "com.databricks" % "databricks-connect" % "16.1.+"
 

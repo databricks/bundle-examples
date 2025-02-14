@@ -7,19 +7,13 @@ workspace:
   host: {{workspace_host}}
   artifact_path: {{.artifacts_dest_path}}
 
-# TODO: this needs to be reused across multiple files, not just in here
-{{- $version := "0.1" }}
-{{- $dbr_version := "16.1" }}
-{{- $scala_version := "2.12" }}
-{{- $main_class_name := "com.examples.Main" }}
-
 artifacts:
   default:
     type: jar
     build: sbt package && sbt assembly
     path: .
     files:
-      - source: ./target/scala-{{$scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
+      - source: {{template `jar_path` .}}
 
 resources:
   jobs:
@@ -33,14 +27,14 @@ resources:
           job_cluster_key: {{.project_name}}_job_cluster
           {{- end }}
           spark_jar_task:
-            main_class_name: {{$main_class_name}}
+            main_class_name: {{template `main_class_name` .}}
           libraries:
-            - jar: ./target/scala-{{$scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
+            - jar: {{template `jar_path` .}}
       {{- if not .existing_cluster_id }}
       job_clusters:
         - job_cluster_key: {{.project_name}}_job_cluster
           new_cluster:
-            spark_version: {{$dbr_version}}.x-scala{{$scala_version}}
+            spark_version: {{template `dbr_version` .}}.x-scala{{template `scala_major_minor_version` .}}
             node_type_id: i3.xlarge  # Default instance type (can be changed)
             autoscale:
               max_workers: 2

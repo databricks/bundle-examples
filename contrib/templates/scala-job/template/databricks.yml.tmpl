@@ -7,9 +7,11 @@ workspace:
   host: {{workspace_host}}
   artifact_path: {{.artifacts_dest_path}}
 
+# TODO: this needs to be reused across multiple files, not just in here
 {{- $version := "0.1" }}
 {{- $dbr_version := "16.1" }}
 {{- $scala_version := "2.13" }}
+{{- $main_class_name := "com.examples" }}
 
 artifacts:
   default:
@@ -31,7 +33,7 @@ resources:
           job_cluster_key: {{.project_name}}_job_cluster
           {{- end }}
           spark_jar_task:
-            main_class_name: {{.main_class_name}}
+            main_class_name: {{$main_class_name}}
           libraries:
             - jar: ./target/scala-{{$scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
       {{- if not .existing_cluster_id }}

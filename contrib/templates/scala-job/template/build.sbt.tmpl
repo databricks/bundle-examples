@@ -4,7 +4,8 @@ name := "{{.project_name}}"
 organization := "com.examples"
 version := "{{template `version` .}}"
 
-// This is only to fetch db connect 16.2 (unreleased) from local maven repo
+// If we are using 16.2, we will fetch it locally since as of 14-02-2025, we have not released scala client 16.2.0.
+// Otherwise we will fetch it from remote maven repo.
 resolvers += "Local Maven" at "file://" + new File("./local_dependencies").getAbsolutePath
 libraryDependencies += "com.databricks" % "databricks-connect" % "{{template `dbr_version` .}}.+"
 

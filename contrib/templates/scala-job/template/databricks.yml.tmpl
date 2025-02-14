@@ -4,8 +4,8 @@ bundle:
   name: {{.project_name}}
 
 workspace:
-  host: {{workspace_host}}
-  artifact_path: {{.artifacts_dest_path}}
+  host: {{.custom_workspace_host}}
+  artifact_path: {{.artifacts_dest_path}}/${workspace.current_user.short_name}
 
 artifacts:
   default:
@@ -49,4 +49,4 @@ targets:
     mode: development
     default: true
     workspace:
-      host: {{workspace_host}}
+      host: {{.custom_workspace_host}}

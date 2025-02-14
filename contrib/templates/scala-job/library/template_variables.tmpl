@@ -3,7 +3,7 @@
 {{- end }}
 
 {{ define `dbr_version` -}}
-    16.2
+    16.1
 {{- end }}
 
 {{ define `scala_major_minor_version` -}}
@@ -12,6 +12,10 @@
 
 {{ define `scala_version` -}}
     {{template `scala_major_minor_version` .}}.18
+{{- end}}
+
+{{ define `java_version` -}}
+    17
 {{- end}}
 
 {{ define `organization` -}}

@@ -4,7 +4,7 @@ name := "{{.project_name}}"
 organization := "com.examples"
 version := "{{template `version` .}}"
 
-libraryDependencies += "com.databricks" % "databricks-connect" % "16.1.+"
+libraryDependencies += "com.databricks" % "databricks-connect" % "{{template `dbr_version` .}}.+"
 
 assembly / assemblyOption ~= { _.withIncludeScala(false) }
 assembly / assemblyExcludedJars := {

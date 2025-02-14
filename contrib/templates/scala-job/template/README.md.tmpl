@@ -1,0 +1,9 @@
+# {{.project_name}}
+## Instructions to setup
+
+### Prerequisites
+1. Databricks CLI + .databrickscfg file setup (PAT token required)
+2. For local development, see system environment setup here https://docs.databricks.com/en/release-notes/runtime/16.1.html#system-environment to ensure there are no compiling issues but [As of 02-14-2025] TLDR:
+- Java {{template `java_version` .}}
+- Scala {{template `scala_version` .}}
+- sbt installed

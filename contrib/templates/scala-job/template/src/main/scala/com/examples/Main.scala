@@ -6,7 +6,7 @@ import org.apache.spark.sql.functions.udf
 
 object Main {
   def main(args: Array[String]): Unit = {
-    println("Hello, World foo123!")
+    println("Hello, World!")
 
     val spark = getSession()
     println("Showing range ...")

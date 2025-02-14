@@ -6,23 +6,29 @@
       "description": "Name of project (press enter to use default name)",
       "order": 1
     },
+    "custom_workspace_host": {
+      "type": "string",
+      "default": "{{workspace_host}}",
+      "description": "Workspace host url",
+      "order": 2
+    },
     "artifacts_dest_path": {
       "type": "string",
       "description": "Destination path in Databricks where the JAR and other artifacts will be stored (e.g.; /Volumes/main/{{short_name}}/scala_job_test). Note: You must create a Volumes first",
-      "order": 2
+      "order": 3
     },
     "existing_cluster_id": {
       "type": "string",
       "description": "Enter the cluster id for an existing cluster or leave empty to create a new cluster",
       "default": "",
-      "order": 3
+      "order": 4
     },
     "cluster_type": {
       "type": "string",
       "enum": ["Standard", "Dedicated"],
       "default": "Standard",
       "description": "Select cluster type: Dedicated or Standard. If Standard, is the JAR allowlisted by the admin for your workspace? (If not, inform admin: https://docs.databricks.com/en/data-governance/unity-catalog/manage-privileges/allowlist.html)",
-      "order": 4
+      "order": 5
     }
   }
 }

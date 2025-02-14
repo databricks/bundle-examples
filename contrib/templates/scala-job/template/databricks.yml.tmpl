@@ -25,8 +25,8 @@ resources:
       name: {{.project_name}}
       tasks:
         - task_key: main_task
-          {{- if .cluster_key }}
-          existing_cluster_id: {{.cluster_key}}
+          {{- if .existing_cluster_id }}
+          existing_cluster_id: {{.existing_cluster_id}}
           {{- else }}
           job_cluster_key: {{.project_name}}_job_cluster
           {{- end }}
@@ -34,7 +34,7 @@ resources:
             main_class_name: {{.main_class_name}}
           libraries:
             - jar: ./target/scala-{{$scala_version}}/{{.project_name}}-assembly-{{$version}}.jar
-      {{- if not .cluster_key }}
+      {{- if not .existing_cluster_id }}
       job_clusters:
         - job_cluster_key: {{.project_name}}_job_cluster
           new_cluster:

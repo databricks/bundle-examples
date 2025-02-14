@@ -9,20 +9,20 @@
     "artifacts_dest_path": {
       "type": "string",
       "description": "Destination path in Databricks where the JAR and other artifacts will be stored. Note: You must create a Volumes first",
-      "order": 3
+      "order": 2
     },
-    "cluster_key": {
+    "existing_cluster_id": {
       "type": "string",
-      "description": "Enter the cluster key for an existing cluster or leave empty to create a new cluster",
+      "description": "Enter the cluster id for an existing cluster or leave empty to create a new cluster",
       "default": "",
-      "order": 5
+      "order": 3
     },
     "cluster_type": {
       "type": "string",
       "enum": ["Standard", "Dedicated"],
       "default": "Standard",
       "description": "Select cluster type: Dedicated or Standard. If Standard, is the JAR allowlisted by the admin for your workspace? (If not, inform admin: https://docs.databricks.com/en/data-governance/unity-catalog/manage-privileges/allowlist.html)",
-      "order": 8
+      "order": 4
     }
   }
 }

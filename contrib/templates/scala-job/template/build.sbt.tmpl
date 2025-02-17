@@ -8,6 +8,7 @@ version := "{{template `version` .}}"
 // Otherwise we will fetch it from remote maven repo.
 resolvers += "Local Maven" at "file://" + new File("./local_dependencies").getAbsolutePath
 libraryDependencies += "com.databricks" % "databricks-connect" % "{{template `dbr_version` .}}.+"
+libraryDependencies += "org.slf4j" % "slf4j-simple" % "2.0.16"
 
 assembly / assemblyOption ~= { _.withIncludeScala(false) }
 assembly / assemblyExcludedJars := {

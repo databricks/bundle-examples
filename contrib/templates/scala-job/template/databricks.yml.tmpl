@@ -10,7 +10,7 @@ workspace:
 artifacts:
   default:
     type: jar
-    build: tar -xvzf local_dependencies/dbconnect-scala-16.2.0-dist.tar.gz -C local_dependencies/ && sbt package && sbt assembly
+    build: sbt package && sbt assembly
     path: .
     files:
       - source: {{template `jar_path` .}}

@@ -34,6 +34,7 @@ object Main {
       println("Running outside Databricks")
       DatabricksSession.builder()
         .serverless()
+        .addCompiledArtifacts(Main.getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
         .getOrCreate()
     }
   }

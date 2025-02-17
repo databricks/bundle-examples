@@ -27,7 +27,7 @@
       "skip_prompt_if": {
 	"properties": {
 	    "existing_cluster_id": {
-		    "pattern": "^\S.*$"
+		    "pattern": "^\\S.*$"
 	    }
 	}
       },

@@ -3,7 +3,7 @@
     "project_name": {
       "type": "string",
       "default": "project_name",
-      "description": "Name of project (press enter to use default name)",
+      "description": "Name of project (press enter to use default name). Do not add spaces or any special characters.",
       "order": 1
     },
     "custom_workspace_host": {
@@ -14,7 +14,7 @@
     },
     "artifacts_dest_path": {
       "type": "string",
-      "description": "Destination path in Databricks where the JAR and other artifacts will be stored (e.g.; /Volumes/main/{{short_name}}/scala_job_test). Note: You must create a Volumes first",
+      "description": "Destination path in Databricks where the JAR and other artifacts will be stored (e.g.; /Volumes/main/{{short_name}}/scala_job_test). Note: If you use Volumes, You must create a Volumes first and the path should start with /Volumes",
       "order": 3
     },
     "existing_cluster_id": {
@@ -24,6 +24,13 @@
       "order": 4
     },
     "cluster_type": {
+      "skip_prompt_if": {
+	"properties": {
+	    "existing_cluster_id": {
+		    "pattern": "^\S.*$"
+	    }
+	}
+      },
       "type": "string",
       "enum": ["Standard", "Dedicated"],
       "default": "Standard",

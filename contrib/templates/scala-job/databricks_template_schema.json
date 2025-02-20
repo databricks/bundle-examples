@@ -2,7 +2,7 @@
   "properties": {
     "project_name": {
       "type": "string",
-      "description": "Name of project. Do not add spaces.",
+      "description": "Name of project. Do not add spaces",
       "order": 1
     },
     "custom_workspace_host": {

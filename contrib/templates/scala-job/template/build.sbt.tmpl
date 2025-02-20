@@ -4,9 +4,6 @@ name := "{{.project_name}}"
 organization := "com.examples"
 version := "{{template `version` .}}"
 
-// If we are using 16.2, we will fetch it locally since as of 14-02-2025, we have not released scala client 16.2.0.
-// Otherwise we will fetch it from remote maven repo.
-resolvers += "Local Maven" at "file://" + new File("./local_dependencies").getAbsolutePath
 libraryDependencies += "com.databricks" % "databricks-connect" % "{{template `dbr_version` .}}.+"
 libraryDependencies += "org.slf4j" % "slf4j-simple" % "2.0.16"
 
@@ -18,4 +15,19 @@ assembly / assemblyExcludedJars := {
 
 assemblyMergeStrategy := {
   case _ => MergeStrategy.preferProject
+}
+
+lazy val fatJar = {{template `jar_path` .}}
+
+lazy val runFatJar = taskKey[Unit]("Runs the assembled JAR locally")
+
+runFatJar := {
+  val jar = fatJar
+  if (!jar.exists()) {
+    println(s"Assembly JAR not found at $jar, creating it...")
+    (assembly).value
+  }
+  println(s"Running assembled JAR: $jar")
+  val exitCode = Process(Seq("java", "-jar", jar.getAbsolutePath)).!
+  if (exitCode != 0) sys.error(s"Running JAR failed with exit code $exitCode")
 }

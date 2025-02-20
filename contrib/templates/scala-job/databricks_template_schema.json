@@ -13,7 +13,7 @@
     },
     "artifacts_dest_path": {
       "type": "string",
-      "description": "Destination path in Databricks where the JAR and other artifacts will be stored. Note: If you use Volumes, You must create a Volumes first and the path should start with /Volumes",
+      "description": "Destination path in Databricks where the JAR and other artifacts will be stored You can use /Workspace or /Volumes in Dedicated clusters but only /Volumes in Standard clusters.",
       "order": 3
     },
     "existing_cluster_id": {

@@ -17,17 +17,4 @@ assemblyMergeStrategy := {
   case _ => MergeStrategy.preferProject
 }
 
-lazy val fatJar = {{template `jar_path` .}}
-
-lazy val runFatJar = taskKey[Unit]("Runs the assembled JAR locally")
-
-runFatJar := {
-  val jar = fatJar
-  if (!jar.exists()) {
-    println(s"Assembly JAR not found at $jar, creating it...")
-    (assembly).value
-  }
-  println(s"Running assembled JAR: $jar")
-  val exitCode = Process(Seq("java", "-jar", jar.getAbsolutePath)).!
-  if (exitCode != 0) sys.error(s"Running JAR failed with exit code $exitCode")
-}
+run / javaOptions += "--add-opens=java.base/java.nio=ALL-UNNAMED"

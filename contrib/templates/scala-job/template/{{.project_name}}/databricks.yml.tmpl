@@ -9,7 +9,7 @@ include:
 
 workspace:
   host: {{workspace_host}}
-  artifact_path: {{.artifacts_dest_path}}/${workspace.current_user.short_name}
+  artifact_path: {{.artifacts_dest_path}}/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
 
 artifacts:
   default:

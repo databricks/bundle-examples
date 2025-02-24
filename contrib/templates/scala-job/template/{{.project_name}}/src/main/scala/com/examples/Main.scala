@@ -1,3 +1,7 @@
+/*
+This project is a simple example of how to use the Databricks Connect Scala client to run on
+serverless or on a Databricks cluster.
+ */
 package com.examples
 
 import com.databricks.connect.DatabricksSession

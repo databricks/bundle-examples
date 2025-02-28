@@ -3,7 +3,7 @@
 scalaVersion := "{{template `scala_version` .}}"
 
 name := "{{.project_name}}"
-organization := "com.examples"
+organization := "{{template `organization` .}}"
 version := "{{template `version` .}}"
 
 libraryDependencies += "com.databricks" % "databricks-connect" % "{{template `dbr_version` .}}.+"

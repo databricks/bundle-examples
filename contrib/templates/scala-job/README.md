@@ -1,4 +1,6 @@
-An (experimental) template to create a scala job which uploads an assembly jar to your Databricks workspace using scala dbconnect. This can also be reused for local development with dbconnect serverless
+# scala-job
+
+This is an (experimental) template for creating using Scala with Databricks Asset Bundles. It uses sbt to compile and package Scala files, and can be used with Databricks Connect for local development.
 
 Run 
 ```

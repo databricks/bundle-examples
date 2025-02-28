@@ -2,7 +2,7 @@ An (experimental) template to create a scala job which uploads an assembly jar t
 
 Run 
 ```
-mkdir dabs_test && cd dabs_test && databricks bundle init --template-dir contrib/templates/scala-job https://github.com/databricks/bundle-examples
+databricks bundle init --template-dir contrib/templates/scala-job https://github.com/databricks/bundle-examples
 ```
 
 and follow the generated README.md to get started.

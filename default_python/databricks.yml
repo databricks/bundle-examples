@@ -14,17 +14,3 @@ targets:
     # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
     mode: development
     default: true
-    workspace:
-      host: https://company.databricks.com
-
-  prod:
-    mode: production
-    workspace:
-      host: https://company.databricks.com
-      # We explicitly specify /Users/user@company.com to make sure we only have a single copy.
-      root_path: /Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
-    permissions:
-      - user_name: user@company.com
-        level: CAN_MANAGE
-    run_as:
-      user_name: user@company.com

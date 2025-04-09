@@ -46,7 +46,7 @@
       },
       "position" : {
         "x" : 0,
-        "y" : 1,
+        "y" : 0,
         "width" : 2,
         "height" : 1
       }
@@ -121,51 +121,61 @@
               "name" : "day_of_week",
               "expression" : "`day_of_week`"
             }, {
-              "name" : "fare_amount",
-              "expression" : "`fare_amount`"
+              "name" : "dropoff_zip",
+              "expression" : "`dropoff_zip`"
             }, {
               "name" : "trip_distance",
               "expression" : "`trip_distance`"
+            }, {
+              "name" : "fare_amount",
+              "expression" : "`fare_amount`"
             } ],
             "disaggregated" : true
           }
         } ],
         "spec" : {
+          "version" : 3,
+          "widgetType" : "scatter",
           "encodings" : {
-            "color" : {
-              "displayName" : "Day of Week",
-              "fieldName" : "day_of_week",
-              "scale" : {
-                "type" : "categorical"
-              }
-            },
             "x" : {
+              "fieldName" : "trip_distance",
               "axis" : {
                 "title" : "Trip Distance (miles)"
               },
-              "displayName" : "trip_distance",
-              "fieldName" : "trip_distance",
               "scale" : {
                 "type" : "quantitative"
-              }
+              },
+              "displayName" : "trip_distance"
             },
             "y" : {
+              "fieldName" : "fare_amount",
               "axis" : {
                 "title" : "Fare Amount (USD)"
               },
-              "displayName" : "fare_amount",
-              "fieldName" : "fare_amount",
               "scale" : {
                 "type" : "quantitative"
-              }
+              },
+              "displayName" : "fare_amount"
+            },
+            "color" : {
+              "fieldName" : "day_of_week",
+              "scale" : {
+                "type" : "categorical"
+              },
+              "displayName" : "Day of Week"
+            },
+            "size" : {
+              "fieldName" : "dropoff_zip",
+              "scale" : {
+                "type" : "quantitative"
+              },
+              "displayName" : "dropoff_zip"
             }
           },
           "frame" : {
             "showTitle" : true,
             "title" : "Daily Fare Trends by Day of Week"
-          },
-          "version" : 3,
-          "widgetType" : "scatter"
+          }
         }
       },
       "position" : {
@@ -181,7 +191,7 @@
       },
       "position" : {
         "x" : 0,
-        "y" : 0,
+        "y" : 1,
         "width" : 6,
         "height" : 1
       }
@@ -329,7 +339,7 @@
       },
       "position" : {
         "x" : 2,
-        "y" : 1,
+        "y" : 0,
         "width" : 2,
         "height" : 1
       }
@@ -577,7 +587,7 @@
       },
       "position" : {
         "x" : 4,
-        "y" : 1,
+        "y" : 0,
         "width" : 2,
         "height" : 1
       }

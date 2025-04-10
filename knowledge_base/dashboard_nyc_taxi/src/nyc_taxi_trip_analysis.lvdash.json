@@ -121,9 +121,6 @@
               "name" : "day_of_week",
               "expression" : "`day_of_week`"
             }, {
-              "name" : "dropoff_zip",
-              "expression" : "`dropoff_zip`"
-            }, {
               "name" : "trip_distance",
               "expression" : "`trip_distance`"
             }, {
@@ -163,18 +160,14 @@
                 "type" : "categorical"
               },
               "displayName" : "Day of Week"
-            },
-            "size" : {
-              "fieldName" : "dropoff_zip",
-              "scale" : {
-                "type" : "quantitative"
-              },
-              "displayName" : "dropoff_zip"
             }
           },
           "frame" : {
             "showTitle" : true,
-            "title" : "Daily Fare Trends by Day of Week"
+            "title" : "Daily Fare Trends by Day of Week",
+            "headerAlignment" : "center",
+            "showDescription" : true,
+            "description" : "foobar"
           }
         }
       },

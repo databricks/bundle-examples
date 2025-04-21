@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "utils"
+version = "0.1.0"
+description = "Python package that contails useful helper functions for spark streaming jobs."
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+packages = [
+    { include = "utils" }
+]
+
+[tool.poetry.scripts]
+main = "utils.main:add_processing_timestamp"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

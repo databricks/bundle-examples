@@ -1,0 +1,16 @@
+# The main pipeline for my_project
+resources:
+  pipelines:
+    my_dlt_pipeline:
+      name: my_dlt_pipeline_${var.env}
+      catalog: {{ your_metastore_catalog }}
+      # In lower environments for local deployments, make this schema value unique for best testing experience (UC isolation)
+      target: {{ your_schema_target }}
+      libraries:
+        - notebook:
+            path: ../../src/pipelines/dlt_pipeline.ipynb
+
+      configuration:
+        bundle.sourcePath: /Workspace/${workspace.file_path}/src
+        dlt.dependencies.get_taxis_data: /Workspace${workspace.file_path}/src/packages/get_taxis_data
+        dlt.dependencies.utils: /Workspace${workspace.file_path}/src/packages/utils

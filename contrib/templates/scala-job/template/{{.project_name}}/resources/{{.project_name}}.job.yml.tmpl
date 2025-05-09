@@ -8,6 +8,7 @@ resources:
         - task_key: main_task
           spark_jar_task:
             main_class_name: {{template `main_class_name` .}}
+          environment_key: default
       environments:
         - environment_key: default
           spec:

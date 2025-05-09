@@ -14,4 +14,4 @@ resources:
           spec:
             client: "3"
             jar_dependencies:
-                - {{.artifacts_dest_path}}/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}/.internal/{{template `jar_path` .}}
+                - {{.artifacts_dest_path}}/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}/.internal/{{.project_name}}-assembly-{{template `version` .}}.jar

@@ -8,13 +8,9 @@ resources:
         - task_key: main_task
           spark_jar_task:
             main_class_name: {{template `main_class_name` .}}
-          libraries:
-            - jar: ../{{template `jar_path` .}}
-      queue:
-        enabled: true
       environments:
         - environment_key: default
           spec:
             client: "3"
             jar_dependencies:
-                - {{.artifacts_dest_path}}/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+                - ../{{template `jar_path` .}}

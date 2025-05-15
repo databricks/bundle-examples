@@ -22,7 +22,7 @@ Run a script to write a secret to the secret scope:
 ```
 SECRET_SCOPE_NAME=$(databricks bundle summary -o json | jq -r '.resources.secret_scopes.my_secret_scope.name')
 
-databricks secrets put-secret ${SECRET_SCOPE_NAME} example-key --string-value example-value --profile ${DATABRICKS_PROFILE}
+databricks secrets put-secret ${SECRET_SCOPE_NAME} example-key --string-value example-value
 ```
 
 Run the job:

@@ -22,7 +22,7 @@ resources:
       tasks:
         - task_key: example_python_task
           spark_python_task:
-            python_file: "jobs/example_spark_python_task.py"
+            python_file: "src/example_spark_python_task.py"
             parameters:
               - --scope_name={{job.parameters.scope_name}}
 

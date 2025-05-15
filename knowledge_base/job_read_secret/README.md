@@ -4,7 +4,7 @@ This example demonstrates how to define a secret scope and a job with a task tha
 
 It includes and deploys an example secret scope, a job managed by DABs and a task that reads a secret from the secret scope to a Databricks workspace.
 
-For more information about Databricks Secrets, please refer to the [documentation](https://docs.databricks.com/aws/en/security/secrets).
+For more information about Databricks secrets, see the [documentation](https://docs.databricks.com/aws/en/security/secrets).
 
 ## Prerequisites
 

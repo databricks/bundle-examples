@@ -13,8 +13,7 @@ For more information about Databricks secrets, see the [documentation](https://d
 ## Usage
 
 Modify `databricks.yml`:
-* Update the `host` field under `workspace` to the Databricks workspace to deploy to.
-* Change the name of the secret scope under the `secret_scopes` field.
+* Update the `host` field under `workspace` to the Databricks workspace to deploy to
 
 Run `databricks bundle deploy` to deploy the bundle.
 

@@ -17,7 +17,7 @@ Modify `databricks.yml`:
 
 Run `databricks bundle deploy` to deploy the bundle.
 
-Run a script to write a secret to the secret scope:
+Run this script to write a secret to the secret scope. Databricks CLI commands run from inside the bundle root directory use the same authentication credentials as the bundle:
 
 ```
 SECRET_SCOPE_NAME=$(databricks bundle summary -o json | jq -r '.resources.secret_scopes.my_secret_scope.name')

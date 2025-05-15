@@ -7,7 +7,7 @@ bundle:
 resources:
   secret_scopes:
     my_secret_scope:
-      name: secrets-scope-1
+      name: prod-secrets-scope
       permissions:
         - level: CAN_VIEW
           group_name: users

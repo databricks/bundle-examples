@@ -28,40 +28,7 @@ Run `databricks bundle deploy` to deploy the dashboard.
 
 Run `databricks bundle open` to navigate to the deployed dashboard in your browser. Alternatively, run `databricks bundle summary` to display its URL.
 Note:
-At this moment, we have created the AI/BI dashboard, but the dashboard snapshot job is not fully ready yet since the dashboard id is only generated after the dashboard is created.
-
-#### Step 4: Update dashboard id in the dashboard snapshot job
-
-Use the summary command output to locate the generated dashboard ID:
-
-```
-$userName@GVFX6GR6RN dashboard_nyc_taxi % databricks bundle summary
-Name: dashboard_nyc_taxi
-Target: dev
-Workspace:
-  Host: $host
-  User: $user
-  Path: /Workspace/Users/$user/.bundle/dashboard_nyc_taxi/dev
-Resources:
-  Dashboards:
-    nyc_taxi_trip_analysis:
-      Name: [dev $userName] NYC Taxi Trip Analysis
-      URL:  $workspaceUrl/dashboardsv3/$dashboardId/published?o=$workspaceId
-  Jobs:
-    my_project_job:
-      Name: [dev $userName] my_project_job
-      URL:  $workspaceUrl/jobs/$jobId?o=$workspaceId
-```
-
-Once you've located the dashboard ID, open resources/nyc_taxi_trip_analysis.job.yml and insert the ID accordingly.
-
-Then, redeploy the bundle:
-
-```
-databricks bundle deploy
-```
-
-This sets up the snapshot job to run daily at 8 AM, capture a snapshot of the dashboard, and send it via email to the specified subscriber.
+At this moment, we have created the AI/BI dashboard and sets up the snapshot job to run daily at 8 AM, capture a snapshot of the dashboard, and send it via email to the specified subscriber.
 
 ### Visual modification
 

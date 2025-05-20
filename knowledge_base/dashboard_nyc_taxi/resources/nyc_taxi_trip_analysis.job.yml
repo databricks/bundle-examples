@@ -1,12 +1,11 @@
 resources:
   jobs:
-    my_project_job:
-      name: my_project_job
+    dashboard_snapshot_job:
+      name: "Daily NYC Taxi Trip Analysis refresh"
 
       schedule:
         quartz_cron_expression: '0 0 8 * * ?' # daily at 8am
         timezone_id: UTC
-        pause_status: UNPAUSED
 
       tasks:
         - task_key: dashboard_task
@@ -16,4 +15,5 @@ resources:
                 - user_name:  "test@gmail.com" # Replace this with the email of snapshot subscriber email
               paused: false
             warehouse_id: ${var.warehouse_id}
-            dashboard_id:  "01111111111111111f361f7719111099" # Replace this with the newly generated dashboard id. This will be a UUID string of the dashboard, which could be found from dashboard url.
+            dashboard_id: ${resources.dashboards.nyc_taxi_trip_analysis.id}
+

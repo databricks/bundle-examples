@@ -20,7 +20,7 @@ For more information about AI/BI dashboards, please refer to the [documentation]
 
 #### Step2: Modify `resources/nyc_taxi_trip_analysis.job.yml`:
 
-- Update the `user_name` field under `subscribers` to the email of the subscriber of the dashboard
+- Update the `user_name` field under `subscribers` to the dashboard subscriber's email
 
 #### Step3: Deploy the dashboard
 

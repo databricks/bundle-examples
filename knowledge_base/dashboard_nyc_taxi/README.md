@@ -1,34 +1,29 @@
 # Dashboard for NYC Taxi Trip Analysis
 
-This example shows how to define an AI/BI dashboard within a Databricks Asset Bundle, set up a job to capture a snapshot of the dashboard, and email it to a subscriber.
+This example shows how to define a Databricks Asset Bundle with an AI/BI dashboard and a job that captures a snapshot of the dashboard and emails it to a subscriber.
 
-It deploys the sample __NYC Taxi Trip Analysis__ dashboard to a Databricks workspace and configures a daily schedule to run the dashboard and send the snapshot via email.
+It deploys the sample __NYC Taxi Trip Analysis__ dashboard to a Databricks workspace and configures a daily schedule to run the dashboard and send the snapshot in email to a specified email address.
 
 For more information about AI/BI dashboards, please refer to the [documentation](https://docs.databricks.com/dashboards/index.html).
 
 ## Prerequisites
 
-- For creating dashboard: Databricks CLI v0.232.0 or above
-- For dashboard snapshot task: Databricks CLI v0.250.0 or above
+This example includes a dashboard snapshot task, which requires Databricks CLI  v0.250.0 or above. Creating dashboards in bundles is supported in Databricks CLI v0.232.0 or above.
 
 ## Usage
 
-#### Step1: Modify `databricks.yml`:
+1. Modify `databricks.yml`:
+    - Update the `host` field under `workspace` to the Databricks workspace to deploy to.
+    - Update the `warehouse` field under `warehouse_id` to the name of the SQL warehouse to use.
 
-- Update the `host` field under `workspace` to the Databricks workspace to deploy to.
-- Update the `warehouse` field under `warehouse_id` to the name of the SQL warehouse to use.
+2. Modify `resources/nyc_taxi_trip_analysis.job.yml`:
+    - Update the `user_name` field under `subscribers` to the dashboard subscriber's email.
 
-#### Step2: Modify `resources/nyc_taxi_trip_analysis.job.yml`:
+3. Deploy the dashboard:
+    - Run `databricks bundle deploy` to deploy the dashboard.
+    - Run `databricks bundle open` to navigate to the deployed dashboard in your browser. Alternatively, run `databricks bundle summary` to display its URL.
 
-- Update the `user_name` field under `subscribers` to the dashboard subscriber's email
-
-#### Step3: Deploy the dashboard
-
-Run `databricks bundle deploy` to deploy the dashboard.
-
-Run `databricks bundle open` to navigate to the deployed dashboard in your browser. Alternatively, run `databricks bundle summary` to display its URL.
-Note:
-At this moment, we have created the AI/BI dashboard and sets up the snapshot job to run daily at 8 AM, capture a snapshot of the dashboard, and send it via email to the specified subscriber.
+The AI/BI dashboard is created and the snapshot job is set to run daily at 8 AM, which captures a snapshot of the dashboard, and sends it in email to the specified subscriber.
 
 ### Visual modification
 

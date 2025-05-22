@@ -12,7 +12,7 @@ resources:
           dashboard_task:
             subscription:
               subscribers:
-                - user_name:  "test@gmail.com" # Replace this with the email of snapshot subscriber email
+                - user_name:  ${workspace.current_user.userName} # Replace this with the email of snapshot subscriber email
               paused: false
             warehouse_id: ${var.warehouse_id}
             dashboard_id: ${resources.dashboards.nyc_taxi_trip_analysis.id}

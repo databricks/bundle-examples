@@ -19,15 +19,7 @@ object Main {
     println("Showing nyctaxi trips ...")
     val nycTaxi = new NycTaxi(spark)
     val df = nycTaxi.trips()
-
-    // Define a simple UDF that formats the passenger count as a string
-    val testudf = udf((count: String) => s"test: $count")
-
-    // Apply the UDF to the passenger_count column
-    val transformedDF = df.withColumn("testresult", testudf(F.col("dropoff_zip")))
-
-    // Show the transformed DataFrame
-    transformedDF.show()
+    df.show()
   }
 
   def getSession(): SparkSession = {
@@ -39,6 +31,7 @@ object Main {
       println("Running outside Databricks")
       DatabricksSession.builder()
         .serverless()
+        .validateSession(false)
         .addCompiledArtifacts(Main.getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
         .getOrCreate()
     }

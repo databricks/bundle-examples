@@ -1,24 +1,26 @@
 {
-  "evaluation" : {
-    "source" : {
-      "name" : "id",
-      "display" : "id",
-      "aggregation" : "AGGREGATION_UNSPECIFIED"
+  "evaluation": {
+    "source": {
+      "name": "id",
+      "display": "id",
+      "aggregation": "AGGREGATION_UNSPECIFIED"
     },
-    "comparison_operator" : "EQUAL",
-    "threshold" : {
-      "value" : {
-        "double_value" : 0.0
+    "comparison_operator": "EQUAL",
+    "threshold": {
+      "value": {
+        "double_value": 2.0
       }
     },
-    "notification" : {
-      "retrigger_seconds" : 0,
-      "notify_on_ok" : true
+    "notification": {
+      "retrigger_seconds": 0,
+      "notify_on_ok": true
     }
   },
-  "schedule" : {
-    "quartz_cron_schedule" : "0 24 */1 * * ?",
-    "timezone_id" : "Europe/Amsterdam"
+  "schedule": {
+    "quartz_cron_schedule": "0 24 */1 * * ?",
+    "timezone_id": "Europe/Amsterdam"
   },
-  "query_lines" : [ "select * from range(10)" ]
+  "query_lines": [
+    "select * from range(20)"
+  ]
 }

@@ -26,7 +26,7 @@ object Main {
     // Get DATABRICKS_RUNTIME_VERSION environment variable
     if (sys.env.contains("DATABRICKS_RUNTIME_VERSION")) {
       println("Running in a Databricks cluster")
-      SparkSession.builder().getOrCreate()
+      SparkSession.active
     } else {
       println("Running outside Databricks")
       DatabricksSession.builder()

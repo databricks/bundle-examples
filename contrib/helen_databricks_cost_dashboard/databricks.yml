@@ -1,0 +1,27 @@
+# databricks.yml
+# This is the configuration for the Databricks Asset Bundle helen_databricks_cost_dashboard.
+
+bundle:
+  name: helen_databricks_cost_dashboard
+
+include:
+  - resources/*.yml
+
+targets:
+  # The deployment targets. See https://docs.databricks.com/en/dev-tools/bundles/deployment-modes.html
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-1851412605280541.1.azuredatabricks.net
+
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-1851412605280541.1.azuredatabricks.net
+      root_path: /Shared/.bundle/prod/${bundle.name}
+    run_as:
+      # This runs as neelabh.kashyap@helen.fi in production. Alternatively,
+      # a service principal could be used here using service_principal_name
+      user_name: neelabh.kashyap@helen.fi
+    

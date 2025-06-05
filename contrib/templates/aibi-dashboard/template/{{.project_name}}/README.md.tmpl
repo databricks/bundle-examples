@@ -1,0 +1,29 @@
+# {{ (regexp "_").ReplaceAllString .project_name " " }}
+
+## Purpose and Business Context
+TODO: Explain the business need this dashboard addresses. Mention key decisions it supports or business processes it enables.
+
+## Target Audience
+TODO: Specify who the dashboard is intended for: analysts, data engineers, product managers, finance teams, etc.
+
+## Data Sources
+TODO: List all data sources on which this dashboard depends
+
+## Usage
+
+### Prerequisites
+- Databricks CLI v0.254.0 or newer
+
+### Developing the dashboard
+If you have GNU Make installed you can run `make sync` to sync with the latest version of the dashboard once.
+
+If you want to continue editing the dashboard, you can run `make edit` and continue to edit the dashboard. Once done, hit ^+C to exit to the terminal. 
+
+### Deployment
+Run `databricks bundle deploy` to deploy the dashboard. A CI pipeline can be used to deploy to production in a similar fashion.
+
+## Data Refresh and Update Frequency
+TODO: Indicate how often the underlying data is refreshed (e.g., daily, hourly) and whether it's automated.
+
+## Contact Information
+TODO: Provide names/emails of owners or maintainers who can help with questions or support.

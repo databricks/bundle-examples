@@ -1,0 +1,6 @@
+resources:
+  dashboards:
+    helen_databricks_cost_dashboard:
+      display_name: "Helen Databricks Cost Dashboard"
+      warehouse_id: e6b3b0f666dc69cf
+      file_path: ../src/helen_databricks_cost_dashboard.lvdash.json

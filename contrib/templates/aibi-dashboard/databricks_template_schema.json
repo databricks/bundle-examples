@@ -1,0 +1,17 @@
+{
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "default": "my_dashboard",
+      "description": "What is the name of the AI/BI Dashboard you are building?",
+      "order": 1
+    },
+    "dashboard_path": {
+        "type": "string",
+        "default": "dashboards/My Dashboard",
+        "description": "Relative path of the dashboard with respect to the Databricks home folder",
+        "order": 2
+    }
+  },
+  "success_message": "\nYour bundle '{{.project_name}}' has been created."
+}

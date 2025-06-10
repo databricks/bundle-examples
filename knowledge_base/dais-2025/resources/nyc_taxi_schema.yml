@@ -1,0 +1,10 @@
+resources:
+  schemas:
+    nyc_taxi_schema:
+      name: nyc_taxi
+      catalog_name: dabs
+
+      comment: |
+         Raw NYC taxi trip data and derivatives.
+
+         Get in touch via `#dabs-at-scale-example` on Slack for questions.

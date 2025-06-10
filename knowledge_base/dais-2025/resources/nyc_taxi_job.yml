@@ -1,0 +1,35 @@
+resources:
+  jobs:
+    nyc_taxi_job:
+      name: NYC Taxi Job
+
+      trigger:
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      parameters:
+        - name: catalog
+          default: dabs
+        - name: schema
+          default: ${resources.schemas.nyc_taxi_schema.name}
+
+      tasks:
+        - task_key: run_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.nyc_taxi_pipeline.id}
+
+        - task_key: compute_anomalies
+          depends_on:
+            - task_key: run_pipeline
+          notebook_task:
+            notebook_path: ../src/compute_anomalies.ipynb
+
+        - task_key: refresh_dashboard
+          depends_on:
+            - task_key: run_pipeline
+          dashboard_task:
+            dashboard_id: ${resources.dashboards.nyc_taxi_dashboard.id}
+            subscription:
+              subscribers:
+                - user_name: pieter.noordhuis@databricks.com

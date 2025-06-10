@@ -1,0 +1,19 @@
+resources:
+  pipelines:
+    nyc_taxi_pipeline:
+      name: NYC Taxi Pipeline
+
+      catalog: dabs
+      schema: ${resources.schemas.nyc_taxi_schema.name}
+
+      serverless: true
+
+      libraries:
+        - file:
+            path: ../src/pipeline/trips_raw.py
+        - file:
+            path: ../src/pipeline/*.sql
+
+      configuration:
+        # Pass the source table variable value as configuration.
+        source_table: ${var.source_table}

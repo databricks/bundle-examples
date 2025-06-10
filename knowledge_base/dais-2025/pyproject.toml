@@ -1,0 +1,13 @@
+[project]
+name = "dais-2025"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "pip",
+    "databricks-connect",
+    "databricks-dlt",
+]
+
+[tool.ruff.lint]
+select = []

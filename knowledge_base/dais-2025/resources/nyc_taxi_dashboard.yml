@@ -1,0 +1,15 @@
+resources:
+  dashboards:
+    nyc_taxi_dashboard:
+      display_name: "NYC Taxi Trip Analysis"
+      file_path: ../src/nyc_taxi_trip_analysis.lvdash.json
+      warehouse_id: ${var.warehouse_id}
+
+      # Embed credentials of the deployer to make the
+      # dashboard accessible to all workspace users.
+      embed_credentials: true
+
+      # Allow all workspace users to view this dashboard.
+      permissions:
+        - level: CAN_READ
+          group_name: users

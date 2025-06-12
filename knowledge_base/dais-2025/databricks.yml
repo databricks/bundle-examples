@@ -48,6 +48,7 @@ permissions:
 targets:
   development:
     mode: development
+    default: true
 
     workspace:
       host: https://nephos-west-2-1.cloud.databricks.com/
@@ -72,7 +73,7 @@ targets:
     mode: production
 
     workspace:
-      host: https://nephos-west-2-1.cloud.databricks.com/
+      host: https://production-west-2-1.cloud.databricks.com/
 
       # Pin to a specific path to avoid unintentionally creating
       # multiple production deployments in the same workspace.
@@ -84,7 +85,7 @@ targets:
 
     resources:
       jobs:
-        nyc_taxi_etl:
+        nyc_taxi_job:
 
           # Only notify on failure in production.
           email_notifications:

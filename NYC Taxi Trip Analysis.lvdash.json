@@ -14,6 +14,7 @@
         "  (\n",
         "    SELECT\n",
         "      pickup_zip,\n",
+        "      1,\n",
         "      dropoff_zip,\n",
         "      concat(pickup_zip, '-', dropoff_zip) AS route,\n",
         "      count(*) as frequency,\n",

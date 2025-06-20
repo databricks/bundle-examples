@@ -13,7 +13,7 @@
       "description": "\nPlease provide the Unity Catalog volume destination path in Databricks where the directory will be created containing the JAR and other artifacts to store. [example: /Volumes/abcdef1234567890].\nNote: Only when using Standard clusters, your admin must allowlist the volume JAR path you specify for your workspace (see https://docs.databricks.com/en/data-governance/unity-catalog/manage-privileges/allowlist.html)",
       "order": 2,
       "pattern": "^/Volumes(?:/[a-z0-9_-]+)+/?$",
-      "pattern_match_failure_message": "Please enter a valid path like /Volumes/my-folder. Only lowercase letters, numbers, dashes, and underscores are allowed in folder names."
+      "pattern_match_failure_message": "Please enter a valid path like /Volumes/my-folder/. Only lowercase letters, numbers, dashes, and underscores are allowed in folder names."
     }
   }
 }

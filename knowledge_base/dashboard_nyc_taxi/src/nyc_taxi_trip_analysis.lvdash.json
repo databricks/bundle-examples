@@ -1,27 +1,80 @@
 {
   "datasets": [
     {
-      "displayName": "route revenue",
       "name": "0ca96e81",
-      "query": "SELECT\n  T.pickup_zip,\n  T.dropoff_zip,\n  T.route as `Route`,\n  T.frequency as `Number Trips`,\n  T.total_fare as `Total Revenue`\nFROM\n  (\n    SELECT\n      pickup_zip,\n      dropoff_zip,\n      concat(pickup_zip, '-', dropoff_zip) AS route,\n      count(*) as frequency,\n      SUM(fare_amount) as total_fare\n    FROM\n      `samples`.`nyctaxi`.`trips`\n    GROUP BY\n       1,2,3\n  ) T\nORDER BY\n  1 ASC"
+      "displayName": "route revenue",
+      "queryLines": [
+        "SELECT\n",
+        "  T.pickup_zip,\n",
+        "  T.dropoff_zip,\n",
+        "  T.route as `Route`,\n",
+        "  T.frequency as `Number Trips`,\n",
+        "  T.total_fare as `Total Revenue`\n",
+        "FROM\n",
+        "  (\n",
+        "    SELECT\n",
+        "      pickup_zip,\n",
+        "      dropoff_zip,\n",
+        "      concat(pickup_zip, '-', dropoff_zip) AS route,\n",
+        "      count(*) as frequency,\n",
+        "      SUM(fare_amount) as total_fare\n",
+        "    FROM\n",
+        "      `samples`.`nyctaxi`.`trips`\n",
+        "    GROUP BY\n",
+        "       1,2,3\n",
+        "  ) T\n",
+        "ORDER BY\n",
+        "  1 ASC"
+      ]
     },
     {
-      "displayName": "trips",
       "name": "3f5450e6",
-      "query": "SELECT\n  T.tpep_pickup_datetime,\n  T.tpep_dropoff_datetime,\n  T.fare_amount,\n  T.pickup_zip,\n  T.dropoff_zip,\n  T.trip_distance,\n  T.weekday,\n  CASE\n    WHEN T.weekday = 1 THEN 'Sunday'\n    WHEN T.weekday = 2 THEN 'Monday'\n    WHEN T.weekday = 3 THEN 'Tuesday'\n    WHEN T.weekday = 4 THEN 'Wednesday'\n    WHEN T.weekday = 5 THEN 'Thursday'\n    WHEN T.weekday = 6 THEN 'Friday'\n    WHEN T.weekday = 7 THEN 'Saturday'\n    ELSE 'N/A'\n  END AS day_of_week, \n  T.fare_amount, \n  T.trip_distance\nFROM\n  (\n    SELECT\n      dayofweek(tpep_pickup_datetime) as weekday,\n      *\n    FROM\n      `samples`.`nyctaxi`.`trips`\n    WHERE\n      trip_distance > 0\n      AND trip_distance < 10\n      AND fare_amount > 0\n      AND fare_amount < 50\n  ) T\nORDER BY\n  T.weekday  "
+      "displayName": "trips",
+      "queryLines": [
+        "SELECT\n",
+        "  T.tpep_pickup_datetime,\n",
+        "  T.tpep_dropoff_datetime,\n",
+        "  T.fare_amount,\n",
+        "  T.pickup_zip,\n",
+        "  T.dropoff_zip,\n",
+        "  T.trip_distance,\n",
+        "  T.weekday,\n",
+        "  CASE\n",
+        "    WHEN T.weekday = 1 THEN 'Sunday'\n",
+        "    WHEN T.weekday = 2 THEN 'Monday'\n",
+        "    WHEN T.weekday = 3 THEN 'Tuesday'\n",
+        "    WHEN T.weekday = 4 THEN 'Wednesday'\n",
+        "    WHEN T.weekday = 5 THEN 'Thursday'\n",
+        "    WHEN T.weekday = 6 THEN 'Friday'\n",
+        "    WHEN T.weekday = 7 THEN 'Saturday'\n",
+        "    ELSE 'N/A'\n",
+        "  END AS day_of_week, \n",
+        "  T.fare_amount, \n",
+        "  T.trip_distance\n",
+        "FROM\n",
+        "  (\n",
+        "    SELECT\n",
+        "      dayofweek(tpep_pickup_datetime) as weekday,\n",
+        "      *\n",
+        "    FROM\n",
+        "      `samples`.`nyctaxi`.`trips`\n",
+        "    WHERE\n",
+        "      trip_distance > 0\n",
+        "      AND trip_distance < 10\n",
+        "      AND fare_amount > 0\n",
+        "      AND fare_amount < 50\n",
+        "  ) T\n",
+        "ORDER BY\n",
+        "  T.weekday  "
+      ]
     }
   ],
   "pages": [
     {
+      "name": "5a35864d",
       "displayName": "Summary",
       "layout": [
         {
-          "position": {
-            "height": 1,
-            "width": 2,
-            "x": 0,
-            "y": 1
-          },
           "widget": {
             "name": "01e21234",
             "queries": [
@@ -29,17 +82,17 @@
                 "name": "dashboards/01ee564285a315dd80d473e76171660a/datasets/01ee564285a51daf810a8ffc5051bfee_tpep_dropoff_datetime",
                 "query": {
                   "datasetName": "3f5450e6",
-                  "disaggregated": false,
                   "fields": [
                     {
-                      "expression": "`tpep_dropoff_datetime`",
-                      "name": "tpep_dropoff_datetime"
+                      "name": "tpep_dropoff_datetime",
+                      "expression": "`tpep_dropoff_datetime`"
                     },
                     {
-                      "expression": "COUNT_IF(`associative_filter_predicate_group`)",
-                      "name": "tpep_dropoff_datetime_associativity"
+                      "name": "tpep_dropoff_datetime_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
                     }
-                  ]
+                  ],
+                  "disaggregated": false
                 }
               }
             ],
@@ -60,15 +113,15 @@
               "version": 2,
               "widgetType": "filter-date-range-picker"
             }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 2,
+            "height": 1
           }
         },
         {
-          "position": {
-            "height": 4,
-            "width": 3,
-            "x": 0,
-            "y": 10
-          },
           "widget": {
             "name": "2c147a61",
             "queries": [
@@ -76,17 +129,17 @@
                 "name": "main_query",
                 "query": {
                   "datasetName": "3f5450e6",
-                  "disaggregated": false,
                   "fields": [
                     {
-                      "expression": "COUNT(`*`)",
-                      "name": "count(*)"
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
                     },
                     {
-                      "expression": "DATE_TRUNC(\"HOUR\", `tpep_pickup_datetime`)",
-                      "name": "hourly(tpep_pickup_datetime)"
+                      "name": "hourly(tpep_pickup_datetime)",
+                      "expression": "DATE_TRUNC(\"HOUR\", `tpep_pickup_datetime`)"
                     }
-                  ]
+                  ],
+                  "disaggregated": false
                 }
               }
             ],
@@ -137,15 +190,15 @@
               "version": 3,
               "widgetType": "bar"
             }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 3,
+            "height": 4
           }
         },
         {
-          "position": {
-            "height": 8,
-            "width": 4,
-            "x": 2,
-            "y": 2
-          },
           "widget": {
             "name": "35a5a364",
             "queries": [
@@ -153,21 +206,21 @@
                 "name": "main_query",
                 "query": {
                   "datasetName": "3f5450e6",
-                  "disaggregated": true,
                   "fields": [
                     {
-                      "expression": "`day_of_week`",
-                      "name": "day_of_week"
+                      "name": "day_of_week",
+                      "expression": "`day_of_week`"
                     },
                     {
-                      "expression": "`fare_amount`",
-                      "name": "fare_amount"
+                      "name": "fare_amount",
+                      "expression": "`fare_amount`"
                     },
                     {
-                      "expression": "`trip_distance`",
-                      "name": "trip_distance"
+                      "name": "trip_distance",
+                      "expression": "`trip_distance`"
                     }
-                  ]
+                  ],
+                  "disaggregated": true
                 }
               }
             ],
@@ -208,27 +261,31 @@
               "version": 3,
               "widgetType": "scatter"
             }
+          },
+          "position": {
+            "x": 2,
+            "y": 2,
+            "width": 4,
+            "height": 8
           }
         },
         {
-          "position": {
-            "height": 1,
-            "width": 6,
-            "x": 0,
-            "y": 0
-          },
           "widget": {
             "name": "4e04176c",
-            "textbox_spec": "# NYC Taxi Trip Analysis"
+            "multilineTextboxSpec": {
+              "lines": [
+                "# NYC Taxi Trip Analysis 2"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 1
           }
         },
         {
-          "position": {
-            "height": 4,
-            "width": 3,
-            "x": 3,
-            "y": 10
-          },
           "widget": {
             "name": "64a2a1f5",
             "queries": [
@@ -236,17 +293,17 @@
                 "name": "main_query",
                 "query": {
                   "datasetName": "3f5450e6",
-                  "disaggregated": false,
                   "fields": [
                     {
-                      "expression": "COUNT(`*`)",
-                      "name": "count(*)"
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
                     },
                     {
-                      "expression": "DATE_TRUNC(\"HOUR\", `tpep_dropoff_datetime`)",
-                      "name": "hourly(tpep_dropoff_datetime)"
+                      "name": "hourly(tpep_dropoff_datetime)",
+                      "expression": "DATE_TRUNC(\"HOUR\", `tpep_dropoff_datetime`)"
                     }
-                  ]
+                  ],
+                  "disaggregated": false
                 }
               }
             ],
@@ -294,15 +351,15 @@
               "version": 3,
               "widgetType": "bar"
             }
+          },
+          "position": {
+            "x": 3,
+            "y": 10,
+            "width": 3,
+            "height": 4
           }
         },
         {
-          "position": {
-            "height": 2,
-            "width": 2,
-            "x": 0,
-            "y": 2
-          },
           "widget": {
             "name": "8a537060",
             "queries": [
@@ -310,13 +367,13 @@
                 "name": "main_query",
                 "query": {
                   "datasetName": "3f5450e6",
-                  "disaggregated": false,
                   "fields": [
                     {
-                      "expression": "COUNT(`*`)",
-                      "name": "count(*)"
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
                     }
-                  ]
+                  ],
+                  "disaggregated": false
                 }
               }
             ],
@@ -334,15 +391,15 @@
               "version": 2,
               "widgetType": "counter"
             }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 2,
+            "height": 2
           }
         },
         {
-          "position": {
-            "height": 1,
-            "width": 2,
-            "x": 2,
-            "y": 1
-          },
           "widget": {
             "name": "c4e14639",
             "queries": [
@@ -350,34 +407,34 @@
                 "name": "dashboards/01eed0e4082a1c7e903cac7e74114376/datasets/01eed0e4082d1205adc131b86b10198e_pickup_zip",
                 "query": {
                   "datasetName": "0ca96e81",
-                  "disaggregated": false,
                   "fields": [
                     {
-                      "expression": "`pickup_zip`",
-                      "name": "pickup_zip"
+                      "name": "pickup_zip",
+                      "expression": "`pickup_zip`"
                     },
                     {
-                      "expression": "COUNT_IF(`associative_filter_predicate_group`)",
-                      "name": "pickup_zip_associativity"
+                      "name": "pickup_zip_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
                     }
-                  ]
+                  ],
+                  "disaggregated": false
                 }
               },
               {
                 "name": "dashboards/01eed0e4082a1c7e903cac7e74114376/datasets/01eed0e4082e1ff49c3209776820e82e_pickup_zip",
                 "query": {
                   "datasetName": "3f5450e6",
-                  "disaggregated": false,
                   "fields": [
                     {
-                      "expression": "`pickup_zip`",
-                      "name": "pickup_zip"
+                      "name": "pickup_zip",
+                      "expression": "`pickup_zip`"
                     },
                     {
-                      "expression": "COUNT_IF(`associative_filter_predicate_group`)",
-                      "name": "pickup_zip_associativity"
+                      "name": "pickup_zip_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
                     }
-                  ]
+                  ],
+                  "disaggregated": false
                 }
               }
             ],
@@ -403,15 +460,15 @@
               "version": 2,
               "widgetType": "filter-multi-select"
             }
+          },
+          "position": {
+            "x": 2,
+            "y": 1,
+            "width": 2,
+            "height": 1
           }
         },
         {
-          "position": {
-            "height": 6,
-            "width": 2,
-            "x": 0,
-            "y": 4
-          },
           "widget": {
             "name": "c532be56",
             "queries": [
@@ -419,21 +476,21 @@
                 "name": "main_query",
                 "query": {
                   "datasetName": "0ca96e81",
-                  "disaggregated": true,
                   "fields": [
                     {
-                      "expression": "`Number Trips`",
-                      "name": "Number Trips"
+                      "name": "Number Trips",
+                      "expression": "`Number Trips`"
                     },
                     {
-                      "expression": "`Route`",
-                      "name": "Route"
+                      "name": "Route",
+                      "expression": "`Route`"
                     },
                     {
-                      "expression": "`Total Revenue`",
-                      "name": "Total Revenue"
+                      "name": "Total Revenue",
+                      "expression": "`Total Revenue`"
                     }
-                  ]
+                  ],
+                  "disaggregated": true
                 }
               }
             ],
@@ -628,15 +685,15 @@
               "widgetType": "table",
               "withRowNumber": false
             }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 2,
+            "height": 6
           }
         },
         {
-          "position": {
-            "height": 1,
-            "width": 2,
-            "x": 4,
-            "y": 1
-          },
           "widget": {
             "name": "c6fc64a3",
             "queries": [
@@ -644,34 +701,34 @@
                 "name": "dashboards/01eed0e4082a1c7e903cac7e74114376/datasets/01eed0e4082d1205adc131b86b10198e_dropoff_zip",
                 "query": {
                   "datasetName": "0ca96e81",
-                  "disaggregated": false,
                   "fields": [
                     {
-                      "expression": "`dropoff_zip`",
-                      "name": "dropoff_zip"
+                      "name": "dropoff_zip",
+                      "expression": "`dropoff_zip`"
                     },
                     {
-                      "expression": "COUNT_IF(`associative_filter_predicate_group`)",
-                      "name": "dropoff_zip_associativity"
+                      "name": "dropoff_zip_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
                     }
-                  ]
+                  ],
+                  "disaggregated": false
                 }
               },
               {
                 "name": "dashboards/01eed0e4082a1c7e903cac7e74114376/datasets/01eed0e4082e1ff49c3209776820e82e_dropoff_zip",
                 "query": {
                   "datasetName": "3f5450e6",
-                  "disaggregated": false,
                   "fields": [
                     {
-                      "expression": "`dropoff_zip`",
-                      "name": "dropoff_zip"
+                      "name": "dropoff_zip",
+                      "expression": "`dropoff_zip`"
                     },
                     {
-                      "expression": "COUNT_IF(`associative_filter_predicate_group`)",
-                      "name": "dropoff_zip_associativity"
+                      "name": "dropoff_zip_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
                     }
-                  ]
+                  ],
+                  "disaggregated": false
                 }
               }
             ],
@@ -697,10 +754,21 @@
               "version": 2,
               "widgetType": "filter-multi-select"
             }
+          },
+          "position": {
+            "x": 4,
+            "y": 1,
+            "width": 2,
+            "height": 1
           }
         }
       ],
-      "name": "5a35864d"
+      "pageType": "PAGE_TYPE_CANVAS"
     }
-  ]
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    }
+  }
 }

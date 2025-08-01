@@ -2,9 +2,11 @@
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: default_sql
+  uuid: 853cd9bc-631c-4d4f-bca0-3195c7540854
 
 include:
   - resources/*.yml
+  - resources/*/*.yml
 
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:
@@ -27,21 +29,19 @@ targets:
       host: https://company.databricks.com
     variables:
       warehouse_id: abcdef1234567890
-      catalog: main
+      catalog: catalog
       schema: ${workspace.current_user.short_name}
 
   prod:
     mode: production
     workspace:
       host: https://company.databricks.com
-      # We explicitly specify /Users/user@company.com to make sure we only have a single copy.
-      root_path: /Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+      # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
+      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
     variables:
       warehouse_id: abcdef1234567890
-      catalog: main
+      catalog: catalog
       schema: default
     permissions:
       - user_name: user@company.com
         level: CAN_MANAGE
-    run_as:
-      user_name: user@company.com

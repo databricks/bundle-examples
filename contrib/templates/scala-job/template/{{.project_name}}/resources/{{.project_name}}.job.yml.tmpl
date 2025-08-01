@@ -1,0 +1,17 @@
+# The main job for {{.project_name}}
+
+resources:
+  jobs:
+    {{.project_name}}:
+      name: {{.project_name}}
+      tasks:
+        - task_key: main_task
+          spark_jar_task:
+            main_class_name: {{template `main_class_name` .}}
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            client: "3"
+            jar_dependencies:
+                - ${workspace.artifact_path}/.internal/{{.project_name}}-assembly-{{template `version` .}}.jar

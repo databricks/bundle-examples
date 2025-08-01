@@ -60,42 +60,42 @@ fi
 
 cd $(dirname $0)/..
 
-# init_bundle "default-python" '{
-#     "project_name":     "default_python",
-#     "include_notebook": "yes",
-#     "include_dlt":      "yes",
-#     "include_python":   "yes",
-#     "serverless":       "yes"
-# }'
+init_bundle "default-python" '{
+    "project_name":     "default_python",
+    "include_notebook": "yes",
+    "include_dlt":      "yes",
+    "include_python":   "yes",
+    "serverless":       "yes"
+}'
 
-# init_bundle "default-sql" '{
-#     "project_name":     "default_sql",
-#     "http_path":        "/sql/1.0/warehouses/abcdef1234567890",
-#     "default_catalog":  "catalog",
-#     "personal_schemas": "yes, automatically use a schema based on the current user name during development"
-# }'
+init_bundle "default-sql" '{
+    "project_name":     "default_sql",
+    "http_path":        "/sql/1.0/warehouses/abcdef1234567890",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes, automatically use a schema based on the current user name during development"
+}'
 
-# init_bundle "dbt-sql" '{
-#     "project_name":     "dbt_sql",
-#     "http_path":        "/sql/1.0/warehouses/abcdef1234567890",
-#     "default_catalog":  "catalog",
-#     "personal_schemas": "yes, use a schema based on the current user name during development"
-# }'
+init_bundle "dbt-sql" '{
+    "project_name":     "dbt_sql",
+    "http_path":        "/sql/1.0/warehouses/abcdef1234567890",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes, use a schema based on the current user name during development"
+}'
 
-# init_bundle "lakeflow-pipelines" '{
-#     "project_name":     "lakeflow_pipelines_sql",
-#     "default_catalog":  "catalog",
-#     "personal_schemas": "yes",
-#     "language":         "sql"
-# }'
+init_bundle "lakeflow-pipelines" '{
+    "project_name":     "lakeflow_pipelines_sql",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes",
+    "language":         "sql"
+}'
 
 
-# init_bundle "lakeflow-pipelines" '{
-#     "project_name":     "lakeflow_pipelines_python",
-#     "default_catalog":  "catalog",
-#     "personal_schemas": "yes",
-#     "language":         "python"
-# }'
+init_bundle "lakeflow-pipelines" '{
+    "project_name":     "lakeflow_pipelines_python",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes",
+    "language":         "python"
+}'
 
 cd contrib
 (

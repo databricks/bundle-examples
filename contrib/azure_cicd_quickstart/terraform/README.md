@@ -33,7 +33,6 @@ This Terraform configuration creates an Azure DevOps project with a CI/CD pipeli
    
    # Project Configuration  
    project_name = "dab-deployment-project"
-   repository_name = "dab-repository"
    pipeline_name = "DAB-CI-Pipeline"
    
    # Azure Subscription

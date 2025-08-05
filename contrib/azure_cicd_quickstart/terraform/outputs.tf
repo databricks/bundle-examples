@@ -1,4 +1,3 @@
-# Outputs
 output "project_id" {
   description = "The ID of the created project"
   value       = azuredevops_project.project.id

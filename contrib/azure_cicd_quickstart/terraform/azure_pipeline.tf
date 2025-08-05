@@ -1,29 +1,3 @@
-# Note: Azure DevOps organizations are typically created through the Azure portal
-# This configuration assumes the organization already exists and focuses on project creation
-
-resource "azuredevops_project" "project" {
-  name               = var.project_name
-  description        = var.project_description
-  visibility         = var.project_visibility
-  version_control    = "Git"
-  work_item_template = "Agile"
-
-  features = {
-    "boards"       = "enabled"
-    "repositories" = "enabled"
-    "pipelines"    = "enabled"
-    "testplans"    = "disabled"
-    "artifacts"    = "enabled"
-  }
-}
-
-# Use the default repository created with the project
-data "azuredevops_git_repository" "default_repo" {
-  project_id = azuredevops_project.project.id
-  name       = var.project_name
-}
-
-# Azure DevOps Build Definition (Pipeline)
 resource "azuredevops_build_definition" "pipeline" {
   project_id = azuredevops_project.project.id
   name       = var.pipeline_name
@@ -49,7 +23,7 @@ resource "azuredevops_build_definition" "pipeline" {
   ]
 }
 
-# Single Variable Group (following working pattern from old pipeline)
+
 resource "azuredevops_variable_group" "main_variables" {
   project_id   = azuredevops_project.project.id
   name         = "${var.project_name}-variables"
@@ -89,7 +63,7 @@ resource "azuredevops_variable_group" "main_variables" {
   }
 }
 
-# Pipeline authorization for the single variable group
+
 resource "azuredevops_pipeline_authorization" "main_variables_auth" {
   project_id  = azuredevops_project.project.id
   resource_id = azuredevops_variable_group.main_variables.id

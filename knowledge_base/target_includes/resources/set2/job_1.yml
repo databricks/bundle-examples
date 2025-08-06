@@ -3,20 +3,18 @@
 
 job-config: &job-config
   set2-job-1:
-    name: "Set2 Job 1 - ${var.environment}"
+    name: "Set2 Job 1 - ${bundle.target}"
     tasks:
       - task_key: "process_data"
         notebook_task:
           notebook_path: ../../src/notebook.py
-        new_cluster:
-          spark_version: "13.3.x-scala2.12"
-          node_type_id: "Standard_DS3_v2"
-          num_workers: 1
     max_concurrent_runs: 1
     timeout_seconds: 3600
-    schedule:
-      quartz_cron_expression: "0 0 12 * * ?"
-      timezone_id: "UTC"
+    trigger:
+      type: "cron"
+      cron:
+        quartz_cron_expression: "0 0 12 * * ?"
+        timezone_id: "UTC"
 
 targets:
   staging:

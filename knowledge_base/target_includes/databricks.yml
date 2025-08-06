@@ -6,19 +6,19 @@ include:
   - resources/set2/*.yml
 
 variables:
-  environment:
-    description: "Define the environment where the job will run"
+  name_suffix:
+    description: "Target specific suffix for the job name"
 
 targets:
   dev:
     default: true
     variables:
-      environment: dev
+      name_suffix: foo
 
   staging:
     variables:
-      environment: staging
+      name_suffix: bar
 
   prod:
     variables:
-      environment: prod
+      name_suffix: baz

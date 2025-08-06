@@ -51,10 +51,10 @@ Workspace:
 Resources:
   Jobs:
     set1-job-1:
-      Name: Set1 Job 1 - dev
+      Name: Set1 Job 1 - foo
       URL:  (not deployed)
     set1-job-2:
-      Name: Set1 Job 2 - dev
+      Name: Set1 Job 2 - foo
       URL:  (not deployed)
 
 # Summary of the bundle resources for staging
@@ -68,16 +68,16 @@ Workspace:
 Resources:
   Jobs:
     set1-job-1:
-      Name: Set1 Job 1 - staging
+      Name: Set1 Job 1 - bar
       URL:  (not deployed)
     set1-job-2:
-      Name: Set1 Job 2 - staging
+      Name: Set1 Job 2 - bar
       URL:  (not deployed)
     set2-job-1:
-      Name: Set2 Job 1 - staging
+      Name: Set2 Job 1 - bar
       URL:  (not deployed)
     set2-job-2:
-      Name: Set2 Job 2 - staging
+      Name: Set2 Job 2 - bar
       URL:  (not deployed)
 
 # Summary of the bundle resources for prod
@@ -91,10 +91,10 @@ Workspace:
 Resources:
   Jobs:
     set2-job-1:
-      Name: Set2 Job 1 - prod
+      Name: Set2 Job 1 - baz
       URL:  (not deployed)
     set2-job-2:
-      Name: Set2 Job 2 - prod
+      Name: Set2 Job 2 - baz
       URL:  (not deployed)
 ```
 

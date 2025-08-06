@@ -1,0 +1,24 @@
+bundle:
+  name: target-includes-example
+
+include:
+  - resources/set1/*.yml
+  - resources/set2/*.yml
+
+variables:
+  environment:
+    description: "Define the environment where the job will run"
+
+targets:
+  dev:
+    default: true
+    variables:
+      environment: dev
+
+  staging:
+    variables:
+      environment: staging
+
+  prod:
+    variables:
+      environment: prod

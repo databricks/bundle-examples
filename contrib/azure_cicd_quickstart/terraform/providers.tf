@@ -30,5 +30,5 @@ provider "azuread" {
 
 provider "azurerm" {
   features {}
-  subscription_id = var.azure_subscription_id
+  subscription_id = "edd4cc45-85c7-4aec-8bf5-648062d519bf"
 }

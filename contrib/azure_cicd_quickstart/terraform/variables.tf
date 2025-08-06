@@ -48,36 +48,83 @@ variable "pipeline_yml_path" {
 }
 
 # Service Connection Variables
-variable "service_connection_name" {
-  description = "Name for the Azure DevOps service connection"
+# Service Connection Names for Each Environment
+variable "service_connection_name_dev" {
+  description = "Name for the Azure DevOps service connection for dev environment"
   type        = string
-  default     = "azure-databricks-connection"
 }
 
-variable "azure_subscription_id" {
-  description = "Azure subscription ID where resources will be deployed"
+variable "service_connection_name_test" {
+  description = "Name for the Azure DevOps service connection for test environment"
+  type        = string
+}
+
+variable "service_connection_name_prod" {
+  description = "Name for the Azure DevOps service connection for prod environment"
+  type        = string
+}
+
+# Dev Environment Azure Subscription
+variable "azure_subscription_id_dev" {
+  description = "Azure subscription ID for dev environment"
   type        = string
   
   validation {
-    condition = can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", var.azure_subscription_id))
-    error_message = "Azure subscription ID must be a valid GUID format."
+    condition = can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", var.azure_subscription_id_dev))
+    error_message = "Dev Azure subscription ID must be a valid GUID format."
   }
 }
 
-variable "azure_subscription_name" {
-  description = "Azure subscription name"
+variable "azure_subscription_name_dev" {
+  description = "Azure subscription name for dev environment"
   type        = string
   
   validation {
-    condition     = length(var.azure_subscription_name) > 0
-    error_message = "Azure subscription name cannot be empty."
+    condition     = length(var.azure_subscription_name_dev) > 0
+    error_message = "Dev Azure subscription name cannot be empty."
   }
 }
 
-variable "environment_name" {
-  description = "Environment name for federated identity (e.g., dev, prod)"
+# Test Environment Azure Subscription
+variable "azure_subscription_id_test" {
+  description = "Azure subscription ID for test environment"
   type        = string
-  default     = "dev"
+  
+  validation {
+    condition = can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", var.azure_subscription_id_test))
+    error_message = "Test Azure subscription ID must be a valid GUID format."
+  }
+}
+
+variable "azure_subscription_name_test" {
+  description = "Azure subscription name for test environment"
+  type        = string
+  
+  validation {
+    condition     = length(var.azure_subscription_name_test) > 0
+    error_message = "Test Azure subscription name cannot be empty."
+  }
+}
+
+# Prod Environment Azure Subscription
+variable "azure_subscription_id_prod" {
+  description = "Azure subscription ID for prod environment"
+  type        = string
+  
+  validation {
+    condition = can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", var.azure_subscription_id_prod))
+    error_message = "Prod Azure subscription ID must be a valid GUID format."
+  }
+}
+
+variable "azure_subscription_name_prod" {
+  description = "Azure subscription name for prod environment"
+  type        = string
+  
+  validation {
+    condition     = length(var.azure_subscription_name_prod) > 0
+    error_message = "Prod Azure subscription name cannot be empty."
+  }
 }
 
 variable "azdo_personal_access_token" {

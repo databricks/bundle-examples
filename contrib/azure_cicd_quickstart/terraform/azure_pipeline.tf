@@ -15,58 +15,104 @@ resource "azuredevops_build_definition" "pipeline" {
   }
 
   variable_groups = [
-    azuredevops_variable_group.main_variables.id
+    azuredevops_variable_group.dev_variables.id,
+    azuredevops_variable_group.test_variables.id,
+    azuredevops_variable_group.prod_variables.id
   ]
 
   depends_on = [
-    azuredevops_variable_group.main_variables
+    azuredevops_variable_group.dev_variables,
+    azuredevops_variable_group.test_variables,
+    azuredevops_variable_group.prod_variables
   ]
 }
 
 
-resource "azuredevops_variable_group" "main_variables" {
+# Dev Environment Variable Group
+resource "azuredevops_variable_group" "dev_variables" {
   project_id   = azuredevops_project.project.id
-  name         = "${var.project_name}-variables"
-  description  = "Main variable group for DAB deployment"
+  name         = "${var.pipeline_name}-Dev-Variables"
+  description  = "Variable group for dev environment DAB deployment"
   
-  # Default environment (dev)
   variable {
     name  = "env"
     value = "dev"
   }
   
-  # Default Databricks host (dev)
   variable {
     name  = "DATABRICKS_HOST"
     value = var.databricks_host_dev
   }
   
-  # All environment-specific Databricks hosts for pipeline overrides
   variable {
-    name  = "DATABRICKS_HOST_DEV"
-    value = var.databricks_host_dev
+    name  = "SERVICE_CONNECTION_NAME"
+    value = var.service_connection_name_dev
+  }
+}
+
+# Test Environment Variable Group
+resource "azuredevops_variable_group" "test_variables" {
+  project_id   = azuredevops_project.project.id
+  name         = "${var.pipeline_name}-Test-Variables"
+  description  = "Variable group for test environment DAB deployment"
+  
+  variable {
+    name  = "env"
+    value = "test"
   }
   
   variable {
-    name  = "DATABRICKS_HOST_TEST"
+    name  = "DATABRICKS_HOST"
     value = var.databricks_host_test
   }
   
   variable {
-    name  = "DATABRICKS_HOST_PROD"
+    name  = "SERVICE_CONNECTION_NAME"
+    value = var.service_connection_name_test
+  }
+}
+
+# Prod Environment Variable Group
+resource "azuredevops_variable_group" "prod_variables" {
+  project_id   = azuredevops_project.project.id
+  name         = "${var.pipeline_name}-Prod-Variables"
+  description  = "Variable group for prod environment DAB deployment"
+  
+  variable {
+    name  = "env"
+    value = "prod"
+  }
+  
+  variable {
+    name  = "DATABRICKS_HOST"
     value = var.databricks_host_prod
   }
   
   variable {
     name  = "SERVICE_CONNECTION_NAME"
-    value = var.service_connection_name
+    value = var.service_connection_name_prod
   }
 }
 
 
-resource "azuredevops_pipeline_authorization" "main_variables_auth" {
+# Pipeline authorization for all variable groups
+resource "azuredevops_pipeline_authorization" "dev_variables_auth" {
   project_id  = azuredevops_project.project.id
-  resource_id = azuredevops_variable_group.main_variables.id
+  resource_id = azuredevops_variable_group.dev_variables.id
+  type        = "variablegroup"
+  pipeline_id = azuredevops_build_definition.pipeline.id
+}
+
+resource "azuredevops_pipeline_authorization" "test_variables_auth" {
+  project_id  = azuredevops_project.project.id
+  resource_id = azuredevops_variable_group.test_variables.id
+  type        = "variablegroup"
+  pipeline_id = azuredevops_build_definition.pipeline.id
+}
+
+resource "azuredevops_pipeline_authorization" "prod_variables_auth" {
+  project_id  = azuredevops_project.project.id
+  resource_id = azuredevops_variable_group.prod_variables.id
   type        = "variablegroup"
   pipeline_id = azuredevops_build_definition.pipeline.id
 }

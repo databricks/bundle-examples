@@ -24,12 +24,73 @@ output "pipeline_url" {
 }
 
 # Variable Group Outputs
-output "main_variable_group_name" {
-  description = "Name of the main variable group"
-  value       = azuredevops_variable_group.main_variables.name
+output "dev_variable_group_name" {
+  description = "Name of the dev variable group"
+  value       = azuredevops_variable_group.dev_variables.name
 }
 
-output "main_variable_group_id" {
-  description = "ID of the main variable group"
-  value       = azuredevops_variable_group.main_variables.id
+output "test_variable_group_name" {
+  description = "Name of the test variable group"
+  value       = azuredevops_variable_group.test_variables.name
+}
+
+output "prod_variable_group_name" {
+  description = "Name of the prod variable group"
+  value       = azuredevops_variable_group.prod_variables.name
+}
+
+# Service Connection Outputs
+output "dev_service_connection_name" {
+  description = "Name of the dev service connection"
+  value       = azuredevops_serviceendpoint_azurerm.dev_pipeline_service_connection.service_endpoint_name
+}
+
+output "test_service_connection_name" {
+  description = "Name of the test service connection"
+  value       = azuredevops_serviceendpoint_azurerm.test_pipeline_service_connection.service_endpoint_name
+}
+
+output "prod_service_connection_name" {
+  description = "Name of the prod service connection"
+  value       = azuredevops_serviceendpoint_azurerm.prod_pipeline_service_connection.service_endpoint_name
+}
+
+# Managed Identity Outputs
+output "dev_managed_identity_name" {
+  description = "Name of the dev managed identity"
+  value       = azurerm_user_assigned_identity.dev_pipeline_identity.name
+}
+
+output "test_managed_identity_name" {
+  description = "Name of the test managed identity"
+  value       = azurerm_user_assigned_identity.test_pipeline_identity.name
+}
+
+output "prod_managed_identity_name" {
+  description = "Name of the prod managed identity"
+  value       = azurerm_user_assigned_identity.prod_pipeline_identity.name
+}
+
+# Summary Output
+output "deployment_summary" {
+  description = "Summary of all created resources"
+  value = {
+    project_name = var.project_name
+    pipeline_name = var.pipeline_name
+    variable_groups = {
+      dev  = azuredevops_variable_group.dev_variables.name
+      test = azuredevops_variable_group.test_variables.name
+      prod = azuredevops_variable_group.prod_variables.name
+    }
+    service_connections = {
+      dev  = azuredevops_serviceendpoint_azurerm.dev_pipeline_service_connection.service_endpoint_name
+      test = azuredevops_serviceendpoint_azurerm.test_pipeline_service_connection.service_endpoint_name
+      prod = azuredevops_serviceendpoint_azurerm.prod_pipeline_service_connection.service_endpoint_name
+    }
+    managed_identities = {
+      dev  = azurerm_user_assigned_identity.dev_pipeline_identity.name
+      test = azurerm_user_assigned_identity.test_pipeline_identity.name
+      prod = azurerm_user_assigned_identity.prod_pipeline_identity.name
+    }
+  }
 }

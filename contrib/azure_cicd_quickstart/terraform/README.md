@@ -20,6 +20,12 @@ This Terraform configuration creates an Azure DevOps project with a CI/CD pipeli
 
 ### 1. Prepare Configuration Files
 
+This Terraform configuration creates all resources for all environments in a **single deployment**. It will create:
+- One Azure DevOps project and pipeline
+- Three variable groups (Dev, Test, Prod)
+- Three managed identities (one per environment)
+- Three service connections (one per subscription)
+
 1. **Copy the template file**:
    ```bash
    cp terraform.tfvars.template terraform.tfvars
@@ -28,20 +34,34 @@ This Terraform configuration creates an Azure DevOps project with a CI/CD pipeli
 2. **Edit terraform.tfvars** with your values:
    ```hcl
    # Azure DevOps Organization
-   organization_name = "your-org-name"           # From https://dev.azure.com/{org-name}
-   organization_id = "12345678-1234-1234-1234-123456789abc"  # Organization GUID
+   organization_name = "your-org-name"
+   organization_id = "12345678-1234-1234-1234-123456789abc"
+   azdo_personal_access_token = "your-azdo-pat-token"
    
-   # Project Configuration  
+   # Project Configuration
    project_name = "dab-deployment-project"
    pipeline_name = "DAB-CI-Pipeline"
    
-   # Azure Subscription
-   azure_subscription_id = "your-subscription-id"
-   azure_subscription_name = "your-subscription-name"
-   resource_group_name = "your-resource-group"
+   # Management Resource Group (where identities will be created)
+   resource_group_name = "your-management-resource-group"
    
-   # Service Connection
-   service_connection_name = "dab-service-connection"
+   # Dev Environment
+   azure_subscription_id_dev = "your-dev-subscription-id"
+   azure_subscription_name_dev = "your-dev-subscription-name"
+   service_connection_name_dev = "MyProject-Dev-Connection"
+   databricks_host_dev = "https://your-dev-workspace.azuredatabricks.net/"
+   
+   # Test Environment
+   azure_subscription_id_test = "your-test-subscription-id"
+   azure_subscription_name_test = "your-test-subscription-name"
+   service_connection_name_test = "MyProject-Test-Connection"
+   databricks_host_test = "https://your-test-workspace.azuredatabricks.net/"
+   
+   # Prod Environment
+   azure_subscription_id_prod = "your-prod-subscription-id"
+   azure_subscription_name_prod = "your-prod-subscription-name"
+   service_connection_name_prod = "MyProject-Prod-Connection"
+   databricks_host_prod = "https://your-prod-workspace.azuredatabricks.net/"
    ```
 
 ### 2. Get Required Values
@@ -92,34 +112,66 @@ az devops project list --org https://dev.azure.com/{org-name}
 
 ### 4. Deploy Infrastructure
 
-1. **Initialize Terraform**:
+**Single deployment** creates all resources for all environments.
+
+1. **Set Azure CLI to management subscription** (where resource group exists):
+   ```bash
+   az account set --subscription "your-management-subscription-id"
+   az account show  # Verify you're in the correct subscription
+   ```
+
+2. **Initialize and Deploy**:
    ```bash
    terraform init
-   ```
-
-2. **Validate Configuration**:
-   ```bash
    terraform validate
    terraform plan
-   ```
-
-3. **Deploy Resources**:
-   ```bash
    terraform apply
    ```
 
+**Note**: The managed identities will be created in your management subscription but will have permissions to deploy to their respective target subscriptions (dev/test/prod).
+
 ### 5. Post-Deployment Configuration
 
-#### Update Pipeline Variables
-After deployment, update the pipeline YAML variables:
+#### Pipeline YAML Configuration
+After deployment, your pipeline YAML should use conditional variable group selection based on the branch. The Terraform deployment has created three variable groups:
 
+- `{pipeline_name}-Dev-Variables` (for dev branch)
+- `{pipeline_name}-Test-Variables` (for test branch)  
+- `{pipeline_name}-Prod-Variables` (for main branch)
+
+**Your pipeline should be configured like this**:
 ```yaml
+trigger:
+  branches:
+    include:
+      - dev
+      - test
+      - main
+
 variables:
-  - name: DATABRICKS_HOST
-    value: 'https://your-databricks-workspace-url'
-  - name: SERVICE_CONNECTION_NAME  
-    value: 'your-service-connection-name'  # Must match tfvars
+  # Dynamically select variable group based on branch
+  - ${{ if eq(variables['Build.SourceBranchName'], 'dev') }}:
+      - group: '{pipeline_name}-Dev-Variables'
+  - ${{ elseif eq(variables['Build.SourceBranchName'], 'test') }}:
+      - group: '{pipeline_name}-Test-Variables'
+  - ${{ elseif eq(variables['Build.SourceBranchName'], 'main') }}:
+      - group: '{pipeline_name}-Prod-Variables'
+
+stages:
+  - stage: Build
+    jobs:
+      - job: BuildJob
+        steps:
+          - script: |
+              echo "Environment: $(env)"
+              echo "Databricks Host: $(DATABRICKS_HOST)"
+              echo "Service Connection: $(SERVICE_CONNECTION_NAME)"
 ```
+
+Each variable group contains:
+- `env` - Environment name (dev/test/prod)
+- `DATABRICKS_HOST` - Environment-specific Databricks workspace URL
+- `SERVICE_CONNECTION_NAME` - Environment-specific service connection name
 
 #### Create DAB Folders
 1. Clone the created repository
@@ -156,7 +208,7 @@ variables:
    ```
 
 3. **Verify**:
-   - PR should trigger validation pipeline
+   - PR should trigger change detection (no deployment)
    - Merge to main should trigger deployment pipeline
 
 ## Troubleshooting
@@ -241,23 +293,51 @@ For issues related to:
 ## Architecture Diagram
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Azure DevOps  │    │     Azure       │    │   Databricks    │
-│                 │    │                 │    │                 │
-│  ┌─────────────┐│    │┌─────────────────│    │                 │
-│  │   Pipeline  ││    ││Managed Identity │    │   Workspace     │
-│  │             ││────┤│                 │────│                 │
-│  │ - PR Val.   ││    ││Federated Cred.  │    │   DAB Deploy    │
-│  │ - Deploy    ││    │└─────────────────│    │                 │
-│  └─────────────┘│    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            Azure DevOps (Single Org)                        │
+│                                                                             │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐          │
+│  │   Project       │    │  Variable Groups │    │    Pipeline     │          │
+│  │  - Repository   │    │                 │    │                 │          │
+│  │  - Pipeline     │    │ MyProject-Dev   │    │ Conditional     │          │
+│  │                 │    │ MyProject-Test  │    │ Variable Group  │          │
+│  │                 │    │ MyProject-Prod  │    │ Selection       │          │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘          │
+└─────────────────────────────────────────────────────────────────────────────┘
+              │                        │                        │
+              │                        │                        │
+┌─────────────▼─────────────┐ ┌────────▼────────┐ ┌─────────────▼─────────────┐
+│     Dev Subscription      │ │ Test Subscription│ │    Prod Subscription     │
+│                           │ │                 │ │                          │
+│ ┌─────────────────────────┐ │ ┌───────────────┐ │ ┌─────────────────────────┐│
+│ │ MyProject-dev-identity  │ │ │MyProject-test │ │ │ MyProject-prod-identity ││
+│ │ + Service Connection    │ │ │+ Service Conn │ │ │ + Service Connection    ││
+│ │ + Federated Credential  │ │ │+ Fed Cred     │ │ │ + Federated Credential  ││
+│ └─────────────────────────┘ │ └───────────────┘ │ └─────────────────────────┘│
+│                           │ │                 │ │                          │
+│ ┌─────────────────────────┐ │ ┌───────────────┐ │ ┌─────────────────────────┐│
+│ │   Databricks Dev        │ │ │Databricks Test│ │ │   Databricks Prod       ││
+│ │   Workspace             │ │ │Workspace      │ │ │   Workspace             ││
+│ └─────────────────────────┘ │ └───────────────┘ │ └─────────────────────────┘│
+└───────────────────────────┘ └─────────────────┘ └───────────────────────────┘
 ```
 
 ## Next Steps
 
-After successful deployment:
-1. Create additional DAB projects in `data_eng_bundles/`
-2. Set up branch policies for production deployments
-3. Configure notifications for pipeline results
-4. Implement additional environments (test, prod)
-5. Add monitoring and logging for deployed DABs
+After successful deployment of all three environments:
+1. Update your pipeline YAML to use conditional variable group selection
+2. Create additional DAB projects in `data_eng_bundles/`
+3. Set up branch policies for production deployments (main branch)
+4. Configure notifications for pipeline results
+5. Test the pipeline by creating branches and PRs for each environment
+6. Add monitoring and logging for deployed DABs
+
+## Summary
+
+This architecture provides:
+- **Environment Isolation**: Each environment has its own Azure subscription and managed identity
+- **Single DevOps Project**: All environments share the same Azure DevOps project and pipeline
+- **Single Deployment**: One terraform apply creates all resources for all environments
+- **Dynamic Configuration**: Pipeline automatically selects the correct variable group based on branch
+- **Security**: Each environment uses its own managed identity with minimal required permissions
+- **Enterprise Standard**: Follows typical enterprise DevOps patterns with centralized CI/CD

@@ -23,15 +23,15 @@ target_includes/
 
 The bundle defines three targets:
 
-1. **dev**: Includes only `resources/set1/*.yml`
+- **dev**: Includes only `resources/set1/*.yml`
    - Contains: set1-job-1, set1-job-2
    - Environment: development
 
-2. **staging**: Includes both `resources/set1/*.yml` and `resources/set2/*.yml`
+- **staging**: Includes both `resources/set1/*.yml` and `resources/set2/*.yml`
    - Contains: set1-job-1, set1-job-2, set2-job-1, set2-job-2
    - Environment: staging
 
-3. **prod**: Includes only `resources/set2/*.yml`
+- **prod**: Includes only `resources/set2/*.yml`
    - Contains: set2-job-1, set2-job-2
    - Environment: production
 

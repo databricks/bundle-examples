@@ -136,7 +136,7 @@ az devops project list --org https://dev.azure.com/{org-name}
 
 ### 5. Post-Deployment - Pipeline Ready to Use
 
-#### ✨ Fully Automated Pipeline Setup
+#### Fully Automated Pipeline Setup
 The Terraform deployment automatically creates and configures everything needed for CI/CD:
 
 1. **Auto-generated `azure-pipelines.yml`** - Pipeline configuration is created and committed to your repository
@@ -160,7 +160,7 @@ Each variable group contains:
 - `DATABRICKS_HOST` - Environment-specific Databricks workspace URL
 - `SERVICE_CONNECTION_NAME` - Environment-specific service connection name
 
-**✅ No manual pipeline configuration required** - everything works immediately after `terraform apply`!
+**No manual pipeline configuration required** - everything works immediately after `terraform apply`!
 
 #### Add Your DAB Projects
 1. **Clone the created repository**:
@@ -352,12 +352,12 @@ After successful deployment:
 
 This fully automated solution provides:
 
-- ✅ **Complete Automation**: Single `terraform apply` creates everything - no manual configuration needed
-- 🏗️ **Enterprise Architecture**: Environment isolation with centralized CI/CD management  
-- 🔐 **Zero Secrets**: Managed identity authentication - no passwords or keys to manage
-- 🎯 **Smart Deployment**: Only deploys changed DAB folders for efficiency
-- 🌐 **Multi-Environment**: Automatic dev/test/prod environment selection based on git branch
-- 📋 **Production Ready**: Comprehensive error handling, logging, and pipeline authorization
-- 🚀 **Immediate Use**: Pipeline is configured and ready to use as soon as Terraform completes
+- **Complete Automation**: Single `terraform apply` creates everything - no manual configuration needed
+- **Enterprise Architecture**: Environment isolation with centralized CI/CD management  
+- **Zero Secrets**: Managed identity authentication - no passwords or keys to manage
+- **Smart Deployment**: Only deploys changed DAB folders for efficiency
+- **Multi-Environment**: Automatic dev/test/prod environment selection based on git branch
+- **Production Ready**: Comprehensive error handling, logging, and pipeline authorization
+- **Immediate Use**: Pipeline is configured and ready to use as soon as Terraform completes
 
 **Perfect for teams who want enterprise-grade DAB CI/CD without the complexity!**

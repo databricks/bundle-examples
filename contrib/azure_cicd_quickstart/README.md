@@ -2,15 +2,15 @@
 
 A complete solution for deploying Databricks Asset Bundles using Azure DevOps pipelines with managed identity authentication and multi-environment support.
 The azure_cicd_quickstart project deploys Azure resources to facilitate a safe ci/cd process with Databricks Asset Bundles. To learn more about when to use terraform, apis, and Databricks Asset Bundles read https://medium.com/@alexott_en/terraform-vs-databricks-asset-bundles-6256aa70e387
-## 🚀 Quick Start
+## Quick Start
 
 This solution automatically creates everything you need for DAB CI/CD in Azure DevOps:
 
-- ✅ **Azure DevOps project and pipeline**
-- ✅ **Multi-environment variable groups** (dev/test/prod)  
-- ✅ **Managed identities** with federated credentials
-- ✅ **Service connections** for each environment
-- ✅ **Automated pipeline configuration** - no manual setup required
+- **Azure DevOps project and pipeline**
+- **Multi-environment variable groups** (dev/test/prod)  
+- **Managed identities** with federated credentials
+- **Service connections** for each environment
+- **Automated pipeline configuration** - no manual setup required
 
 ### Prerequisites
 
@@ -44,7 +44,7 @@ This solution automatically creates everything you need for DAB CI/CD in Azure D
    - Create PRs to trigger validation  
    - Merge to main/test/dev to deploy
 
-## 📋 What Gets Created
+## What Gets Created
 
 | Component | Description |
 |-----------|-------------|
@@ -62,13 +62,13 @@ The pipeline automatically:
 4. **Deploys only changed bundles** for efficiency
 5. **Provides detailed logging** and error handling
 
-## 📁 Repository Structure
+## Repository Structure
 
 After deployment, your repository will look like:
 
 ```
 your-repo/
-├── azure-pipelines.yml          # ✨ Auto-generated pipeline
+├── azure-pipelines.yml          # Auto-generated pipeline
 ├── my-data-pipeline/            # Your DAB folders
 │   ├── databricks.yml          # (anywhere in repo)
 │   └── src/
@@ -79,7 +79,7 @@ your-repo/
     └── README.md               # Detailed setup guide
 ```
 
-## 🎯 Branch-Based Deployments
+## Branch-Based Deployments
 
 | Branch | Environment | Variable Group | Databricks Workspace |
 |--------|------------|----------------|----------------------|
@@ -87,13 +87,13 @@ your-repo/
 | `test` | Testing | `{pipeline_name}-Test-Variables` | Test workspace |
 | `main` | Production | `{pipeline_name}-Prod-Variables` | Prod workspace |
 
-## 📖 Detailed Documentation
+## Detailed Documentation
 
 For complete setup instructions, troubleshooting, and advanced configuration:
 
-👉 **[See Terraform README](terraform/README.md)** for detailed deployment guide
+**[See Terraform README](terraform/README.md)** for detailed deployment guide
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -107,7 +107,7 @@ For complete setup instructions, troubleshooting, and advanced configuration:
 2. Verify all prerequisite permissions are in place
 3. Review Azure DevOps pipeline logs for specific error messages
 
-## 🏗️ Architecture
+## Architecture
 
 This solution follows enterprise DevOps patterns:
 
@@ -117,7 +117,7 @@ This solution follows enterprise DevOps patterns:
 - **Conditional Deployment**: Only changed DABs are deployed
 - **Branch Protection**: Production deployments only from main branch
 
-## 🚦 Next Steps
+## Next Steps
 
 After successful deployment:
 

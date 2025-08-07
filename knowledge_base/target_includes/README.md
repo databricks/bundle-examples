@@ -35,12 +35,22 @@ The bundle defines three targets:
    - Contains: set2-job-1, set2-job-2
    - Environment: production
 
+
+## Notes
+
+There are some important aspects of this implementation:
+- The `databricks.yml` file includes all configuration files for all targets (see `include` section). This does not impact which resources will be deployed to each target.
+- For each job in a corresponding configuration file, such as `resources/set1/job_1.yml`, targets are defined where the job should be deployed. YAML anchors are used to avoid duplications between targets.
+
+
 ## Usage
 
 ```bash
-# Summary of the bundle resources for dev
 databricks bundle summary -p u2m -t dev
+```
 
+Output:
+```bash
 Name: target-includes-example
 Target: dev
 Workspace:
@@ -54,10 +64,14 @@ Resources:
     set1-job-2:
       Name: Set1 Job 2 - foo
       URL:  (not deployed)
+```
 
-# Summary of the bundle resources for staging
+```bash
 databricks bundle summary -p u2m -t staging
+```
 
+Output:
+```bash
 Name: target-includes-example
 Target: staging
 Workspace:
@@ -77,10 +91,14 @@ Resources:
     set2-job-2:
       Name: Set2 Job 2 - bar
       URL:  (not deployed)
+```
 
-# Summary of the bundle resources for prod
+```bash
 databricks bundle summary -p u2m -t prod   
+```
 
+Output:
+```bash
 Name: target-includes-example
 Target: prod
 Workspace:
@@ -95,9 +113,3 @@ Resources:
       Name: Set2 Job 2 - baz
       URL:  (not deployed)
 ```
-
-## Notes
-
-There are some important aspects of this implementation:
-- The `databricks.yml` file includes all configuration files for all targets (see `include` section). This does not impact which resources will be deployed to each target.
-- For each job in a corresponding configuration file, such as `resources/set1/job_1.yml`, targets are defined where the job should be deployed. YAML anchors are used to avoid duplications between targets.

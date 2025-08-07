@@ -98,6 +98,6 @@ Resources:
 
 ## Notes
 
-There are some key aspects in this implementation
-1. In `databricks.yml` file we include (see `include` section) all configuration files for all targets. This does not impact which resources will be deployed for which target.
-2. For each job in corresponding configuration file like `resources/set1/job_1.yml` we define in which targets this job should be deployed. We use YAML anchors to avoid duplications between targets.
+There are some important aspects of this implementation:
+- The `databricks.yml` file includes all configuration files for all targets (see `include` section). This does not impact which resources will be deployed to each target.
+- For each job in a corresponding configuration file, such as `resources/set1/job_1.yml`, targets are defined where the job should be deployed. YAML anchors are used to avoid duplications between targets.

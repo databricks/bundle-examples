@@ -71,12 +71,24 @@ output "prod_managed_identity_name" {
   value       = azurerm_user_assigned_identity.prod_pipeline_identity.name
 }
 
+# Repository Files Output
+output "readme_file" {
+  description = "README file created in repository"
+  value       = "README.md"
+}
+
+output "pipeline_file_path" {
+  description = "Path to the auto-created pipeline YAML file"
+  value       = var.pipeline_yml_path
+}
+
 # Summary Output
 output "deployment_summary" {
   description = "Summary of all created resources"
   value = {
     project_name = var.project_name
     pipeline_name = var.pipeline_name
+    pipeline_file = var.pipeline_yml_path
     variable_groups = {
       dev  = azuredevops_variable_group.dev_variables.name
       test = azuredevops_variable_group.test_variables.name

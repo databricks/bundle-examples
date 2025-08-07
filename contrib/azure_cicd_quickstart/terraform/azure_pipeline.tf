@@ -6,7 +6,7 @@ resource "azuredevops_build_definition" "pipeline" {
   repository {
     repo_type   = "TfsGit"
     repo_id     = data.azuredevops_git_repository.default_repo.id
-    branch_name = data.azuredevops_git_repository.default_repo.default_branch
+    branch_name = "refs/heads/main"
     yml_path    = var.pipeline_yml_path
   }
 
@@ -23,7 +23,9 @@ resource "azuredevops_build_definition" "pipeline" {
   depends_on = [
     azuredevops_variable_group.dev_variables,
     azuredevops_variable_group.test_variables,
-    azuredevops_variable_group.prod_variables
+    azuredevops_variable_group.prod_variables,
+    null_resource.initialize_repo,
+    azuredevops_git_repository_file.azure_pipeline_yml
   ]
 }
 
@@ -114,5 +116,27 @@ resource "azuredevops_pipeline_authorization" "prod_variables_auth" {
   project_id  = azuredevops_project.project.id
   resource_id = azuredevops_variable_group.prod_variables.id
   type        = "variablegroup"
+  pipeline_id = azuredevops_build_definition.pipeline.id
+}
+
+# Pipeline authorization for service connections
+resource "azuredevops_pipeline_authorization" "dev_service_connection_auth" {
+  project_id  = azuredevops_project.project.id
+  resource_id = azuredevops_serviceendpoint_azurerm.dev_pipeline_service_connection.id
+  type        = "endpoint"
+  pipeline_id = azuredevops_build_definition.pipeline.id
+}
+
+resource "azuredevops_pipeline_authorization" "test_service_connection_auth" {
+  project_id  = azuredevops_project.project.id
+  resource_id = azuredevops_serviceendpoint_azurerm.test_pipeline_service_connection.id
+  type        = "endpoint"
+  pipeline_id = azuredevops_build_definition.pipeline.id
+}
+
+resource "azuredevops_pipeline_authorization" "prod_service_connection_auth" {
+  project_id  = azuredevops_project.project.id
+  resource_id = azuredevops_serviceendpoint_azurerm.prod_pipeline_service_connection.id
+  type        = "endpoint"
   pipeline_id = azuredevops_build_definition.pipeline.id
 }

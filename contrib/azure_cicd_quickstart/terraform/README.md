@@ -132,56 +132,35 @@ az devops project list --org https://dev.azure.com/{org-name}
 
 ### 5. Post-Deployment Configuration
 
-#### Pipeline YAML Configuration
-After deployment, your pipeline YAML should use conditional variable group selection based on the branch. The Terraform deployment has created three variable groups:
+#### Automated Pipeline Creation
+The Terraform deployment automatically creates the `azure-pipelines.yml` file in your repository with the correct configuration. The pipeline is pre-configured with:
 
-- `{pipeline_name}-Dev-Variables` (for dev branch)
-- `{pipeline_name}-Test-Variables` (for test branch)  
-- `{pipeline_name}-Prod-Variables` (for main branch)
-
-**Your pipeline should be configured like this**:
-```yaml
-trigger:
-  branches:
-    include:
-      - dev
-      - test
-      - main
-
-variables:
-  # Dynamically select variable group based on branch
-  - ${{ if eq(variables['Build.SourceBranchName'], 'dev') }}:
-      - group: '{pipeline_name}-Dev-Variables'
-  - ${{ elseif eq(variables['Build.SourceBranchName'], 'test') }}:
-      - group: '{pipeline_name}-Test-Variables'
-  - ${{ elseif eq(variables['Build.SourceBranchName'], 'main') }}:
-      - group: '{pipeline_name}-Prod-Variables'
-
-stages:
-  - stage: Build
-    jobs:
-      - job: BuildJob
-        steps:
-          - script: |
-              echo "Environment: $(env)"
-              echo "Databricks Host: $(DATABRICKS_HOST)"
-              echo "Service Connection: $(SERVICE_CONNECTION_NAME)"
-```
+- **Conditional variable group selection** based on branch (dev/test/main)
+- **Dynamic environment targeting** using the variable groups created by Terraform:
+  - `{pipeline_name}-Dev-Variables` (for dev branch)
+  - `{pipeline_name}-Test-Variables` (for test branch)  
+  - `{pipeline_name}-Prod-Variables` (for main branch)
+- **DAB change detection** to deploy only modified bundles
+- **Sequential deployment** with comprehensive error handling
+- **Skip logic** to avoid unnecessary deployments when no changes are detected
 
 Each variable group contains:
 - `env` - Environment name (dev/test/prod)
 - `DATABRICKS_HOST` - Environment-specific Databricks workspace URL
 - `SERVICE_CONNECTION_NAME` - Environment-specific service connection name
 
+**No manual pipeline configuration is required** - the pipeline is ready to use immediately after Terraform deployment.
+
 #### Create DAB Folders
 1. Clone the created repository
-2. Create folder structure:
+2. Create your DAB folder structure anywhere in the repository:
    ```
-   data_eng_bundles/
-   ├── your-dab-folder/
-   │   ├── databricks.yml
-   │   └── src/
+   your-dab-folder/
+   ├── databricks.yml
+   └── src/
    ```
+   
+   The pipeline automatically detects any folder containing a `databricks.yml` file (up to 7 levels deep).
 
 ### 6. Test the Pipeline
 

@@ -1,7 +1,7 @@
 # Azure DevOps CI/CD for Databricks Asset Bundles (DABs)
 
 A complete solution for deploying Databricks Asset Bundles using Azure DevOps pipelines with managed identity authentication and multi-environment support.
-
+The azure_cicd_quickstart project deploys Azure resources to facilitate a safe ci/cd process with Databricks Asset Bundles. To learn more about when to use terraform, apis, and Databricks Asset Bundles read https://medium.com/@alexott_en/terraform-vs-databricks-asset-bundles-6256aa70e387
 ## 🚀 Quick Start
 
 This solution automatically creates everything you need for DAB CI/CD in Azure DevOps:

@@ -2,9 +2,7 @@
 
 This example demonstrates the concept of using `target_includes` (or similar include mechanisms) in Databricks Asset Bundles to organize job configurations across different environments without duplication.
 
-## Overview
-
-This example implements the use case described in [GitHub Issue #2878](https://github.com/databricks/cli/issues/2878), which requests the ability to include specific resource files based on target configurations.
+It addresses the use case described in [GitHub Issue #2878](https://github.com/databricks/cli/issues/2878), which requests the ability to include specific resource files based on target configurations.
 
 ## Directory Structure
 

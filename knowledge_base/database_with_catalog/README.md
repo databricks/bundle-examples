@@ -9,6 +9,7 @@ For more information about Databricks database instances, see the [documentation
 ## Prerequisites
 
 * Databricks CLI v0.265.0 or above
+* `psql` client version 14 or above (only needed to run the demo data generation)
 
 ## Usage
 

@@ -12,6 +12,6 @@ resources:
       environments:
         - environment_key: default
           spec:
-            client: "3"
+            client: "4"
             jar_dependencies:
                 - ${workspace.artifact_path}/.internal/{{.project_name}}-assembly-{{template `version` .}}.jar

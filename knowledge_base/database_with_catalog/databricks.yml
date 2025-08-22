@@ -20,9 +20,6 @@ resources:
 # Defines the targets for this bundle.
 # Targets allow you to deploy the same bundle to different Databricks workspaces.
 targets:
-  prod: { 
-    # No overrides
-  }
   dev:
     # This target is for development purposes.
     # It defaults to the current Databricks workspace.

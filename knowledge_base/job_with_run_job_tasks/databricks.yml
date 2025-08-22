@@ -2,7 +2,7 @@ bundle:
   name: job_with_run_job_tasks
 
 workspace:
-  host: https://e2-dogfood.staging.cloud.databricks.com
+  host: https://myworkspace.cloud.databricks.com
 
 permissions:
   - level: CAN_VIEW

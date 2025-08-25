@@ -1,0 +1,27 @@
+# Job 2 for set2 - used in staging and prod targets
+# Using YAML anchors to avoid duplication
+
+job-config: &job-config
+  set2-job-2:
+    name: "Set2 Job 2 - ${bundle.target}"
+    tasks:
+      - task_key: "process_data"
+        notebook_task:
+          notebook_path: ../../src/notebook.py
+    max_concurrent_runs: 1
+    timeout_seconds: 3600
+    trigger:
+      type: "cron"
+      cron:
+        quartz_cron_expression: "0 0 12 * * ?"
+        timezone_id: "UTC"
+
+targets:
+  staging:
+    resources:
+      jobs: 
+        <<: *job-config
+  prod:
+    resources:
+      jobs: 
+        <<: *job-config

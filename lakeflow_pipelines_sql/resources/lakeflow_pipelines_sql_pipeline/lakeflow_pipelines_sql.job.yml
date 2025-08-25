@@ -1,8 +1,8 @@
-# The job that triggers etl_pipeline.
+# The job that triggers lakeflow_pipelines_sql_pipeline.
 resources:
   jobs:
-    etl_pipeline_job:
-      name: etl_pipeline_job
+    lakeflow_pipelines_sql_job:
+      name: lakeflow_pipelines_sql_job
 
       trigger:
         # Run this job every day, exactly one day from the last run; see https://docs.databricks.com/api/workspace/jobs/create#trigger
@@ -16,4 +16,4 @@ resources:
       tasks:
         - task_key: refresh_pipeline
           pipeline_task:
-            pipeline_id: ${resources.pipelines.etl_pipeline.id}
+            pipeline_id: ${resources.pipelines.lakeflow_pipelines_sql_pipeline.id}

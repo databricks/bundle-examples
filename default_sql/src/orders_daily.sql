@@ -1,4 +1,4 @@
--- This query is executed using Databricks Workflows (see resources/default_sql_sql_job.yml)
+-- This query is executed using Databricks Workflows (see resources/default_sql_sql.job.yml)
 
 USE CATALOG {{catalog}};
 USE IDENTIFIER({{schema}});

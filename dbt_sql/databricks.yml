@@ -3,20 +3,22 @@
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: dbt_sql
+  uuid: 5e5ca8d5-0388-473e-84a1-1414ed89c5df
 
 include:
   - resources/*.yml
+  - resources/*/*.yml
 
 # Deployment targets.
 # The default schema, catalog, etc. for dbt are defined in dbt_profiles/profiles.yml
 targets:
   dev:
-    default: true
     # The default target uses 'mode: development' to create a development copy.
     # - Deployed resources get prefixed with '[dev my_user_name]'
     # - Any job schedules and triggers are paused by default.
     # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
     mode: development
+    default: true
     workspace:
       host: https://company.databricks.com
 
@@ -24,10 +26,8 @@ targets:
     mode: production
     workspace:
       host: https://company.databricks.com
-      # We explicitly specify /Users/user@company.com to make sure we only have a single copy.
-      root_path: /Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+      # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
+      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
     permissions:
       - user_name: user@company.com
         level: CAN_MANAGE
-    run_as:
-      user_name: user@company.com

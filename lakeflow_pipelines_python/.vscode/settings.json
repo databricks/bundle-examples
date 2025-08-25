@@ -1,5 +1,6 @@
 {
     "python.analysis.stubPath": ".vscode",
+    "databricks.python.envFile": "${workspaceFolder}/.env",
     "jupyter.interactiveWindow.cellMarker.codeRegex": "^# COMMAND ----------|^# Databricks notebook source|^(#\\s*%%|#\\s*\\<codecell\\>|#\\s*In\\[\\d*?\\]|#\\s*In\\[ \\])",
     "jupyter.interactiveWindow.cellMarker.default": "# COMMAND ----------",
     "python.testing.pytestArgs": [
@@ -7,21 +8,14 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.analysis.extraPaths": ["src"],
+    "python.analysis.extraPaths": ["resources/lakeflow_pipelines_python_pipeline"],
     "files.exclude": {
         "**/*.egg-info": true,
         "**/__pycache__": true,
         ".pytest_cache": true,
     },
-    "sqltools.connections": [
-        {
-            "connectionMethod": "VS Code Extension (beta)",
-            "catalog": "catalog",
-            "previewLimit": 50,
-            "driver": "Databricks",
-            "name": "databricks",
-            "path": "/sql/1.0/warehouses/abcdef1234567890"
-        }
-    ],
-    "sqltools.autoConnectTo": "",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+    },
 }

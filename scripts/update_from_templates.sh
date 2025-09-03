@@ -50,12 +50,12 @@ if [ ! "$DATABRICKS_HOST" ]; then
     exit 1
 fi
 
-if [ -n "$1" ]; then 
+# Prompt for CURRENT_USER_NAME if not passed as first arg
+if [ -n "${1-}" ]; then 
     CURRENT_USER_NAME="$1"
 else
-    read -p "Enter the current user name (e.g., 'lennart_kats'): " CURRENT_USER_NAME
-    read -p "Enter the current user name (e.g., 'lennart_kats'): " CURRENT_USER_NAME
-    if [ ! "$CURRENT_USER_NAME" ]; then
+    read -r -p "Enter the current user name of your 'DEFAULT' profile (e.g., 'lennart_kats'): " CURRENT_USER_NAME
+    if [ -z "${CURRENT_USER_NAME:-}" ]; then
         echo "Error: current user name is required." >&2
         exit 1
     fi

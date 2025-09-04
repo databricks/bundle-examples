@@ -26,7 +26,7 @@ targets:
     workspace:
       host: https://company.databricks.com
     variables:
-      catalog: main
+      catalog: catalog
       schema: ${workspace.current_user.short_name}
       notifications: []
       
@@ -34,14 +34,14 @@ targets:
     mode: production
     workspace:
       host: https://company.databricks.com
-      # We explicitly specify /Workspace/Users/user@databricks.com to make sure we only have a single copy.
-      root_path: /Workspace/Users/user@databricks.com/.bundle/${bundle.name}/${bundle.target}
+      # We explicitly specify /Workspace/Users/user@company.com to make sure we only have a single copy.
+      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
     permissions:
-      - user_name: user@databricks.com
+      - user_name: user@company.com
         level: CAN_MANAGE
     run_as:
-      user_name: user@databricks.com
+      user_name: user@company.com
     variables:
-      catalog: main
+      catalog: catalog
       schema: default
-      notifications: [user@databricks.com]
+      notifications: [user@company.com]

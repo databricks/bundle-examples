@@ -5,4 +5,5 @@ exclude = [
     "default_python/*",
     "default_sql/*",
     "mlops_stacks/*",
+    "lakeflow_pipelines_python/*",
 ]

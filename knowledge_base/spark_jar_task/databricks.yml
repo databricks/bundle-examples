@@ -2,7 +2,7 @@ bundle:
   name: spark-jar-task
 
 workspace:
-  host: https://e2-dogfood.staging.cloud.databricks.com
+  host: https://myworkspace.cloud.databricks.com
   artifact_path: /Volumes/my/artifact/path
 
 artifacts:

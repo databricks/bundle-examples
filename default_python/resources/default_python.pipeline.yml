@@ -4,10 +4,11 @@ resources:
     default_python_pipeline:
       name: default_python_pipeline
       catalog: main
-      target: default_python_${bundle.environment}
+      schema: default_python_${bundle.target}
+      serverless: true
       libraries:
         - notebook:
             path: ../src/dlt_pipeline.ipynb
 
       configuration:
-        bundle.sourcePath: /Workspace/${workspace.file_path}/src
+        bundle.sourcePath: ${workspace.file_path}/src

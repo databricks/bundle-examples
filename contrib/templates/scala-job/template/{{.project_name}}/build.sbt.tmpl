@@ -6,7 +6,7 @@ name := "{{.project_name}}"
 organization := "{{template `organization` .}}"
 version := "{{template `version` .}}"
 
-libraryDependencies += "com.databricks" % "databricks-connect" % "{{template `dbr_version` .}}.+"
+libraryDependencies += "com.databricks" %% "databricks-connect" % "{{template `dbr_version` .}}.+"
 libraryDependencies += "org.slf4j" % "slf4j-simple" % "2.0.16"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % Test

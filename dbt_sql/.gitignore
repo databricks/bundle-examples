@@ -11,4 +11,5 @@ scratch/**
 # dbt
 target/
 dbt_packages/
+dbt_modules/
 logs/

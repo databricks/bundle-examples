@@ -2,9 +2,16 @@
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: default_python
+  uuid: 87d5a23e-7bc7-4f52-98ee-e374b67d5681
+
+artifacts:
+  python_artifact:
+    type: whl
+    build: uv build --wheel
 
 include:
   - resources/*.yml
+  - resources/*/*.yml
 
 targets:
   dev:
@@ -21,10 +28,8 @@ targets:
     mode: production
     workspace:
       host: https://company.databricks.com
-      # We explicitly specify /Users/user@company.com to make sure we only have a single copy.
-      root_path: /Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+      # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
+      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
     permissions:
       - user_name: user@company.com
         level: CAN_MANAGE
-    run_as:
-      user_name: user@company.com

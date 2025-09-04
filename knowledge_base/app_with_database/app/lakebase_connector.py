@@ -17,12 +17,16 @@ print("postgres_host", postgres_host)
 print("postgres_port", postgres_port)
 print("postgres_database", postgres_database)
 
-postgres_pool = create_engine(f"postgresql+psycopg://{postgres_username}:@{postgres_host}:{postgres_port}/{postgres_database}")
+postgres_pool = create_engine(
+    f"postgresql+psycopg://{postgres_username}:@{postgres_host}:{postgres_port}/{postgres_database}"
+)
+
 
 @event.listens_for(postgres_pool, "do_connect")
 def provide_token(dialect, conn_rec, cargs, cparams):
     """Provide the App's OAuth token. Caching is managed by WorkspaceClient"""
     cparams["password"] = workspace_client.config.oauth_token().access_token
+
 
 def get_holiday_requests():
     """
@@ -34,6 +38,7 @@ def get_holiday_requests():
     df = pd.read_sql_query("SELECT * FROM holidays.holiday_requests;", postgres_pool)
     return df
 
+
 def update_request_status(request_id, status, comment):
     """Update the status and manager note for a specific holiday request."""
     with postgres_pool.begin() as conn:
@@ -42,22 +47,18 @@ def update_request_status(request_id, status, comment):
                  UPDATE holidays.holiday_requests
                  SET status = :status, manager_note = :comment
                  WHERE request_id = :request_id
-                 """
-                 ),
-            {"status": status, "comment": comment or "", "request_id": request_id}
+                 """),
+            {"status": status, "comment": comment or "", "request_id": request_id},
         )
+
 
 def initialize_schema():
     with postgres_pool.begin() as conn:
         # create schema:
-        conn.execute(
-            text("""CREATE SCHEMA IF NOT EXISTS holidays""")
-        )
+        conn.execute(text("""CREATE SCHEMA IF NOT EXISTS holidays"""))
         print("schema created (or already exists)")
         # grant privileges
-        conn.execute(
-            text("""GRANT USAGE ON SCHEMA holidays TO PUBLIC""")
-        )
+        conn.execute(text("""GRANT USAGE ON SCHEMA holidays TO PUBLIC"""))
         conn.execute(
             text("""GRANT SELECT ON ALL TABLES IN SCHEMA holidays TO PUBLIC""")
         )
@@ -88,5 +89,6 @@ def initialize_schema():
             """)
         )
         print("demo data is inserted")
+
 
 initialize_schema()

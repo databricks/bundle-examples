@@ -30,11 +30,7 @@ def register_callbacks(app):
         prevent_initial_call=True,
     )
     def submit_holiday_request_review(
-            n_clicks,
-            selected_row_nr,
-            table_data,
-            selected_action,
-            manager_comment
+        n_clicks, selected_row_nr, table_data, selected_action, manager_comment
     ):
         if (selected_action is None) | (selected_row_nr is None):
             return "Please select a request and approve/decline."

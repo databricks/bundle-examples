@@ -74,7 +74,7 @@ def make_app_layout():
                 ],
                 className="action-panel",
             ),
-            dcc.Interval(id="refresh-interval", interval=10*1000, n_intervals=0),
+            dcc.Interval(id="refresh-interval", interval=10 * 1000, n_intervals=0),
         ],
         className="container",
     )

@@ -1,0 +1,24 @@
+bundle:
+  name: target-includes-example
+
+include:
+  - resources/set1/*.yml
+  - resources/set2/*.yml
+
+variables:
+  name_suffix:
+    description: "Target specific suffix for the job name"
+
+targets:
+  dev:
+    default: true
+    variables:
+      name_suffix: foo
+
+  staging:
+    variables:
+      name_suffix: bar
+
+  prod:
+    variables:
+      name_suffix: baz

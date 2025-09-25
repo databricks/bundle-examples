@@ -10,29 +10,29 @@ dbt_sql:
 
   # The default target when deployed with the Databricks CLI
   # N.B. when you use dbt from the command line, it uses the profile from .dbt/profiles.yml
-  dev:
-    type: databricks
-    method: http
-    catalog: catalog
-    schema: "{{ var('dev_schema') }}"
-
-    http_path: /sql/1.0/warehouses/abcdef1234567890
-
-    # The workspace host / token are provided by Databricks
-    # see databricks.yml for the workspace host used for 'dev'
-    host: "{{ env_var('DBT_HOST') }}"
-    token: "{{ env_var('DBT_ACCESS_TOKEN') }}"
-
-  # The production target when deployed with the Databricks CLI
-  prod:
-    type: databricks
-    method: http
-    catalog: catalog
-    schema: default
-
-    http_path: /sql/1.0/warehouses/abcdef1234567890
-
-    # The workspace host / token are provided by Databricks
-    # see databricks.yml for the workspace host used for 'prod'
-    host: "{{ env_var('DBT_HOST') }}"
-    token: "{{ env_var('DBT_ACCESS_TOKEN') }}"
+      dev:
+        type: databricks
+        method: http
+        catalog: catalog
+        schema: "{{ var('dev_schema') }}"
+    
+        http_path: /sql/1.0/warehouses/abcdef1234567890
+    
+        # The workspace host / token are provided by Databricks
+        # see databricks.yml for the workspace host used for 'dev'
+        host: "{{ env_var('DBT_HOST') }}"
+        token: "{{ env_var('DBT_ACCESS_TOKEN') }}"
+    
+      # The production target when deployed with the Databricks CLI
+      prod:
+        type: databricks
+        method: http
+        catalog: catalog
+        schema: default
+    
+        http_path: /sql/1.0/warehouses/abcdef1234567890
+    
+        # The workspace host / token are provided by Databricks
+        # see databricks.yml for the workspace host used for 'prod'
+        host: "{{ env_var('DBT_HOST') }}"
+        token: "{{ env_var('DBT_ACCESS_TOKEN') }}"

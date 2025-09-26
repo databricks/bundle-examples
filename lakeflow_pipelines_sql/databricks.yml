@@ -14,8 +14,6 @@ variables:
     description: The catalog to use
   schema:
     description: The schema to use
-  notifications:
-    description: The email addresses to use for failure notifications
 
 targets:
   dev:
@@ -30,18 +28,15 @@ targets:
     variables:
       catalog: catalog
       schema: ${workspace.current_user.short_name}
-      notifications: []
-
   prod:
     mode: production
     workspace:
       host: https://company.databricks.com
       # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
       root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: catalog
+      schema: prod
     permissions:
       - user_name: user@company.com
         level: CAN_MANAGE
-    variables:
-      catalog: catalog
-      schema: default
-      notifications: [user@company.com]

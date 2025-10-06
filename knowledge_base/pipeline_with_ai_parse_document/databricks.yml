@@ -16,12 +16,6 @@ variables:
   output_volume_path:
     description: Output volume path for processed images
     default: /Volumes/main/default/parsed_output
-  raw_table_name:
-    description: Name of the raw parsed documents table
-    default: parsed_documents_raw
-  text_table_name:
-    description: Name of the text output table
-    default: parsed_documents_text
 
 include:
   - resources/*.yml

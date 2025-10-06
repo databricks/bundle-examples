@@ -21,7 +21,7 @@ AS (
     ai_parse_document(
       content,
       map(
-        'version', '1.1',
+        'version', '2.0',
         'imageOutputPath', '/Volumes/main/default/parsed_output/',
         'descriptionElementTypes', '*'
       )

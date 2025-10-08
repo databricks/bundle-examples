@@ -1,0 +1,167 @@
+---
+title: "File Push"
+language: python
+author: "Chi Yang"
+date: 2025-08-07
+
+tags:
+- ingestion
+- file
+- nocode
+---
+
+# File Push
+
+A lightweight, no‑code file ingestion workflow. Configure a set of tables, get a volume path for each, and drop files into those paths—your data lands in Unity Catalog tables via Auto Loader and Lakeflow Pipeline.
+
+## Table of Contents
+- [Quick Start](#quick-start)
+  - [Step 1. Configure tables](#step-1-configure-tables)
+  - [Step 2. Deploy & set up](#step-2-deploy--set-up)
+  - [Step 3. Retrieve endpoint & push files](#step-3-retrieve-endpoint--push-files)
+- [Debug Table Issues](#debug-table-issues)
+  - [Step 1. Configure tables to debug](#step-1-configure-tables-to-debug)
+  - [Step 2. Deploy & set up in dev mode](#step-2-deploy--set-up-in-dev-mode)
+  - [Step 3. Retrieve endpoint & push files to debug](#step-3-retrieve-endpoint--push-files-to-debug)
+  - [Step 4. Debug table configs](#step-4-debug-table-configs)
+  - [Step 5. Fix the table configs in production](#step-5-fix-the-table-configs-in-production)
+
+---
+
+## Quick Start
+
+### Step 1. Configure tables
+Edit table configs in `./src/configs/tables.json`. Only `name` and `format` are required.
+
+For supported `format_options`, see the [Auto Loader options](https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options). Not all options are supported here. If unsure, specify only `name` and `format`, or follow [Debug Table Issues](#debug-table-issues) to discover the correct options.
+
+```json
+[
+  {
+    "name": "table1",
+    "format": "csv",
+    "format_options":
+    {
+      "escape": "\""
+    },
+    "schema_hints": "id int, name string"
+  },
+  {
+    "name": "table2",
+    "format": "json"
+  }
+]
+```
+
+> **Tip:** Keep `schema_hints` minimal; Auto Loader can evolve the schema as new columns appear.
+
+### Step 2. Deploy & set up
+
+```bash
+databricks bundle deploy
+databricks bundle run configuration_job
+```
+
+Wait for the configuration job to finish before moving on.
+
+### Step 3. Retrieve endpoint & push files
+Fetch the volume path for uploading files to a specific table (example: `table1`):
+
+```bash
+databricks tables get {{.catalog_name}}.{{.schema_name}}.table1 --output json \
+  | jq -r '.properties["filepush.table_volume_path_data"]'
+```
+
+Example output:
+
+```text
+/Volumes/{{.catalog_name}}/{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/data/table1
+```
+
+Upload files to the path above using any of the [Volumes file APIs](https://docs.databricks.com/aws/en/volumes/volume-files#methods-for-managing-files-in-volumes).
+
+**Databricks CLI example** (destination uses the `dbfs:` scheme):
+
+```bash
+databricks fs cp /local/file/path/datafile1.csv \
+  dbfs:/Volumes/{{.catalog_name}}/{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/data/table1
+```
+
+**REST API example**:
+
+```bash
+# prerequisites: export DATABRICKS_HOST and DATABRICKS_TOKEN (PAT token)
+curl -X PUT "$DATABRICKS_HOST/api/2.0/fs/files/Volumes/{{.catalog_name}}/{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/data/table1/datafile1.csv" \
+  -H "Authorization: Bearer $DATABRICKS_TOKEN" \
+  -H "Content-Type: application/octet-stream" \
+  --data-binary @"/local/file/path/datafile1.csv"
+```
+
+Within about a minute, the data should appear in the table `{{.catalog_name}}.{{.schema_name}}.table1`.
+
+---
+
+## Debug Table Issues
+If data isn’t parsed as expected, use **dev mode** to iterate on table options safely.
+
+### Step 1. Configure tables to debug
+Configure tables as in [Step 1 of Quick Start](#step-1-configure-tables).
+
+### Step 2. Deploy & set up in **dev mode**
+
+```bash
+databricks bundle deploy -t dev
+databricks bundle run configuration_job -t dev
+```
+
+Wait for the configuration job to finish. Example output:
+
+```text
+2025-09-23 22:03:04,938 [INFO] initialization - ==========
+catalog_name: {{.catalog_name}}
+schema_name: dev_chi_yang_{{.schema_name}}
+volume_path_root: /Volumes/{{.catalog_name}}/dev_chi_yang_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume
+volume_path_data: /Volumes/{{.catalog_name}}/dev_chi_yang_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/data
+volume_path_archive: /Volumes/{{.catalog_name}}/dev_chi_yang_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/archive
+==========
+```
+
+> **Note:** In **dev mode**, the schema name is **prefixed**. Use the printed schema name for the remaining steps.
+
+### Step 3. Retrieve endpoint & push files to debug
+Get the dev volume path (note the **prefixed schema**):
+
+```bash
+databricks tables get {{.catalog_name}}.dev_chi_yang_{{.schema_name}}.table1 --output json \
+  | jq -r '.properties["filepush.table_volume_path_data"]'
+```
+
+Example output:
+
+```text
+/Volumes/{{.catalog_name}}/dev_chi_yang_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/data/table1
+```
+
+Then follow the upload instructions from [Quick Start → Step 3](#step-3-retrieve-endpoint--push-files) to send test files.
+
+### Step 4. Debug table configs
+Open the pipeline in the workspace:
+
+```bash
+databricks bundle open refresh_pipeline -t dev
+```
+
+Click **Edit pipeline** to launch the development UI. Open the `debug_table_config` notebook and follow its guidance to refine the table options. When satisfied, copy the final config back to `./src/configs/tables.json`.
+
+### Step 5. Fix the table configs in production
+Redeploy the updated config and run a full refresh to correct existing data for an affected table:
+
+```bash
+databricks bundle deploy
+databricks bundle run refresh_pipeline --full-refresh table1
+```
+
+---
+
+**That’s it!** You now have a managed, push-based file ingestion workflow with debuggable table configs and repeatable deployments.
+

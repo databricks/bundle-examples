@@ -12,4 +12,5 @@ resources:
             path: ../src/ingestion.py
       root_path: ../src
       configuration:
+        lakeflow.experimantal.filepush.version: 0.1
         filepush.volume_path_root: ${resources.volumes.filepush_volume.volume_path}

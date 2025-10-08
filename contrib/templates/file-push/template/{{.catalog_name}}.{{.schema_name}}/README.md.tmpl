@@ -119,10 +119,10 @@ Wait for the configuration job to finish. Example output:
 ```text
 2025-09-23 22:03:04,938 [INFO] initialization - ==========
 catalog_name: {{.catalog_name}}
-schema_name: dev_chi_yang_{{.schema_name}}
-volume_path_root: /Volumes/{{.catalog_name}}/dev_chi_yang_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume
-volume_path_data: /Volumes/{{.catalog_name}}/dev_chi_yang_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/data
-volume_path_archive: /Volumes/{{.catalog_name}}/dev_chi_yang_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/archive
+schema_name: dev_first_last_{{.schema_name}}
+volume_path_root: /Volumes/{{.catalog_name}}/dev_first_last_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume
+volume_path_data: /Volumes/{{.catalog_name}}/dev_first_last_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/data
+volume_path_archive: /Volumes/{{.catalog_name}}/dev_first_last_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/archive
 ==========
 ```
 
@@ -132,14 +132,14 @@ volume_path_archive: /Volumes/{{.catalog_name}}/dev_chi_yang_{{.schema_name}}/{{
 Get the dev volume path (note the **prefixed schema**):
 
 ```bash
-databricks tables get {{.catalog_name}}.dev_chi_yang_{{.schema_name}}.table1 --output json \
+databricks tables get {{.catalog_name}}.dev_first_last_{{.schema_name}}.table1 --output json \
   | jq -r '.properties["filepush.table_volume_path_data"]'
 ```
 
 Example output:
 
 ```text
-/Volumes/{{.catalog_name}}/dev_chi_yang_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/data/table1
+/Volumes/{{.catalog_name}}/dev_first_last_{{.schema_name}}/{{.catalog_name}}_{{.schema_name}}_filepush_volume/data/table1
 ```
 
 Then follow the upload instructions from [Quick Start → Step 3](#step-3-retrieve-endpoint--push-files) to send test files.
@@ -163,5 +163,5 @@ databricks bundle run refresh_pipeline --full-refresh table1
 
 ---
 
-**That’s it!** You now have a managed, push-based file ingestion workflow with debuggable table configs and repeatable deployments.
+**That’s it!** You now have a managed, push-based file ingestion workflow with debuggable table configs and repeatable deployments!
 

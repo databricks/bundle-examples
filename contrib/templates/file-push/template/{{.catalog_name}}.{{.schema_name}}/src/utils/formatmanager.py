@@ -94,7 +94,23 @@ class JSON(AutoLoaderFormat):
     }
     self.default_schema |= {"_corrupt_record STRING"}
 
-_supported_formats: dict[str, AutoLoaderFormat] = {f.name: f for f in (CSV(), JSON())}
+class AVRO(AutoLoaderFormat):
+  def __init__(self):
+    super().__init__()
+    self.name = "AVRO"
+    self.options |= {
+      AutoLoaderOption("mergeSchema", "true", True),
+    }
+
+class PARQUET(AutoLoaderFormat):
+  def __init__(self):
+    super().__init__()
+    self.name = "PARQUET"
+    self.options |= {
+      AutoLoaderOption("mergeSchema", "true", True),
+    }
+
+_supported_formats: dict[str, AutoLoaderFormat] = {f.name: f for f in (CSV(), JSON(), AVRO(), PARQUET())}
 
 def get_format_manager(fmt: str) -> dict[str, str]:
   key = fmt.strip().upper()

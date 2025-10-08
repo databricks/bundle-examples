@@ -5,7 +5,7 @@ from databricks.sdk import WorkspaceClient
 def get_config() -> dict:
   json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "configs", "environment.json")
   if not os.path.exists(json_path):
-    raise RuntimeError(f"Missing environment file: {json_path}. Have you run `databricks bundle run configuration_job`?")
+    raise RuntimeError(f"Missing environment file: {json_path}. This should be run in a workspace, not locally. And make sure to run `databricks bundle run configuration_job` at least once.")
   with open(json_path, "r") as f:
     configs = json.load(f)
   return configs

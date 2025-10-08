@@ -33,6 +33,8 @@ A lightweight, no‑code file ingestion workflow. Configure a set of tables, get
 ### Step 1. Configure tables
 Edit table configs in `./src/configs/tables.json`. Only `name` and `format` are required.
 
+Currently supported formats are `csv`, `json`, `avro` and `parquet`.
+
 For supported `format_options`, see the [Auto Loader options](https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options). Not all options are supported here. If unsure, specify only `name` and `format`, or follow [Debug Table Issues](#debug-table-issues) to discover the correct options.
 
 ```json

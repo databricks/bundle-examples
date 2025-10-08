@@ -35,4 +35,3 @@ def has_default_storage() -> bool:
     props.get("defaultManagedLocation") or
     props.get("delta.defaultLocation")
   )
-  

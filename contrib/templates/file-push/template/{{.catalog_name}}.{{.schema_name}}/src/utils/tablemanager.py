@@ -95,4 +95,3 @@ def get_placeholder_df_with_config(spark: SparkSession, table_config: dict) -> D
   reader = _apply_table_options(reader, table_config, fmt_mgr).schema(fmt_mgr.get_default_schema())
 
   return reader.load(get_table_volume_path(table_config.get("name")))
-  

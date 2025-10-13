@@ -3,6 +3,18 @@ resources:
     ai_parse_document_workflow:
       name: ai_parse_document_workflow
 
+      # Optional: Add a schedule
+      # schedule:
+      #   quartz_cron_expression: "0 0 * * * ?"
+      #   timezone_id: "UTC"
+
+      # Job-level parameters shared across all tasks
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
       environments:
         - environment_key: serverless_env
           spec:
@@ -14,8 +26,6 @@ resources:
           notebook_task:
             notebook_path: ../src/transformations/01_parse_documents.py
             base_parameters:
-              catalog: ${var.catalog}
-              schema: ${var.schema}
               source_volume_path: ${var.source_volume_path}
               output_volume_path: ${var.output_volume_path}
               checkpoint_location: ${var.checkpoint_base_path}/01_parse_documents
@@ -28,8 +38,6 @@ resources:
           notebook_task:
             notebook_path: ../src/transformations/02_extract_text.py
             base_parameters:
-              catalog: ${var.catalog}
-              schema: ${var.schema}
               checkpoint_location: ${var.checkpoint_base_path}/02_extract_text
               source_table_name: ${var.raw_table_name}
               table_name: ${var.text_table_name}
@@ -41,15 +49,8 @@ resources:
           notebook_task:
             notebook_path: ../src/transformations/03_extract_structured_data.py
             base_parameters:
-              catalog: ${var.catalog}
-              schema: ${var.schema}
               checkpoint_location: ${var.checkpoint_base_path}/03_extract_structured_data
               source_table_name: ${var.text_table_name}
               table_name: ${var.structured_table_name}
 
       max_concurrent_runs: 1
-
-      # Optional: Add a schedule
-      # schedule:
-      #   quartz_cron_expression: "0 0 * * * ?"
-      #   timezone_id: "UTC"

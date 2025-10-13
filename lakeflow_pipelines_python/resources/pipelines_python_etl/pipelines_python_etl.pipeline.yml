@@ -1,0 +1,14 @@
+# The main pipeline for lakeflow_pipelines_python
+
+resources:
+  pipelines:
+    pipelines_python_etl:
+      name: pipelines_python_etl
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: "."
+
+      libraries:
+        - glob:
+            include: transformations/**

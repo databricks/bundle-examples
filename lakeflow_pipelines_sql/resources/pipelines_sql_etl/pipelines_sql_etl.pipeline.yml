@@ -1,0 +1,14 @@
+# The main pipeline for lakeflow_pipelines_sql
+
+resources:
+  pipelines:
+    pipelines_sql_etl:
+      name: pipelines_sql_etl
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: "."
+
+      libraries:
+        - glob:
+            include: transformations/**

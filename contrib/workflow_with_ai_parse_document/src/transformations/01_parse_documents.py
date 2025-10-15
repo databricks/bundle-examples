@@ -7,11 +7,11 @@
 # COMMAND ----------
 
 # Get parameters
-dbutils.widgets.text("catalog", "users", "Catalog name")
-dbutils.widgets.text("schema", "jas_bali", "Schema name")
-dbutils.widgets.text("source_volume_path", "/Volumes/users/jas_bali/pdfs_ie", "Source volume path")
-dbutils.widgets.text("output_volume_path", "/Volumes/users/jas_bali/pdfs_for_bricks", "Output volume path")
-dbutils.widgets.text("checkpoint_location", "/tmp/checkpoints/parse_documents", "Checkpoint location")
+dbutils.widgets.text("catalog", "main", "Catalog name")
+dbutils.widgets.text("schema", "default", "Schema name")
+dbutils.widgets.text("source_volume_path", "/Volumes/main/default/source_documents", "Source volume path")
+dbutils.widgets.text("output_volume_path", "/Volumes/main/default/parsed_output", "Output volume path")
+dbutils.widgets.text("checkpoint_location", "/Volumes/main/default/checkpoints/parse_documents", "Checkpoint location")
 dbutils.widgets.text("table_name", "parsed_documents_raw", "Output table name")
 
 catalog = dbutils.widgets.get("catalog")
@@ -45,6 +45,7 @@ files_df = (spark.readStream
     .format("binaryFile")
     .schema(binary_file_schema)
     .option("pathGlobFilter", "*.{pdf,jpg,jpeg,png}")
+    .option("recursiveFileLookup", "true")
     .load(source_volume_path)
 )
 

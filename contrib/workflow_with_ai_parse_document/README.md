@@ -1,15 +1,15 @@
-# AI Document Processing Workflow with Structured Streaming
+# AI Document Processing Job with Structured Streaming
 
-A Databricks Asset Bundle demonstrating **incremental document processing** using `ai_parse_document`, `ai_query`, and Databricks Workflows with Structured Streaming.
+A Databricks Asset Bundle demonstrating **incremental document processing** using `ai_parse_document`, `ai_query`, and Databricks Jobs with Structured Streaming.
 
 ## Overview
 
-This example shows how to build an incremental workflow that:
+This example shows how to build an incremental job that:
 1. **Parses** PDFs and images using [`ai_parse_document`](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_parse_document)
 2. **Extracts** clean text with incremental processing
 3. **Analyzes** content using [`ai_query`](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_query) with LLMs
 
-All stages run as Python notebook tasks in a Databricks Workflow using Structured Streaming with serverless compute.
+All stages run as Python notebook tasks in a Databricks Job using Structured Streaming with serverless compute.
 
 ## Architecture
 
@@ -63,7 +63,7 @@ Source Documents (UC Volume)
 
 5. **Upload documents** to your source volume
 
-6. **Run workflow** from the Databricks UI (Workflows)
+6. **Run job** from the Databricks UI (Workflows)
 
 ## Configuration
 
@@ -75,13 +75,13 @@ variables:
   schema: default                                                  # Your schema
   source_volume_path: /Volumes/main/default/source_documents      # Source PDFs
   output_volume_path: /Volumes/main/default/parsed_output         # Parsed images
-  checkpoint_base_path: /tmp/checkpoints/ai_parse_workflow        # Checkpoints
+  checkpoint_base_path: /Volumes/main/default/checkpoints         # Checkpoints
   raw_table_name: parsed_documents_raw                            # Table names
   text_table_name: parsed_documents_text
   structured_table_name: parsed_documents_structured
 ```
 
-## Workflow Tasks
+## Job Tasks
 
 ### Task 1: Document Parsing
 **File**: `src/transformations/01_parse_documents.py`
@@ -126,13 +126,39 @@ The included notebook visualizes parsing results with interactive bounding boxes
 - Automatic image scaling
 - Page selection support
 
+### Example Output
+
+**Document Summary with Element Types**
+
+![Document Summary](assets/document_summary.png)
+
+**Visual Bounding Boxes on Page 1**
+
+![Page 1 Bounding Boxes](assets/page1_bounding_boxes.png)
+
+**Extracted Elements with Descriptions**
+
+![Page 1 Elements List](assets/page1_elements_list.png)
+
+**Page 2 Contents Table with Bounding Boxes**
+
+![Page 2 Contents Table](assets/page2_contents_table.png)
+
+**Table Extraction Example**
+
+![Table Extraction](assets/table_extraction.png)
+
+**Figure Description**
+
+![Figure Description](assets/figure_description.png)
+
 ## Project Structure
 
 ```
 .
 ├── databricks.yml                      # Bundle configuration
 ├── resources/
-│   └── ai_parse_document_workflow.job.yml
+│   └── ai_parse_document_job.job.yml
 ├── src/
 │   ├── transformations/
 │   │   ├── 01_parse_documents.py

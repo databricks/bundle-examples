@@ -26,3 +26,8 @@ scratch/**
 *.png
 *.jpg
 *.jpeg
+
+# Exception: Allow documentation images in assets folder
+!assets/*.png
+!assets/*.jpg
+!assets/*.jpeg

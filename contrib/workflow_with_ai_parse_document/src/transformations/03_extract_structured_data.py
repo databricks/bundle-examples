@@ -7,9 +7,9 @@
 # COMMAND ----------
 
 # Get parameters
-dbutils.widgets.text("catalog", "users", "Catalog name")
-dbutils.widgets.text("schema", "jas_bali", "Schema name")
-dbutils.widgets.text("checkpoint_location", "/tmp/checkpoints/extract_structured", "Checkpoint location")
+dbutils.widgets.text("catalog", "main", "Catalog name")
+dbutils.widgets.text("schema", "default", "Schema name")
+dbutils.widgets.text("checkpoint_location", "/Volumes/main/default/checkpoints/extract_structured", "Checkpoint location")
 dbutils.widgets.text("source_table_name", "parsed_documents_text", "Source table name")
 dbutils.widgets.text("table_name", "parsed_documents_structured", "Output table name")
 

@@ -9,7 +9,11 @@
 # Get parameters
 dbutils.widgets.text("catalog", "main", "Catalog name")
 dbutils.widgets.text("schema", "default", "Schema name")
-dbutils.widgets.text("checkpoint_location", "/Volumes/main/default/checkpoints/extract_structured", "Checkpoint location")
+dbutils.widgets.text(
+    "checkpoint_location",
+    "/Volumes/main/default/checkpoints/extract_structured",
+    "Checkpoint location",
+)
 dbutils.widgets.text("source_table_name", "parsed_documents_text", "Source table name")
 dbutils.widgets.text("table_name", "parsed_documents_structured", "Output table name")
 
@@ -30,20 +34,21 @@ spark.sql(f"USE SCHEMA {schema}")
 from pyspark.sql.functions import col, concat, current_timestamp, expr, length, lit
 
 # Read from source table using Structured Streaming
-text_stream = (spark.readStream
-    .format("delta")
+text_stream = (
+    spark.readStream.format("delta")
     .table(source_table_name)
     .filter(
-        (col("text").isNotNull()) &
-        (col("error_status").isNull()) &
-        (length(col("text")) > 100)
+        (col("text").isNotNull())
+        & (col("error_status").isNull())
+        & (length(col("text")) > 100)
     )
 )
 
 # Extract structured data using ai_query
-structured_df = text_stream.withColumn(
-    "extracted_json",
-    expr("""
+structured_df = (
+    text_stream.withColumn(
+        "extracted_json",
+        expr("""
         ai_query(
             'databricks-claude-sonnet-4',
             concat(
@@ -59,14 +64,15 @@ structured_df = text_stream.withColumn(
                 'temperature', 0.1
             )
         )
-    """)
-).withColumn(
-    "extraction_timestamp", current_timestamp()
-).select("path", "extracted_json", "parsed_at", "extraction_timestamp")
+    """),
+    )
+    .withColumn("extraction_timestamp", current_timestamp())
+    .select("path", "extracted_json", "parsed_at", "extraction_timestamp")
+)
 
 # Write to Delta table with streaming
-(structured_df.writeStream
-    .format("delta")
+(
+    structured_df.writeStream.format("delta")
     .outputMode("append")
     .option("checkpointLocation", checkpoint_location)
     .option("mergeSchema", "true")

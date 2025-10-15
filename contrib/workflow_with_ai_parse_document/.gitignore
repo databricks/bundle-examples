@@ -1,0 +1,33 @@
+# Databricks
+.databricks/
+
+# Python
+build/
+dist/
+__pycache__/
+*.egg-info
+.venv/
+*.py[cod]
+
+# Local configuration (keep your settings private)
+databricks.local.yml
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
+
+# Scratch/temporary files
+scratch/**
+!scratch/README.md
+
+# Test documents (don't commit large PDFs)
+*.pdf
+*.png
+*.jpg
+*.jpeg
+
+# Exception: Allow documentation images in assets folder
+!assets/*.png
+!assets/*.jpg
+!assets/*.jpeg

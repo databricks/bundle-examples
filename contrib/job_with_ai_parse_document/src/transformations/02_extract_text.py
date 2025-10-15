@@ -47,11 +47,7 @@ text_df = (
                 "\n\n",
                 expr("""
                 transform(
-                    CASE
-                        WHEN try_cast(parsed:metadata:version AS STRING) = '1.0'
-                        THEN try_cast(parsed:document:pages AS ARRAY<VARIANT>)
-                        ELSE try_cast(parsed:document:elements AS ARRAY<VARIANT>)
-                    END,
+                    try_cast(parsed:document:elements AS ARRAY<VARIANT>),
                     element -> try_cast(element:content AS STRING)
                 )
             """),

@@ -96,7 +96,7 @@ Uses `ai_parse_document` to extract text, tables, and metadata from PDFs/images:
 
 Extracts clean concatenated text using `transform()`:
 - Reads from previous task's table via streaming
-- Handles both parser v1.0 and v2.0 formats
+- Extracts text from parsed document elements
 - Uses `transform()` for efficient text extraction
 - Includes error handling for failed parses
 

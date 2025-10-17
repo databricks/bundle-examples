@@ -63,7 +63,7 @@ class CSV(AutoLoaderFormat):
     super().__init__()
     self.name = "CSV"
     self.options |= {
-      AutoLoaderOption("header", "true", True),
+      AutoLoaderOption("header", "true"),
       AutoLoaderOption("mergeSchema", "true", True),
       AutoLoaderOption("mode", "PERMISSIVE", True),
       AutoLoaderOption("columnNameOfCorruptRecord", "_corrupt_record", True),

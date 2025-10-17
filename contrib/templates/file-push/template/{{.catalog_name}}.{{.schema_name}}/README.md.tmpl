@@ -1,16 +1,4 @@
----
-title: "File Push"
-language: python
-author: "Chi Yang"
-date: 2025-08-07
-
-tags:
-- ingestion
-- file
-- nocode
----
-
-# File Push
+# Zerobus - File Mode
 
 A lightweight, no‑code file ingestion workflow. Configure a set of tables, get a volume path for each, and drop files into those paths—your data lands in Unity Catalog tables via Auto Loader and Lakeflow Pipeline.
 
@@ -67,6 +55,12 @@ databricks bundle run configuration_job
 Wait for the configuration job to finish before moving on.
 
 ### Step 3. Retrieve endpoint & push files
+First, grant write permissions to the volume. This enables the client to push files:
+
+```bash
+databricks bundle open filepush_volume
+```
+
 Fetch the volume path for uploading files to a specific table (example: `table1`):
 
 ```bash
@@ -131,6 +125,7 @@ volume_path_archive: /Volumes/{{.catalog_name}}/dev_first_last_{{.schema_name}}/
 > **Note:** In **dev mode**, the schema name is **prefixed**. Use the printed schema name for the remaining steps.
 
 ### Step 3. Retrieve endpoint & push files to debug
+
 Get the dev volume path (note the **prefixed schema**):
 
 ```bash

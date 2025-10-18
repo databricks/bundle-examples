@@ -17,7 +17,7 @@ class AutoLoaderFormat:
         self.name = None
         self.options: set[AutoLoaderOption] = {
             AutoLoaderOption("cloudFiles.inferColumnTypes", "true", True),
-            AutoLoaderOption("cloudFiles.schemaEvolutionMode", "addNewColumns", True),
+            AutoLoaderOption("cloudFiles.schemaEvolutionMode", "addNewColumns"),
             AutoLoaderOption("cloudFiles.cleanSource", "MOVE", True),
             AutoLoaderOption("cloudFiles.cleanSource.retentionDuration", "1 day", True),
             AutoLoaderOption(

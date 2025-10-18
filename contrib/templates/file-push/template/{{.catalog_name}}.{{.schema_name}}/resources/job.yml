@@ -1,0 +1,46 @@
+# The main job for schema dab
+# This job will trigger in the schema pipeline
+
+resources:
+  jobs:
+    filetrigger_job:
+      name: ${var.resource_name_prefix}filetrigger_job
+      tasks:
+        - task_key: pipeline_refresh
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.refresh_pipeline.id}
+      trigger:
+        file_arrival:
+          url: ${resources.volumes.filepush_volume.volume_path}/data/
+    configuration_job:
+      name: ${var.resource_name_prefix}configuration_job
+      tasks:
+        - task_key: initialization
+          spark_python_task:
+            python_file: ../src/utils/initialization.py
+            parameters:
+              - "--catalog_name"
+              - "{{job.parameters.catalog_name}}"
+              - "--schema_name"
+              - "{{job.parameters.schema_name}}"
+              - "--volume_path_root"
+              - "{{job.parameters.volume_path_root}}"
+              - "--logging_level"
+              - "${bundle.target}"
+          environment_key: serverless
+        - task_key: trigger_refresh
+          run_job_task:
+            job_id: ${resources.jobs.filetrigger_job.id}
+          depends_on:
+            - task_key: initialization
+      environments:
+        - environment_key: serverless
+          spec:
+            client: "3"
+      parameters:
+        - name: catalog_name
+          default: ${var.catalog_name}
+        - name: schema_name
+          default: ${resources.schemas.main_schema.name}
+        - name: volume_path_root
+          default: ${resources.volumes.filepush_volume.volume_path}

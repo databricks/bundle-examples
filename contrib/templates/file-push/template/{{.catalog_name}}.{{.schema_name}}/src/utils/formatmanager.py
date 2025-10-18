@@ -19,9 +19,7 @@ class AutoLoaderFormat:
             AutoLoaderOption("cloudFiles.inferColumnTypes", "true", True),
             AutoLoaderOption("cloudFiles.schemaEvolutionMode", "addNewColumns", True),
             AutoLoaderOption("cloudFiles.cleanSource", "MOVE", True),
-            AutoLoaderOption(
-                "cloudFiles.cleanSource.retentionDuration", "1 day", True
-            ),
+            AutoLoaderOption("cloudFiles.cleanSource.retentionDuration", "1 day", True),
             AutoLoaderOption(
                 "cloudFiles.cleanSource.moveDestination",
                 f"{envmanager.get_config()['volume_path_archive']}/{{table_name}}",
@@ -54,7 +52,7 @@ class AutoLoaderFormat:
         return {k: v for k, v in options.items() if k in defaults and v != defaults[k]}
 
     def get_merged_options(
-        self, options: dict[str, str], table_name: str, is_placeholder: bool=False
+        self, options: dict[str, str], table_name: str, is_placeholder: bool = False
     ) -> dict[str, str]:
         self.validate_user_options(options)
         defaults = {opt.key: opt.value for opt in self.options}

@@ -75,28 +75,38 @@ def is_table_created(table_name: str) -> bool:
 
 
 def _apply_table_options(
-    reader: DataStreamReader, table_config: dict, fmt_mgr
+    reader: DataStreamReader, table_config: dict, fmt_mgr, is_placeholder: bool = False
 ) -> DataStreamReader:
     name = table_config.get("name")
     fmt = table_config.get("format")
 
     # format options
     user_fmt_opts = table_config.get("format_options", {})
-    final_fmt_opts = fmt_mgr.get_merged_options(user_fmt_opts, name)
+    final_fmt_opts = fmt_mgr.get_merged_options(user_fmt_opts, name, is_placeholder)
     reader = reader.option("cloudFiles.format", fmt)
     for k, v in final_fmt_opts.items():
         reader = reader.option(k, v)
 
     # schema hints
     schema_hints = table_config.get("schema_hints")
+
+    use_schema = (
+        final_fmt_opts.get("cloudFiles.schemaEvolutionMode", "").lower() == "rescue"
+        or is_placeholder
+    )
+
+    # schema_hints goes first, then default schema entries (ordered)
+    base_schema = []
     if schema_hints:
-        reader = reader.option(
-            "cloudFiles.schemaHints", ", ".join({schema_hints} | fmt_mgr.default_schema)
-        )
+        base_schema.append(schema_hints)
+    base_schema.extend(fmt_mgr.default_schema)
+
+    joined_schema = ", ".join(base_schema)
+
+    if use_schema:
+        reader = reader.schema(joined_schema)
     else:
-        reader = reader.option(
-            "cloudFiles.schemaHints", ", ".join(fmt_mgr.default_schema)
-        )
+        reader = reader.option("cloudFiles.schemaHints", joined_schema)
 
     return reader
 
@@ -127,8 +137,6 @@ def get_placeholder_df_with_config(
     fmt_mgr = formatmanager.get_format_manager(fmt)
 
     reader = spark.readStream.format("cloudFiles")
-    reader = _apply_table_options(reader, table_config, fmt_mgr).schema(
-        fmt_mgr.get_default_schema()
-    )
+    reader = _apply_table_options(reader, table_config, fmt_mgr, is_placeholder=True)
 
     return reader.load(get_table_volume_path(table_config.get("name")))

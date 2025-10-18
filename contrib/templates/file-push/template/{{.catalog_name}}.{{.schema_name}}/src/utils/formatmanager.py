@@ -20,7 +20,7 @@ class AutoLoaderFormat:
             AutoLoaderOption("cloudFiles.schemaEvolutionMode", "addNewColumns", True),
             AutoLoaderOption("cloudFiles.cleanSource", "MOVE", True),
             AutoLoaderOption(
-                "cloudFiles.cleanSource.retentionDuration", "14 days", True
+                "cloudFiles.cleanSource.retentionDuration", "1 day", True
             ),
             AutoLoaderOption(
                 "cloudFiles.cleanSource.moveDestination",
@@ -54,13 +54,17 @@ class AutoLoaderFormat:
         return {k: v for k, v in options.items() if k in defaults and v != defaults[k]}
 
     def get_merged_options(
-        self, options: dict[str, str], table_name: str
+        self, options: dict[str, str], table_name: str, is_placeholder: bool=False
     ) -> dict[str, str]:
         self.validate_user_options(options)
-        defaults = self.get_userfacing_options()
+        defaults = {opt.key: opt.value for opt in self.options}
 
         merged = defaults.copy()
         merged.update({k: v for k, v in options.items() if k in defaults})
+
+        # Do not specify schema evolution mode in placeholder
+        if is_placeholder:
+            merged.pop("cloudFiles.schemaEvolutionMode", None)
 
         # Format the moveDestination with table_name
         move_dest_key = "cloudFiles.cleanSource.moveDestination"

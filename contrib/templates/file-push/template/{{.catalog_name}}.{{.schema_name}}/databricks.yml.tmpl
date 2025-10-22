@@ -1,0 +1,37 @@
+# databricks.yml
+# This is the configuration for the file push DAB dab.
+
+bundle:
+  name: {{.schema_name}}
+  uuid: {{bundle_uuid}}
+
+include:
+  - resources/*.yml
+
+targets:
+  # The deployment targets. See https://docs.databricks.com/en/dev-tools/bundles/deployment-modes.html
+  dev:
+    mode: development
+    workspace:
+      host: {{workspace_host}}
+
+  prod:
+    mode: production
+    default: true
+    workspace:
+      host: {{workspace_host}}
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE
+
+variables:
+  catalog_name:
+    description: The existing catalog where the NEW schema will be created.
+    default: {{.catalog_name}}
+  schema_name:
+    description: The name of the NEW schema where the tables will be created.
+    default: {{.schema_name}}
+  resource_name_prefix:
+    description: The prefix for the resource names.
+    default: ${var.catalog_name}_${var.schema_name}_

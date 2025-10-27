@@ -1,0 +1,27 @@
+package com.examples
+
+import com.databricks.connect.DatabricksSession
+import org.apache.spark.sql.{SparkSession, functions => F}
+import org.apache.spark.sql.functions.udf
+
+object Main {
+  def main(args: Array[String]): Unit = {
+    println("Hello, World!")
+
+    val spark = getSession()
+    println("Showing range ...")
+    spark.range(3).show()
+
+    println("Showing nyctaxi trips ...")
+    val nycTaxi = new NycTaxi(spark)
+    val df = nycTaxi.trips()
+    df.show()
+  }
+
+  def getSession(): SparkSession = {
+    DatabricksSession.builder()
+    .validateSession(false)
+    .addCompiledArtifacts(Main.getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
+    .getOrCreate()
+  }
+}

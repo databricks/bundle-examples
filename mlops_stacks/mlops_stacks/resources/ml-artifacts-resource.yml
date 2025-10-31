@@ -31,7 +31,7 @@ targets:
       
 
 # Allow users to read the experiment 
-permissions: &permissions
+common_permissions: &permissions
   permissions:
     - level: CAN_READ
       group_name: users

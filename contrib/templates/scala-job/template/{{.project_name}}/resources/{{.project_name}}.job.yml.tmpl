@@ -12,6 +12,6 @@ resources:
       environments:
         - environment_key: default
           spec:
-            environment_version: "4"
-            jar_dependencies:
+            environment_version: "4-scala-preview"
+            java_dependencies:
                 - ${workspace.artifact_path}/.internal/{{.project_name}}-assembly-{{template `version` .}}.jar

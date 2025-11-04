@@ -91,11 +91,10 @@ by running `sbt test`.
 
 ### Job configuration
 {{- if eq .compute_type "serverless"}}
-This project uses serverless compute. The serverless environment automatically manages compute resources.
+This project uses serverless compute. No cluster setup is required.
 
-If you prefer to use standard compute with job clusters, you can modify the job YAML file to use `job_clusters` instead of the `environments` configuration.
 {{- else }}
-This project uses standard compute with a job cluster. Standard compute requires Unity Catalog volume JAR paths to be allowlisted by your workspace admin.
+This project uses standard compute for the job cluster. Standard compute requires Unity Catalog volume JAR paths to be allowlisted by your workspace admin.
 
 If you want to use an existing cluster instead, replace `job_cluster_key` in the task configuration with `existing_cluster_id: <your_cluster_id>` in the job YAML file.
 

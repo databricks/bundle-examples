@@ -1,0 +1,26 @@
+{
+  "welcome_message": "\nWelcome to the default-scala template for Databricks Asset Bundles!\n\nA workspace was selected based on your current profile. For information about how to change this, see https://docs.databricks.com/dev-tools/cli/profiles.html.\nworkspace_host: {{workspace_host}}",
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "description": "\nPlease provide a unique name for this project.\nproject_name",
+      "order": 1,
+      "pattern": "^[A-Za-z_][A-Za-z0-9-_]+$",
+      "pattern_match_failure_message": "Name must consist of letters, numbers, dashes, and underscores."
+    },
+    "compute_type": {
+      "type": "string",
+      "description": "\nPlease select the compute type.\ncompute_type",
+      "enum": ["standard cluster", "serverless"],
+      "default": "serverless",
+      "order": 2
+    },
+    "artifacts_dest_path": {
+      "type": "string",
+      "description": "\nPlease provide the Unity Catalog volume destination path in Databricks where the directory will be created containing the JAR and other artifacts to store. [example: /Volumes/abcdef1234567890]{{if eq .compute_type \"standard cluster\"}}\nNote: your admin must allowlist the volume JAR path you specify for your workspace (see https://docs.databricks.com/en/data-governance/unity-catalog/manage-privileges/allowlist.html){{end}}",
+      "order": 3,
+      "pattern": "^/Volumes(?:/[a-z0-9_-]+)+/?$",
+      "pattern_match_failure_message": "Please enter a valid path like /Volumes/my-folder/. Only lowercase letters, numbers, dashes, and underscores are allowed in folder names."
+    }
+  }
+}

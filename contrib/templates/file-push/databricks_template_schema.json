@@ -6,15 +6,15 @@
       "description": "\nPlease provide the name of an EXISTING UC catalog with default storage enabled.\nCatalog Name",
       "order": 1,
       "default": "main",
-      "pattern": "^[a-z_][a-z0-9_]{0,254}$",
-      "pattern_match_failure_message": "Name must only consist of letters, numbers, and underscores."
+      "pattern": "^[a-z_][a-z0-9_-]{0,254}$",
+      "pattern_match_failure_message": "Name must only consist of letters, numbers, dashes, and underscores."
     },
     "schema_name": {
       "type": "string",
       "description": "\nPlease provide a NEW schema name where the pipelines and tables will land in.\nSchema Name",
       "order": 2,
       "default": "filepushschema",
-      "pattern": "^[a-z_][a-z0-9_]{0,254}$",
+      "pattern": "^[a-z_][a-z0-9_-]{0,254}$",
       "pattern_match_failure_message": "Name must only consist of letters, numbers, dashes, and underscores."
     }
   },

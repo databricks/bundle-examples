@@ -36,7 +36,7 @@ ws.schemas.update(
     properties={
         "filepush.volume_path_root": volume_path_root,
         "filepush.volume_path_data": volume_path_data,
-        "filepush.volume_path_data": volume_path_archive,
+        "filepush.volume_path_archive": volume_path_archive,
     },
 )
 logger.info(f"Schema {catalog_name}.{schema_name} configured")

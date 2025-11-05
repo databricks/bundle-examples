@@ -18,9 +18,9 @@ resources:
             main_class_name: {{template `main_class_name` .}}
             parameters:
               - "--catalog"
-              - "{{{{job.parameters.catalog}}}}"
+              - "{{`{{job.parameters.catalog}}`}}"
               - "--schema"
-              - "{{{{job.parameters.schema}}}}"
+              - "{{`{{job.parameters.schema}}`}}"
 {{- if eq .compute_type "serverless"}}
           environment_key: default
 {{- else}}

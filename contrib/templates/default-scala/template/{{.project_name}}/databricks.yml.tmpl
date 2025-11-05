@@ -7,6 +7,12 @@ bundle:
 include:
   - resources/*.yml
 
+variables:
+  catalog:
+    description: The catalog to use
+  schema:
+    description: The schema to use
+
 workspace:
   host: {{workspace_host}}
   artifact_path: {{.artifacts_dest_path}}/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
@@ -29,6 +35,9 @@ targets:
     default: true
     workspace:
       host: {{workspace_host}}
+    variables:
+      catalog: {{.default_catalog}}
+      schema: {{.default_schema}}
 
   prod:
     mode: production
@@ -39,3 +48,6 @@ targets:
     permissions:
       - {{if is_service_principal}}service_principal{{else}}user{{end}}_name: {{user_name}}
         level: CAN_MANAGE
+    variables:
+      catalog: {{.default_catalog}}
+      schema: {{.default_schema}}

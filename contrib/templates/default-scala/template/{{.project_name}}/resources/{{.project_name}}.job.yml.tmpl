@@ -4,6 +4,11 @@ resources:
   jobs:
     {{.project_name}}:
       name: {{.project_name}}
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
       tasks:
         - task_key: main_task
 {{- if eq .compute_type "standard cluster"}}
@@ -11,6 +16,11 @@ resources:
 {{- end}}
           spark_jar_task:
             main_class_name: {{template `main_class_name` .}}
+            parameters:
+              - "--catalog"
+              - "{{{{job.parameters.catalog}}}}"
+              - "--schema"
+              - "{{{{job.parameters.schema}}}}"
 {{- if eq .compute_type "serverless"}}
           environment_key: default
 {{- else}}

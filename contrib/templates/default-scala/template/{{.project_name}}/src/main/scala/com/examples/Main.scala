@@ -12,14 +12,25 @@ object Main {
   def main(args: Array[String]): Unit = {
     println("Hello, World!")
 
+    val catalog = getFromArgs(args, "catalog").getOrElse("samples")
+    val schema = getFromArgs(args, "schema").getOrElse("nyctaxi")
+
+    println(s"Using catalog: $catalog, schema: $schema")
+
     val spark = getSession()
     println("Showing range ...")
     spark.range(3).show()
 
     println("Showing nyctaxi trips ...")
-    val nycTaxi = new NycTaxi(spark)
+    val nycTaxi = new NycTaxi(spark, catalog, schema)
     val df = nycTaxi.trips()
     df.show()
+  }
+
+  private def getFromArgs(args: Array[String], key: String): Option[String] = {
+    args.sliding(2, 2).collectFirst {
+      case Array(k, v) if k == s"--$key" => v
+    }
   }
 
   def getSession(): SparkSession = {

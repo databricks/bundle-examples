@@ -22,7 +22,7 @@ object Main {
     spark.range(3).show()
 
     println("Showing nyctaxi trips ...")
-    val nycTaxi = new NycTaxi(spark, catalog, schema)
+    val nycTaxi = new NycTaxi(spark)
     val df = nycTaxi.trips()
     df.show()
   }

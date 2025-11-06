@@ -13,6 +13,13 @@ variables:
   schema:
     description: The schema to use
 
+{{- $dev_schema := .shared_schema }}
+{{- $prod_schema := .shared_schema }}
+{{- if (regexp "^yes").MatchString .personal_schemas}}
+  {{- $dev_schema = "${workspace.current_user.short_name}"}}
+  {{- $prod_schema = "default"}}
+{{- end}}
+
 workspace:
   host: {{workspace_host}}
   artifact_path: {{.artifacts_dest_path}}/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
@@ -37,7 +44,7 @@ targets:
       host: {{workspace_host}}
     variables:
       catalog: {{.default_catalog}}
-      schema: {{.default_schema}}
+      schema: {{$dev_schema}}
 
   prod:
     mode: production
@@ -50,4 +57,4 @@ targets:
         level: CAN_MANAGE
     variables:
       catalog: {{.default_catalog}}
-      schema: {{.default_schema}}
+      schema: {{$prod_schema}}

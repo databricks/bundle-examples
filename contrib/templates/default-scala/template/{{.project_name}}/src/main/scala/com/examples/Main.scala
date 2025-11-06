@@ -14,9 +14,8 @@ object Main {
 
     val spark = getSession()
     
-    // Process command-line arguments and set catalog/schema if provided
     setCatalogAndSchema(spark, args)
-
+git 
     println("Showing range ...")
     spark.range(3).show()
   }

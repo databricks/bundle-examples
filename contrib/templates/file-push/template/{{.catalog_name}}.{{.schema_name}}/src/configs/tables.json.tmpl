@@ -1,0 +1,82 @@
+[
+  {
+    "name": "{{.table_1_name}}",
+    "format": "{{.table_1_format}}",
+    "format_options": {
+{{- if eq .table_1_format "csv"}}
+      "header": "{{.table_1_csv_header}}",
+      "delimiter": "{{if eq .table_1_csv_delimiter "\t"}}\\t{{else}}{{.table_1_csv_delimiter}}{{end}}",
+      "escape": "{{if eq .table_1_csv_escape "\""}}\"{{else if eq .table_1_csv_escape "\\"}}\\{{else}}{{.table_1_csv_escape}}{{end}}",
+      "multiLine": "{{.table_1_csv_multiline}}",
+{{- else if eq .table_1_format "json"}}
+      "allowComments": "{{.table_1_json_allow_comments}}",
+      "allowSingleQuotes": "{{.table_1_json_allow_single_quotes}}",
+      "inferTimestamp": "{{.table_1_json_infer_timestamp}}",
+      "multiLine": "{{.table_1_json_multiline}}",
+{{- end}}
+      "cloudFiles.schemaEvolutionMode": "{{.table_1_schema_evolution_mode}}"
+    }{{if .table_1_schema_hints}},
+    "schema_hints": "{{.table_1_schema_hints}}"{{end}}
+  }{{if eq .add_table_2 "yes"}},
+  {
+    "name": "{{.table_2_name}}",
+    "format": "{{.table_2_format}}",
+    "format_options": {
+{{- if eq .table_2_format "csv"}}
+      "header": "{{.table_2_csv_header}}",
+      "delimiter": "{{if eq .table_2_csv_delimiter "\t"}}\\t{{else}}{{.table_2_csv_delimiter}}{{end}}",
+      "escape": "{{if eq .table_2_csv_escape "\""}}\"{{else if eq .table_2_csv_escape "\\"}}\\{{else}}{{.table_2_csv_escape}}{{end}}",
+      "multiLine": "{{.table_2_csv_multiline}}",
+{{- else if eq .table_2_format "json"}}
+      "allowComments": "{{.table_2_json_allow_comments}}",
+      "allowSingleQuotes": "{{.table_2_json_allow_single_quotes}}",
+      "inferTimestamp": "{{.table_2_json_infer_timestamp}}",
+      "multiLine": "{{.table_2_json_multiline}}",
+{{- end}}
+      "cloudFiles.schemaEvolutionMode": "{{.table_2_schema_evolution_mode}}"
+    }{{if .table_2_schema_hints}},
+    "schema_hints": "{{.table_2_schema_hints}}"{{end}}
+  }{{end}}{{if and (eq .add_table_2 "yes") (eq .add_table_3 "yes")}},
+  {
+    "name": "{{.table_3_name}}",
+    "format": "{{.table_3_format}}",
+    "format_options": {
+{{- if eq .table_3_format "csv"}}
+      "header": "{{.table_3_csv_header}}",
+      "delimiter": "{{if eq .table_3_csv_delimiter "\t"}}\\t{{else}}{{.table_3_csv_delimiter}}{{end}}",
+      "escape": "{{if eq .table_3_csv_escape "\""}}\"{{else if eq .table_3_csv_escape "\\"}}\\{{else}}{{.table_3_csv_escape}}{{end}}",
+      "multiLine": "{{.table_3_csv_multiline}}",
+{{- else if eq .table_3_format "json"}}
+      "allowComments": "{{.table_3_json_allow_comments}}",
+      "allowSingleQuotes": "{{.table_3_json_allow_single_quotes}}",
+      "inferTimestamp": "{{.table_3_json_infer_timestamp}}",
+      "multiLine": "{{.table_3_json_multiline}}",
+{{- end}}
+      "cloudFiles.schemaEvolutionMode": "{{.table_3_schema_evolution_mode}}"
+    }{{if .table_3_schema_hints}},
+    "schema_hints": "{{.table_3_schema_hints}}"{{end}}
+  }{{end}}{{if and (eq .add_table_2 "yes") (eq .add_table_3 "yes") (eq .add_table_4 "yes")}},
+  {
+    "name": "{{.table_4_name}}",
+    "format": "{{.table_4_format}}",
+    "format_options": {
+{{- if eq .table_4_format "csv"}}
+      "header": "{{.table_4_csv_header}}",
+      "delimiter": "{{if eq .table_4_csv_delimiter "\t"}}\\t{{else}}{{.table_4_csv_delimiter}}{{end}}",
+      "escape": "{{if eq .table_4_csv_escape "\""}}\"{{else if eq .table_4_csv_escape "\\"}}\\{{else}}{{.table_4_csv_escape}}{{end}}",
+      "multiLine": "{{.table_4_csv_multiline}}",
+{{- else if eq .table_4_format "json"}}
+      "allowComments": "{{.table_4_json_allow_comments}}",
+      "allowSingleQuotes": "{{.table_4_json_allow_single_quotes}}",
+      "inferTimestamp": "{{.table_4_json_infer_timestamp}}",
+      "multiLine": "{{.table_4_json_multiline}}",
+{{- end}}
+      "cloudFiles.schemaEvolutionMode": "{{.table_4_schema_evolution_mode}}"
+    }{{if .table_4_schema_hints}},
+    "schema_hints": "{{.table_4_schema_hints}}"{{end}}
+  }{{end}}
+]
+
+
+
+

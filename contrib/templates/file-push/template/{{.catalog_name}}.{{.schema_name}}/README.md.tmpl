@@ -18,30 +18,49 @@ A lightweight, no‑code file ingestion workflow. Configure a set of tables, get
 
 ## Quick Start
 
-### Step 1. Configure tables
-Edit table configs in `./src/configs/tables.json`. Only `name` and `format` are required.
+### Step 1. Review table configuration
+Your tables have been configured during initialization. You can review and modify them in `./src/configs/tables.json`.
 
 Currently supported formats are `csv`, `json`, `avro` and `parquet`.
 
 For supported `format_options`, see the [Auto Loader options](https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options). Not all options are supported here. If unsure, specify only `name` and `format`, or follow [Debug Table Issues](#debug-table-issues) to discover the correct options.
 
+**Example table configuration:**
 ```json
 [
   {
     "name": "table1",
     "format": "csv",
-    "format_options":
-    {
-      "escape": "\""
+    "format_options": {
+      "header": "true",
+      "delimiter": ",",
+      "escape": "\"",
+      "multiLine": "false",
+      "cloudFiles.schemaEvolutionMode": "addNewColumns",
+      "cloudFiles.inferColumnTypes": "true"
     },
     "schema_hints": "id int, name string"
   },
   {
     "name": "table2",
-    "format": "json"
+    "format": "json",
+    "format_options": {
+      "allowComments": "true",
+      "allowSingleQuotes": "true",
+      "inferTimestamp": "true",
+      "multiLine": "true",
+      "cloudFiles.schemaEvolutionMode": "addNewColumns",
+      "cloudFiles.inferColumnTypes": "true"
+    }
   }
 ]
 ```
+
+**Supported format options by file type:**
+- **CSV**: `header`, `delimiter`, `escape`, `multiLine`
+- **JSON**: `allowComments`, `allowSingleQuotes`, `inferTimestamp`, `multiLine`
+- **AVRO/PARQUET**: Use base options only
+- **All formats**: `cloudFiles.schemaEvolutionMode`, `cloudFiles.inferColumnTypes`
 
 > **Tip:** Keep `schema_hints` minimal; Auto Loader can evolve the schema as new columns appear.
 
@@ -98,10 +117,10 @@ Within about a minute, the data should appear in the table `{{.catalog_name}}.{{
 ---
 
 ## Debug Table Issues
-If data isn’t parsed as expected, use **dev mode** to iterate on table options safely.
+If data isn't parsed as expected, use **dev mode** to iterate on table options safely.
 
 ### Step 1. Configure tables to debug
-Configure tables as in [Step 1 of Quick Start](#step-1-configure-tables).
+Review or modify tables in `./src/configs/tables.json` as needed.
 
 ### Step 2. Deploy & set up in **dev mode**
 

@@ -128,17 +128,23 @@ class PARQUET(AutoLoaderFormat):
         }
 
 
-_supported_formats: dict[str, AutoLoaderFormat] = {
-    f.name: f for f in (CSV(), JSON(), AVRO(), PARQUET())
-}
+# Cache the supported formats so they are only created on the first call
+_supported_formats_cache = {}
+
+def get_supported_formats() -> dict[str, AutoLoaderFormat]:
+    if not _supported_formats_cache:
+        _supported_formats_cache.update({
+            f.name: f for f in (CSV(), JSON(), AVRO(), PARQUET())
+        })
+    return _supported_formats_cache
 
 
 def get_format_manager(fmt: str) -> dict[str, str]:
     key = fmt.strip().upper()
     try:
-        return _supported_formats[key]
+        return get_supported_formats()[key]
     except KeyError:
-        supported = ", ".join(sorted(_supported_formats))
+        supported = ", ".join(sorted(get_supported_formats().keys()))
         raise ValueError(
             f"{fmt!r} is not a supported format. Supported formats: {supported}"
         )

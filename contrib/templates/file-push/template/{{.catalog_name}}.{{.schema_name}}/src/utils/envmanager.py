@@ -16,20 +16,18 @@ def get_config() -> dict:
     return configs
 
 
-def has_default_storage() -> bool:
-    catalog = get_config()["catalog_name"]
-
-    w = WorkspaceClient()
+def has_default_storage(catalog_name: str, workspace_client: WorkspaceClient = None) -> bool:
+    w = workspace_client or WorkspaceClient()
 
     # Try SDK model first
-    info = w.catalogs.get(catalog)
+    info = w.catalogs.get(catalog_name)
     storage_root = getattr(info, "storage_root", None)
     storage_location = getattr(info, "storage_location", None)
     props = getattr(info, "properties", {}) or {}
 
     # Some workspaces expose fields only via raw JSON; fall back if all empty
     if not (storage_root or storage_location or props):
-        j = w.api_client.do("GET", f"/api/2.1/unity-catalog/catalogs/{catalog}")
+        j = w.api_client.do("GET", f"/api/2.1/unity-catalog/catalogs/{catalog_name}")
         storage_root = j.get("storage_root") or j.get("storageLocation")
         storage_location = j.get("storage_location") or j.get("storageLocation")
         props = j.get("properties", {}) or {}

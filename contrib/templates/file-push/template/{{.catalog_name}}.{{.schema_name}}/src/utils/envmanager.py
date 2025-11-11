@@ -16,7 +16,9 @@ def get_config() -> dict:
     return configs
 
 
-def has_default_storage(catalog_name: str, workspace_client: WorkspaceClient = None) -> bool:
+def has_default_storage(
+    catalog_name: str, workspace_client: WorkspaceClient = None
+) -> bool:
     w = workspace_client or WorkspaceClient()
 
     # Try SDK model first

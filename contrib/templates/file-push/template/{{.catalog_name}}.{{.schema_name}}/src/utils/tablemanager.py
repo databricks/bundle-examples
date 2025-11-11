@@ -15,22 +15,22 @@ def validate_config(table_config: dict):
         raise ValueError("name is required for table config")
     if not table_config.get("format"):
         raise ValueError("format is required for table config")
-    
+
     # Validate table name characters (Databricks naming convention)
     table_name = table_config.get("name")
-    if not re.match(r'^[a-z0-9_-]+$', table_name):
+    if not re.match(r"^[a-z0-9_-]+$", table_name):
         raise ValueError(
             f"Table name '{table_name}' contains unsupported characters. "
             "Table names must only consist of lowercase letters, numbers, underscores, and dashes."
         )
-    
+
     # Validate format is supported
     fmt = table_config.get("format")
     try:
         fmt_mgr = formatmanager.get_format_manager(fmt)
     except ValueError as e:
         raise ValueError(f"Unsupported format for table '{table_name}': {e}")
-    
+
     # Validate format options (check for blocklisted/hidden options)
     format_options = table_config.get("format_options", {})
     if format_options:

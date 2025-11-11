@@ -131,11 +131,12 @@ class PARQUET(AutoLoaderFormat):
 # Cache the supported formats so they are only created on the first call
 _supported_formats_cache = {}
 
+
 def get_supported_formats() -> dict[str, AutoLoaderFormat]:
     if not _supported_formats_cache:
-        _supported_formats_cache.update({
-            f.name: f for f in (CSV(), JSON(), AVRO(), PARQUET())
-        })
+        _supported_formats_cache.update(
+            {f.name: f for f in (CSV(), JSON(), AVRO(), PARQUET())}
+        )
     return _supported_formats_cache
 
 

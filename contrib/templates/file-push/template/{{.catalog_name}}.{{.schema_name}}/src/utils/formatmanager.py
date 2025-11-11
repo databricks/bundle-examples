@@ -41,10 +41,10 @@ class AutoLoaderFormat:
         allowed = set(self.get_userfacing_options())
         # Create lowercase version of allowed options for case-insensitive comparison
         allowed_lower = {key.lower() for key in allowed}
-        
+
         # Check for illegal options (case-insensitive)
         illegal = [key for key in options if key.lower() not in allowed_lower]
-        
+
         if illegal:
             raise ValueError(
                 f"Unsupported or protected options: {sorted(illegal)}. "

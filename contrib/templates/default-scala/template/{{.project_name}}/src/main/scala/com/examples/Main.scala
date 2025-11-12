@@ -15,7 +15,6 @@ object Main {
     val spark = getSession()
     
     setCatalogAndSchema(spark, args)
-git 
     println("Showing range ...")
     spark.range(3).show()
   }

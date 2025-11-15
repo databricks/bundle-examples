@@ -1,5 +1,5 @@
 [project]
-name = "lakeflow_pipelines_python"
+name = "lakehouse_framework"
 version = "0.0.1"
 authors = [{ name = "user@company.com" }]
 requires-python = ">=3.10,<=3.13"

@@ -1,9 +1,11 @@
 import dlt
 from pyspark.sql.functions import col
 
-source_catalog = current_catalog()
-source_schema = current_schema()
-target_schema = source_schema.replace("bronze", "silver")
+# Configuration
+bronze_catalog = spark.conf.get("bronze_catalog")
+bronze_schema = spark.conf.get("bronze_schema")
+silver_catalog = spark.conf.get("silver_catalog")
+silver_schema = spark.conf.get("silver_schema")
 
 tables_list = [
     "customer",
@@ -18,9 +20,9 @@ tables_list = [
 
 def create_materialized_table(table):
 
-    @dlt.table(name=f"{source_catalog}.{target_schema}.{table}")
+    @dlt.table(name=f"{silver_catalog}.{silver_schema}.{table}")
     def lakeflow_pipelines_table():
-        return spark.read.table(f"{source_catalog}.{source_schema}.{table}")
+        return spark.read.table(f"{bronze_catalog}.{bronze_schema}.{table}")
 
 
 for table in tables_list:

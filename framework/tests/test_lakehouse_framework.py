@@ -5,8 +5,8 @@ This module contains unit tests for the lakehouse framework package.
 """
 
 import pytest
-from lakehouse_framework.utils import get_catalog_schema, get_table_path
-from lakehouse_framework.config import Config
+from framework.utils import get_catalog_schema, get_table_path
+from framework.config import Config
 
 
 def test_get_catalog_schema():

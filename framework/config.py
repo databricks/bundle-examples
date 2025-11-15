@@ -36,7 +36,7 @@ class Config:
         Returns:
             Config instance populated from Spark config
         """
-        from lakehouse_framework.utils import get_spark_config
+        from framework.utils import get_spark_config
         
         return cls(
             bronze_catalog=get_spark_config("bronze_catalog", "catalog"),

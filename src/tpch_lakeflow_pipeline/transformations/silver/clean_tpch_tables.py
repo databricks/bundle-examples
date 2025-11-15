@@ -1,8 +1,9 @@
 import dlt
 from pathlib import Path
 from pyspark.sql.functions import col
-from lakehouse_framework.config import Config
-from lakehouse_framework.utils import add_metadata_columns, get_or_create_spark_session, load_table_configs
+from framework.config import Config
+from framework.utils import add_metadata_columns, get_or_create_spark_session, load_table_configs
+from framework.write import create_dlt_table
 
 
 # Configuration
@@ -13,7 +14,7 @@ bronze_schema = config.bronze_schema
 silver_catalog = config.silver_catalog
 silver_schema = config.silver_schema
 
-def create_materialized_table(table_name):
+def create_silver_table(table_name):
     """
     Creates a cleaned materialized view in Lakeflow Declarative Pipelines for the specified table.
     
@@ -33,25 +34,24 @@ def create_materialized_table(table_name):
     primary_keys = [key.strip() for key in table_metadata.get("primary_key", "").split(",")]
     expectations = table_metadata.get("expectations", {})
     
-    @dlt.table(
-        name=f"{silver_catalog}.{silver_schema}.{table_name}",
-        comment=description,
-        table_properties={
-            "quality": "silver",
-            "pipelines.autoOptimize.managed": "true",
-            "primary_key": ", ".join(primary_keys)
-        }
-    )
-    @dlt.expect_all_or_drop({f"{pk}_not_null": f"{pk} IS NOT NULL" for pk in primary_keys})
-    @dlt.expect_all_or_drop(expectations)
-    def lakeflow_pipelines_table():
-        """
-        Reads the source table from bronze layer and returns it as a DataFrame.
-        """
+    # Define source function
+    def source_function():
+        """Reads the source table from bronze layer and returns it as a DataFrame."""
         df = spark.read.table(f"{bronze_catalog}.{bronze_schema}.{table_name}")
         return df
     
-    return lakeflow_pipelines_table
+    # Create DLT table using shared function
+    return create_dlt_table(
+        table_name=table_name,
+        catalog=silver_catalog,
+        schema=silver_schema,
+        description=description,
+        primary_keys=primary_keys,
+        quality_level="silver",
+        source_function=source_function,
+        expectations=expectations,
+        metadata=tables_config.get("metadata")
+    )
 
 
 if __name__ == "__main__":
@@ -63,4 +63,4 @@ if __name__ == "__main__":
     tables_list = [table["name"] for table in tables_config["tables"]]
 
     for table_name in tables_list:
-        create_materialized_table(table_name)
+        create_silver_table(table_name)

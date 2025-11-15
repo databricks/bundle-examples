@@ -1,6 +1,6 @@
 import dlt
-from lakehouse_framework.config import Config
-from lakehouse_framework.utils import add_metadata_columns, get_or_create_spark_session
+from framework.config import Config
+from framework.utils import add_metadata_columns, get_or_create_spark_session
 
 
 # Configuration

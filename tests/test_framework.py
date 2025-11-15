@@ -8,7 +8,13 @@ import pytest
 from framework.utils import get_catalog_schema, get_table_path, add_metadata_columns, get_or_create_spark_session
 from framework.config import Config
 
-spark = get_or_create_spark_session()
+# Try to create Spark session, skip Spark tests if not available
+try:
+    spark = get_or_create_spark_session()
+    SPARK_AVAILABLE = True
+except Exception:
+    SPARK_AVAILABLE = False
+    spark = None
 
 def test_get_catalog_schema():
     """Test catalog schema path construction."""

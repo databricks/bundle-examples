@@ -1,9 +1,0 @@
-[format]
-exclude = [
-    # Templates are responsible for formatting at the source.
-    "dbt_sql/*",
-    "default_python/*",
-    "default_sql/*",
-    "mlops_stacks/*",
-    "lakeflow_pipelines_python/*",
-]

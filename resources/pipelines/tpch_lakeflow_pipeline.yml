@@ -21,8 +21,8 @@ resources:
         gold_catalog: ${var.gold_catalog}
         gold_schema: ${resources.schemas.gold_schema.name}
 
-      # environment:
-      #   dependencies:
-      #     # We include every dependency defined by pyproject.toml by defining an editable environment
-      #     # that points to the folder where pyproject.toml is deployed.
-      #     - --editable ${workspace.file_path}
+      environment:
+        dependencies:
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}

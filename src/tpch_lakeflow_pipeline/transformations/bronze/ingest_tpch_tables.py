@@ -18,7 +18,7 @@ def create_materialized_table(table_name: str):
     The source data is read from the samples.tpch schema.
     """
     @dlt.table(name=f"{bronze_catalog}.{bronze_schema}.{table_name}")
-    def lakeflow_pipelines_table(table_name):
+    def lakeflow_pipelines_table():
         """
         Reads the source table from samples.tpch and returns it as a DataFrame.
         """

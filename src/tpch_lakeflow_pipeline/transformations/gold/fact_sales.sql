@@ -14,11 +14,11 @@ CREATE MATERIALIZED VIEW ${gold_catalog}.${gold_schema}.fact_sales
     order_line_code INT COMMENT 'Line number within the order',
     
     -- Additive measures
-    order_quantity DECIMAL(15,2) COMMENT 'Quantity of parts ordered',
-    order_extended_price_usd DECIMAL(15,2) COMMENT 'Extended price in USD (quantity * list price)',
-    order_discount_usd DECIMAL(15,2) COMMENT 'Discount amount in USD',
-    order_tax_usd DECIMAL(15,2) COMMENT 'Tax amount in USD',
-    part_supply_cost_usd DECIMAL(15,2) COMMENT 'Cost to supply the part in USD',
+    order_quantity DECIMAL(18,2) COMMENT 'Quantity of parts ordered',
+    order_extended_price_usd DECIMAL(18,2) COMMENT 'Extended price in USD (quantity * list price)',
+    order_discount_usd DECIMAL(18,2) COMMENT 'Discount amount in USD',
+    order_tax_usd DECIMAL(18,2) COMMENT 'Tax amount in USD',
+    part_supply_cost_usd DECIMAL(18,2) COMMENT 'Cost to supply the part in USD',
     
     -- Semi-additive measures (lag calculations)
     order_commit_lag_days INT COMMENT 'Days between order date and commit date',

@@ -1,27 +1,29 @@
 import dlt
 from pyspark.sql.functions import col
 
-# Configuration
-bronze_catalog = spark.conf.get("bronze_catalog")
-bronze_schema = spark.conf.get("bronze_schema")
-
-tables_list = [
-    "customer",
-    "lineitem",
-    "orders",
-    "nation",
-    "part",
-    "partsupp",
-    "region",
-    "supplier"
-]
-
-def create_materialized_table(table):
-
+def create_materialized_table(table: str):
+    """
+    Creates a materialized view in Lakeflow Declarative Pipelines for the specified table.
+    
+    Args:
+        table (str): Name of the table to create as a materialized view.
+        
+    The materialized view is created in the catalog and schema specified by
+    the bronze_catalog and bronze_schema Spark configuration variables.
+    The source data is read from the samples.tpch schema.
+    """
     @dlt.table(name=f"{bronze_catalog}.{bronze_schema}.{table}")
     def lakeflow_pipelines_table():
+        """
+        Reads the source table from samples.tpch and returns it as a DataFrame.
+        """
         return spark.read.table(f"samples.tpch.{table}")
 
+if __name__ == "__main__":
+    # Configuration
+    bronze_catalog = spark.conf.get("bronze_catalog")
+    bronze_schema = spark.conf.get("bronze_schema")
+    tables_list = ["customer", "lineitem", "orders", "nation", "part", "partsupp", "region", "supplier"]
 
-for table in tables_list:
-    create_materialized_table(table)
+    for table in tables_list:
+        create_materialized_table(table)

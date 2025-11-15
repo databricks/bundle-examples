@@ -31,17 +31,16 @@ def create_materialized_table(table_name: str):
     primary_keys = [key.strip() for key in table_metadata.get("primary_key", "").split(",")]
     
     # Build table properties with primary key information
-    table_properties = {
-        "quality": "bronze",
-        "pipelines.autoOptimize.managed": "true",
-        "primary_key": ", ".join(primary_keys)
-    }
+
     
     @dlt.table(
         name=f"{bronze_catalog}.{bronze_schema}.{table_name}",
         comment=description,
-        table_properties=table_properties,
-        primary_keys=primary_keys if primary_keys and primary_keys[0] else None
+        table_properties={
+            "quality": "bronze",
+            "pipelines.autoOptimize.managed": "true",
+            "primary_key": ", ".join(primary_keys)
+        }  
     )
     @dlt.expect_all_or_drop({f"{pk}_not_null": f"{pk} IS NOT NULL" for pk in primary_keys})
     def lakeflow_pipelines_table():

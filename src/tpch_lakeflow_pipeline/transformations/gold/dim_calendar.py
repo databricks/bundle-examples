@@ -1,8 +1,11 @@
 import dlt
 from lakehouse_framework.config import Config
+from lakehouse_framework.utils import add_metadata_columns, get_or_create_spark_session
+
 
 # Configuration
 config = Config.from_spark_config()
+spark = get_or_create_spark_session()
 gold_catalog = config.gold_catalog
 gold_schema = config.gold_schema
 beginDate = '1990-01-01'

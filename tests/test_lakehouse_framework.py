@@ -5,9 +5,10 @@ This module contains unit tests for the lakehouse framework package.
 """
 
 import pytest
-from lakehouse_framework.utils import get_catalog_schema, get_table_path, add_metadata_columns
+from lakehouse_framework.utils import get_catalog_schema, get_table_path, add_metadata_columns, get_or_create_spark_session
 from lakehouse_framework.config import Config
 
+spark = get_or_create_spark_session()
 
 def test_get_catalog_schema():
     """Test catalog schema path construction."""
@@ -113,3 +114,21 @@ def test_add_metadata_columns():
             
     finally:
         spark.stop()
+
+
+@pytest.mark.skipif(True, reason="Requires Spark/Java environment")
+def test_get_or_create_spark_session():
+    """Test getting or creating a Spark session."""
+    # First call should create a new session
+    spark1 = get_or_create_spark_session("test_app")
+    assert spark1 is not None
+    assert spark1.sparkContext.appName == "test_app"
+    
+    try:
+        # Second call should return the same session
+        spark2 = get_or_create_spark_session("different_app")
+        assert spark2 is not None
+        assert spark1 == spark2  # Should be the same instance
+        
+    finally:
+        spark1.stop()

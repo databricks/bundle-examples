@@ -1,9 +1,12 @@
 import dlt
 from pyspark.sql.functions import col
 from lakehouse_framework.config import Config
+from lakehouse_framework.utils import add_metadata_columns, get_or_create_spark_session
+
 
 # Configuration
 config = Config.from_spark_config()
+spark = get_or_create_spark_session()
 bronze_catalog = config.bronze_catalog
 bronze_schema = config.bronze_schema
 silver_catalog = config.silver_catalog

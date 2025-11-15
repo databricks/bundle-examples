@@ -1,12 +1,14 @@
 import dlt
 from pyspark.sql.functions import col
-from lakehouse_framework.utils import add_metadata_columns
+from lakehouse_framework.utils import add_metadata_columns, get_or_create_spark_session
 from lakehouse_framework.config import Config
 
 # Configuration
 config = Config.from_spark_config()
+spark = get_or_create_spark_session()
 bronze_catalog = config.bronze_catalog
 bronze_schema = config.bronze_schema
+
 
 def create_materialized_table(table_name: str):
     """

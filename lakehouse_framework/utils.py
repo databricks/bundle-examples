@@ -69,3 +69,27 @@ def add_metadata_columns(df):
     """
     from pyspark.sql.functions import current_timestamp
     return df.withColumn("ingest_timestamp", current_timestamp())
+
+
+def get_or_create_spark_session(app_name: str = "lakehouse_framework"):
+    """
+    Get the active Spark session or create a new one if none exists.
+    
+    Args:
+        app_name: Name for the Spark application (used only when creating a new session)
+        
+    Returns:
+        SparkSession: The active or newly created Spark session
+    """
+    from pyspark.sql import SparkSession
+    
+    # Try to get the active session first
+    spark = SparkSession.getActiveSession()
+    
+    if spark is None:
+        # No active session, create a new one
+        spark = SparkSession.builder \
+            .appName(app_name) \
+            .getOrCreate()
+    
+    return spark

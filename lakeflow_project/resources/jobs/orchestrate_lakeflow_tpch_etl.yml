@@ -12,14 +12,6 @@ resources:
           unit: DAYS
         pause_status: PAUSED
 
-      #email_notifications:
-      #  on_failure:
-      #    - your_email@example.com
-
-      # parameters:
-      #   - name: catalog
-      #     default: ${var.catalog}
-
       tasks:
         - task_key: refresh_pipeline
           pipeline_task:
@@ -29,3 +21,7 @@ resources:
         - environment_key: default
           spec:
             environment_version: "2"
+
+      #email_notifications:
+      #  on_failure:
+      #    - your_email@example.com

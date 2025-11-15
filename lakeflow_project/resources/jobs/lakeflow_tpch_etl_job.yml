@@ -2,8 +2,8 @@
 
 resources:
   jobs:
-    sample_job:
-      name: sample_job
+    lakeflow_tpch_etl_job:
+      name: lakeflow_tpch_etl_job
 
       trigger:
         # Run this job every day, exactly one day from the last run; see https://docs.databricks.com/api/workspace/jobs/create#trigger
@@ -22,7 +22,7 @@ resources:
       tasks:
         - task_key: refresh_pipeline
           pipeline_task:
-            pipeline_id: ${resources.pipelines.pipelines_python_etl.id}
+            pipeline_id: ${resources.pipelines.lakeflow_tpch_etl_pipeline.id}
 
       environments:
         - environment_key: default

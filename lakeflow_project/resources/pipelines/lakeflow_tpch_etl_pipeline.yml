@@ -2,16 +2,16 @@
 
 resources:
   pipelines:
-    pipelines_python_etl:
-      name: pipelines_python_etl
+    lakeflow_tpch_etl_pipeline:
+      name: lakeflow_tpch_etl_pipeline
       catalog: ${var.catalog}
       schema: ${resources.schemas.tpch_schema.name}
       serverless: true
-      root_path: "../../src/pipelines_python_etl"
+      root_path: "../../src/lakeflow_tpch_etl"
 
       libraries:
         - glob:
-            include: ../../src/pipelines_python_etl/transformations/**
+            include: ../../src/lakeflow_tpch_etl/transformations/**
 
       # environment:
       #   dependencies:

@@ -1,0 +1,57 @@
+"""
+Utility functions for the Lakehouse Framework.
+
+This module provides common utility functions used across the lakeflow pipelines.
+"""
+
+from typing import Optional
+
+
+def get_catalog_schema(catalog: str, schema: str) -> str:
+    """
+    Construct a fully qualified catalog.schema name.
+    
+    Args:
+        catalog: The catalog name
+        schema: The schema name
+        
+    Returns:
+        Fully qualified catalog.schema string
+    """
+    return f"{catalog}.{schema}"
+
+
+def get_table_path(catalog: str, schema: str, table: str) -> str:
+    """
+    Construct a fully qualified table path.
+    
+    Args:
+        catalog: The catalog name
+        schema: The schema name
+        table: The table name
+        
+    Returns:
+        Fully qualified catalog.schema.table string
+    """
+    return f"{catalog}.{schema}.{table}"
+
+
+def get_spark_config(key: str, default: Optional[str] = None) -> Optional[str]:
+    """
+    Get a Spark configuration value.
+    
+    Args:
+        key: Configuration key to retrieve
+        default: Default value if key not found
+        
+    Returns:
+        Configuration value or default
+    """
+    try:
+        from pyspark.sql import SparkSession
+        spark = SparkSession.getActiveSession()
+        if spark:
+            return spark.conf.get(key, default)
+        return default
+    except Exception:
+        return default

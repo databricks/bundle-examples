@@ -6,6 +6,12 @@ resources:
       comment: |
         # Lakeflow Project Schema - Bronze
         This schema is used for the **Lakeflow Pipelines Python** project.
+      grants:
+        - principal: ${workspace.current_user.userName}
+          privileges:
+            - MANAGE
+            - SELECT
+            - MODIFY
 
     lakeflow_schema_silver:
       catalog_name: ${var.catalog}
@@ -13,6 +19,12 @@ resources:
       comment: |
         # Lakeflow Project Schema - Silver
         This schema is used for the **Lakeflow Pipelines Python** project.
+      grants:
+        - principal: ${workspace.current_user.userName}
+          privileges:
+            - MANAGE
+            - SELECT
+            - MODIFY
 
     lakeflow_schema_gold:
       catalog_name: ${var.catalog}
@@ -20,7 +32,19 @@ resources:
       comment: |
         # Lakeflow Project Schema - Gold
         This schema is used for the **Lakeflow Pipelines Python** project.
-
+      grants:
+        - principal: ${workspace.current_user.userName}
+          privileges:
+            - MANAGE
+            - SELECT
+            - 
+            
+    test_schema:
+      catalog_name: ${var.catalog}
+      name: test_schema
+      comment: |
+        # Lakeflow Project Schema - Gold
+        This schema is used for the **Lakeflow Pipelines Python** project.
       grants:
         - principal: ${workspace.current_user.userName}
           privileges:

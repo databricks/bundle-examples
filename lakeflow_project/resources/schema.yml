@@ -8,10 +8,6 @@ resources:
         # Lakeflow Project Schema - Bronze
         This schema is used for the **Lakeflow Pipelines Python** project.
 
-      permissions:
-        - user_name: ${workspace.current_user.userName}
-          level: CAN_MANAGE
-
     lakeflow_schema_silver:
       catalog_name: ${var.catalog}
       name: ${var.schema}_silver
@@ -19,10 +15,6 @@ resources:
       comment: |
         # Lakeflow Project Schema - Silver
         This schema is used for the **Lakeflow Pipelines Python** project.
-
-      permissions:
-        - user_name: ${workspace.current_user.userName}
-          level: CAN_MANAGE
 
     lakeflow_schema_gold:
       catalog_name: ${var.catalog}
@@ -32,6 +24,6 @@ resources:
         # Lakeflow Project Schema - Gold
         This schema is used for the **Lakeflow Pipelines Python** project.
 
-      permissions:
-        - user_name: ${workspace.current_user.userName}
-          level: CAN_MANAGE
+    permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE

@@ -1,4 +1,5 @@
 .databricks/
+.vscode/
 build/
 dist/
 __pycache__/

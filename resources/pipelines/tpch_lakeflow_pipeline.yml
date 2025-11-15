@@ -13,7 +13,7 @@ resources:
         - glob:
             include: ../../src/tpch_lakeflow_pipeline/transformations/**
 
-      variables:
+      parameters:
         bronze_catalog: ${var.bronze_catalog}
         bronze_schema: ${resources.schemas.bronze_schema.name}
         silver_catalog: ${var.silver_catalog}

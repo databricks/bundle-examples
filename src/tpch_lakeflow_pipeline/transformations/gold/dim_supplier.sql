@@ -8,7 +8,7 @@ CREATE MATERIALIZED VIEW ${gold_catalog}.${gold_schema}.dim_supplier (
     supplier_phone STRING COMMENT 'Supplier phone number',
     supplier_nation STRING COMMENT 'Supplier nation name',
     supplier_region STRING COMMENT 'Supplier region name',
-    supplier_acctbal DECIMAL(15,2) COMMENT 'Supplier account balance',
+    supplier_acctbal DECIMAL(18,2) COMMENT 'Supplier account balance',
     load_timestamp TIMESTAMP COMMENT 'Timestamp when record was loaded'
 )
 COMMENT 'Supplier dimension table with enriched attributes'

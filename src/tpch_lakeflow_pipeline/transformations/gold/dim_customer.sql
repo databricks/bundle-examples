@@ -9,7 +9,7 @@ CREATE MATERIALIZED VIEW ${gold_catalog}.${gold_schema}.dim_customer (
     customer_segment STRING COMMENT 'Market segment',
     customer_nation STRING COMMENT 'Customer nation name',
     customer_region STRING COMMENT 'Customer region name',
-    customer_acctbal DECIMAL(15,2) COMMENT 'Customer account balance',
+    customer_acctbal DECIMAL(18,2) COMMENT 'Customer account balance',
     load_timestamp TIMESTAMP COMMENT 'Timestamp when record was loaded'
 )
 COMMENT 'Customer dimension table with enriched attributes'

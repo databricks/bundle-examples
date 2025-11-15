@@ -9,7 +9,7 @@ CREATE MATERIALIZED VIEW ${gold_catalog}.${gold_schema}.dim_part (
     part_type STRING COMMENT 'Part type',
     part_size INT COMMENT 'Part size',
     part_container STRING COMMENT 'Container type',
-    part_retailprice DECIMAL(15,2) COMMENT 'Retail price',
+    part_retailprice DECIMAL(18,2) COMMENT 'Retail price',
     load_timestamp TIMESTAMP COMMENT 'Timestamp when record was loaded'
 )
 COMMENT 'Part dimension table with product attributes'

@@ -1,14 +1,8 @@
-# Databricks notebook source
-# MAGIC %md
-# MAGIC #####Transform
+import dlt
 
-# COMMAND ----------
-
+# Configuration
 gold_catalog = spark.conf.get("gold_catalog")
 gold_schema = spark.conf.get("gold_schema")
-
-# COMMAND ----------
-
 beginDate = '1990-01-01'
 endDate = '2029-12-31'
 
@@ -17,12 +11,10 @@ endDate = '2029-12-31'
     .createOrReplaceTempView('dates')
 )
 
-# COMMAND ----------
 
-import dlt
 
 @dlt.table(
-    name="gold_dim_calendar",
+    name=f"{gold_catalog}.{gold_schema}.dim_calendar",
     comment="Materialized view of the calendar table"
 )
 def calendar_mv():

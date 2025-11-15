@@ -2,16 +2,16 @@
 
 resources:
   pipelines:
-    pipeline_lakeflow_tpch_etl:
-      name: pipeline_lakeflow_tpch_etl
+    pipeline_tpch_lakeflow_pipeline:
+      name: pipeline_tpch_lakeflow_pipeline
       catalog: ${var.bronze_catalog}
       schema: ${resources.schemas.bronze_schema.name}
       serverless: true
-      root_path: "../../src/lakeflow_tpch_etl"
+      root_path: "../../src/tpch_lakeflow_pipeline"
 
       libraries:
         - glob:
-            include: ../../src/lakeflow_tpch_etl/transformations/**
+            include: ../../src/tpch_lakeflow_pipeline/transformations/**
 
       parameters:
         bronze_catalog: ${var.bronze_catalog}

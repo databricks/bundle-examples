@@ -10,6 +10,6 @@ resources:
         # Lakeflow Project Volume - Bronze
         This volume is used for the **Lakeflow Pipelines Python** project.
       
-    permissions:
+    grants:
       - user_name: ${workspace.current_user.userName}
         level: CAN_MANAGE

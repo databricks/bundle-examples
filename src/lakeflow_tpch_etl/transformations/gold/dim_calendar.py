@@ -4,6 +4,11 @@
 
 # COMMAND ----------
 
+gold_catalog = spark.conf.get("gold_catalog")
+gold_schema = spark.conf.get("gold_schema")
+
+# COMMAND ----------
+
 beginDate = '1990-01-01'
 endDate = '2029-12-31'
 

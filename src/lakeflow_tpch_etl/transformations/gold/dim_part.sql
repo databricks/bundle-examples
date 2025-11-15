@@ -1,6 +1,6 @@
 -- Please edit the sample below
 
-CREATE MATERIALIZED VIEW gold_dim_part AS
+CREATE MATERIALIZED VIEW ${gold_catalog}.${gold_schema}.dim_part AS
 SELECT
     part.p_partkey                      as part_key,
     part.p_mfgr                         as part_mfgr,
@@ -10,4 +10,4 @@ SELECT
     part.p_container                    as part_container,
     part.p_retailprice                  as part_retailprice
 FROM
-    silver_part part
+    ${silver_catalog}.${silver_schema}.part part

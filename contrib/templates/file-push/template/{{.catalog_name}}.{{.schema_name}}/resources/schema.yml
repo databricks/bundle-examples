@@ -1,7 +1,0 @@
-# The schema dab
-
-resources:
-  schemas:
-    main_schema:
-      name: ${var.schema_name}
-      catalog_name: ${var.catalog_name}

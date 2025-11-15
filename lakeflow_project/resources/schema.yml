@@ -21,9 +21,9 @@ resources:
         # Lakeflow Project Schema - Gold
         This schema is used for the **Lakeflow Pipelines Python** project.
 
-    grants:
-      - principal: ${workspace.current_user.userName}
-        privileges:
-          - CAN_MANAGE
-          - SELECT
-          - MODIFY
+      grants:
+        - principal: ${workspace.current_user.userName}
+          privileges:
+            - CAN_MANAGE
+            - SELECT
+            - MODIFY

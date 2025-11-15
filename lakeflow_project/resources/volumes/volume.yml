@@ -2,7 +2,7 @@ resources:
   volumes:
     lakeflow_volume:
       catalog_name: ${var.catalog}
-      schema_name: ${var.schema}_bronze
+      schema_name: ${resources.schemas.tpch_schema.name}
       name: lakeflow_data
       volume_type: MANAGED
       comment: |

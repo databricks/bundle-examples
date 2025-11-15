@@ -18,8 +18,6 @@ resources:
       parameters:
         - name: catalog
           default: ${var.catalog}
-        - name: schema
-          default: ${var.schema}
 
       tasks:
         - task_key: refresh_pipeline

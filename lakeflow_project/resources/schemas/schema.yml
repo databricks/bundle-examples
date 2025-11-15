@@ -1,8 +1,8 @@
 resources:
   schemas:
-    lakeflow_schema_bronze:
+    tpch_schema:
       catalog_name: ${var.catalog}
-      name: ${var.schema}_bronze
+      name: tpch_schema
       comment: |
         # Lakeflow Project Schema - Bronze
         This schema is used for the **Lakeflow Pipelines Python** project.
@@ -29,19 +29,6 @@ resources:
     lakeflow_schema_gold:
       catalog_name: ${var.catalog}
       name: ${var.schema}_gold
-      comment: |
-        # Lakeflow Project Schema - Gold
-        This schema is used for the **Lakeflow Pipelines Python** project.
-      grants:
-        - principal: ${workspace.current_user.userName}
-          privileges:
-            - MANAGE
-            - SELECT
-            - MODIFY
-            
-    test_schema:
-      catalog_name: ${var.catalog}
-      name: test_schema
       comment: |
         # Lakeflow Project Schema - Gold
         This schema is used for the **Lakeflow Pipelines Python** project.

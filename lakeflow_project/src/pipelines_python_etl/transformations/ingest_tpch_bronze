@@ -1,8 +1,6 @@
 import dlt
 from pyspark.sql.functions import col
 
-catalog = "workspace"
-
 tables_list = [
     "customer",
     "lineitem",
@@ -16,7 +14,7 @@ tables_list = [
 
 def create_materialized_table(table):
 
-    @dlt.table(name=f"{table}")
+    @dlt.table(name=f"bronze_{table}")
     def lakeflow_pipelines_table():
         return spark.read.table(f"samples.tpch.{table}")
 

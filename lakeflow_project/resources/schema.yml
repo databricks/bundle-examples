@@ -3,7 +3,6 @@ resources:
     lakeflow_schema_bronze:
       catalog_name: ${var.catalog}
       name: ${var.schema}_bronze
-      
       comment: |
         # Lakeflow Project Schema - Bronze
         This schema is used for the **Lakeflow Pipelines Python** project.
@@ -11,7 +10,6 @@ resources:
     lakeflow_schema_silver:
       catalog_name: ${var.catalog}
       name: ${var.schema}_silver
-      
       comment: |
         # Lakeflow Project Schema - Silver
         This schema is used for the **Lakeflow Pipelines Python** project.
@@ -19,7 +17,6 @@ resources:
     lakeflow_schema_gold:
       catalog_name: ${var.catalog}
       name: ${var.schema}_gold
-      
       comment: |
         # Lakeflow Project Schema - Gold
         This schema is used for the **Lakeflow Pipelines Python** project.

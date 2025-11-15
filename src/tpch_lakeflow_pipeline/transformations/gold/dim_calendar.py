@@ -1,8 +1,10 @@
 import dlt
+from lakehouse_framework.config import Config
 
 # Configuration
-gold_catalog = spark.conf.get("gold_catalog")
-gold_schema = spark.conf.get("gold_schema")
+config = Config.from_spark_config()
+gold_catalog = config.gold_catalog
+gold_schema = config.gold_schema
 beginDate = '1990-01-01'
 endDate = '2029-12-31'
 

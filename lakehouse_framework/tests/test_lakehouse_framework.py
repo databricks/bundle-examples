@@ -6,7 +6,7 @@ This module contains unit tests for the lakehouse framework package.
 
 import pytest
 from lakehouse_framework.utils import get_catalog_schema, get_table_path
-from lakehouse_framework.config import MedallionConfig
+from lakehouse_framework.config import Config
 
 
 def test_get_catalog_schema():
@@ -22,8 +22,8 @@ def test_get_table_path():
 
 
 def test_medallion_config_creation():
-    """Test MedallionConfig creation."""
-    config = MedallionConfig(
+    """Test Config creation."""
+    config = Config(
         bronze_catalog="catalog",
         bronze_schema="bronze",
         silver_catalog="catalog",
@@ -41,8 +41,8 @@ def test_medallion_config_creation():
 
 
 def test_medallion_config_get_layer_path():
-    """Test getting layer paths from MedallionConfig."""
-    config = MedallionConfig(
+    """Test getting layer paths from Config."""
+    config = Config(
         bronze_catalog="catalog",
         bronze_schema="bronze",
         silver_catalog="catalog",
@@ -58,7 +58,7 @@ def test_medallion_config_get_layer_path():
 
 def test_medallion_config_invalid_layer():
     """Test that invalid layer raises ValueError."""
-    config = MedallionConfig(
+    config = Config(
         bronze_catalog="catalog",
         bronze_schema="bronze",
         silver_catalog="catalog",

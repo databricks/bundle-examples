@@ -9,7 +9,7 @@ from typing import Optional
 
 
 @dataclass
-class MedallionConfig:
+class Config:
     """
     Configuration for medallion architecture layers.
     
@@ -29,12 +29,12 @@ class MedallionConfig:
     gold_schema: str
     
     @classmethod
-    def from_spark_config(cls) -> "MedallionConfig":
+    def from_spark_config(cls) -> "Config":
         """
         Load configuration from Spark configuration.
         
         Returns:
-            MedallionConfig instance populated from Spark config
+            Config instance populated from Spark config
         """
         from lakehouse_framework.utils import get_spark_config
         

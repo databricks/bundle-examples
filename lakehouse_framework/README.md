@@ -31,10 +31,10 @@ pip install -e ".[dev]"
 ### Using the Configuration
 
 ```python
-from lakehouse_framework.config import MedallionConfig
+from lakehouse_framework.config import Config
 
 # Load configuration from Spark config (in a pipeline)
-config = MedallionConfig.from_spark_config()
+config = Config.from_spark_config()
 
 # Get layer paths
 bronze_path = config.get_layer_path("bronze")  # catalog.bronze

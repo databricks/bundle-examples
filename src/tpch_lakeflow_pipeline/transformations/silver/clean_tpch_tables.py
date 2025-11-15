@@ -1,11 +1,13 @@
 import dlt
 from pyspark.sql.functions import col
+from lakehouse_framework.config import Config
 
 # Configuration
-bronze_catalog = spark.conf.get("bronze_catalog")
-bronze_schema = spark.conf.get("bronze_schema")
-silver_catalog = spark.conf.get("silver_catalog")
-silver_schema = spark.conf.get("silver_schema")
+config = Config.from_spark_config()
+bronze_catalog = config.bronze_catalog
+bronze_schema = config.bronze_schema
+silver_catalog = config.silver_catalog
+silver_schema = config.silver_schema
 
 def create_materialized_table(table_name):
 

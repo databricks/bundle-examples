@@ -24,6 +24,6 @@ resources:
       grants:
         - principal: ${workspace.current_user.userName}
           privileges:
-            - CAN_MANAGE
+            - MANAGE
             - SELECT
             - MODIFY

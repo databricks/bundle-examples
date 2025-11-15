@@ -1,6 +1,6 @@
 -- Please edit the sample below
 
-CREATE MATERIALIZED VIEW dim_supplier AS
+CREATE MATERIALIZED VIEW gold_dim_supplier AS
 SELECT
     sup.s_suppkey                      as supplier_key,
     sup.s_name                         as supplier_name,

@@ -1,6 +1,6 @@
 -- Please edit the sample below
 
-CREATE MATERIALIZED VIEW dim_part AS
+CREATE MATERIALIZED VIEW gold_dim_part AS
 SELECT
     part.p_partkey                      as part_key,
     part.p_mfgr                         as part_mfgr,

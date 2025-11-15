@@ -1,6 +1,6 @@
 -- Please edit the sample below
 
-CREATE MATERIALIZED VIEW fact_sales AS
+CREATE MATERIALIZED VIEW gold_fact_sales AS
 SELECT
     -- Foreign keys
     cast(date_format(orders.o_orderdate, 'yyyyMMdd') as int)        as calendar_order_id,

@@ -5,7 +5,7 @@ fixed:
   type: databricks
 prompts:
   host:
-    default: company.databricks.com
+    default: https://dbc-b208d150-24a9.cloud.databricks.com/
   token:
     hint: 'personal access token to use, dapiXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     hide_input: true

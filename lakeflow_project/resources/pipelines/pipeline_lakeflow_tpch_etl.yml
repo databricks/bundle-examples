@@ -5,7 +5,7 @@ resources:
     pipeline_lakeflow_tpch_etl:
       name: pipeline_lakeflow_tpch_etl
       catalog: ${var.catalog}
-      schema: ${resources.schemas.tpch_schema.name}
+      schema: ${resources.schemas.lakeflow_bronze.name}
       serverless: true
       root_path: "../../src/lakeflow_tpch_etl"
 

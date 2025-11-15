@@ -10,11 +10,6 @@ spark = get_or_create_spark_session()
 bronze_catalog = config.bronze_catalog
 bronze_schema = config.bronze_schema
 
-# Load table configuration from all JSON files in the directory
-config_dir = Path(__file__).parent
-tables_config = load_table_configs(config_dir)
-
-
 def create_materialized_table(table_name: str):
     """
     Creates a materialized view in Lakeflow Declarative Pipelines for the specified table.
@@ -57,6 +52,9 @@ def create_materialized_table(table_name: str):
     return lakeflow_pipelines_table
 
 if __name__ == "__main__":
+
+    # Load table configuration from all JSON files in the directory 
+    tables_config = load_table_configs("./")
 
     # Extract table names from configuration
     tables_list = [table["name"] for table in tables_config["tables"]]

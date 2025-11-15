@@ -24,7 +24,7 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://company.databricks.com
+      host: https://dbc-b208d150-24a9.cloud.databricks.com/
     variables:
       catalog: catalog
       schema: ${workspace.current_user.short_name}

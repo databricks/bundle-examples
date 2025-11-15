@@ -93,3 +93,38 @@ def get_or_create_spark_session(app_name: str = "lakehouse_framework"):
             .getOrCreate()
     
     return spark
+
+
+def load_table_configs(config_dir):
+    """
+    Load and merge all JSON configuration files from a directory.
+    
+    Args:
+        config_dir: Path to the directory containing JSON configuration files
+        
+    Returns:
+        dict: Merged configuration containing source, tables, and metadata
+    """
+    import json
+    from pathlib import Path
+    
+    config_dir = Path(config_dir)
+    merged_config = {"source": {}, "tables": [], "metadata": {}}
+    
+    for json_file in sorted(config_dir.glob("*.json")):
+        with open(json_file, "r") as f:
+            file_config = json.load(f)
+            
+            # Merge source configuration
+            if "source" in file_config:
+                merged_config["source"].update(file_config["source"])
+            
+            # Append tables
+            if "tables" in file_config:
+                merged_config["tables"].extend(file_config["tables"])
+            
+            # Merge metadata
+            if "metadata" in file_config:
+                merged_config["metadata"].update(file_config["metadata"])
+    
+    return merged_config

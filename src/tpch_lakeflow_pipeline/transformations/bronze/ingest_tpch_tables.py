@@ -1,8 +1,7 @@
 import dlt
-import json
 from pathlib import Path
 from pyspark.sql.functions import col
-from lakehouse_framework.utils import add_metadata_columns, get_or_create_spark_session
+from lakehouse_framework.utils import add_metadata_columns, get_or_create_spark_session, load_table_configs
 from lakehouse_framework.config import Config
 
 # Configuration
@@ -11,10 +10,9 @@ spark = get_or_create_spark_session()
 bronze_catalog = config.bronze_catalog
 bronze_schema = config.bronze_schema
 
-# Load table configuration from JSON
-config_path = Path(__file__).parent / "tpch_tables_config.json"
-with open(config_path, "r") as f:
-    tables_config = json.load(f)
+# Load table configuration from all JSON files in the directory
+config_dir = Path(__file__).parent
+tables_config = load_table_configs(config_dir)
 
 
 def create_materialized_table(table_name: str):

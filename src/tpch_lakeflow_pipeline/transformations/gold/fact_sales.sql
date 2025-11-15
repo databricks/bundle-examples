@@ -21,9 +21,9 @@ CREATE MATERIALIZED VIEW ${gold_catalog}.${gold_schema}.fact_sales
     part_supply_cost_usd DECIMAL(18,2) COMMENT 'Cost to supply the part in USD',
     
     -- Semi-additive measures (lag calculations)
-    order_commit_lag_days INT COMMENT 'Days between order date and commit date',
-    order_receipt_lag_days INT COMMENT 'Days between order date and receipt date',
-    order_ship_lag_days INT COMMENT 'Days between order date and ship date',
+    order_commit_lag_days BIGINT COMMENT 'Days between order date and commit date',
+    order_receipt_lag_days BIGINT COMMENT 'Days between order date and receipt date',
+    order_ship_lag_days BIGINT COMMENT 'Days between order date and ship date',
     
     -- Audit column
     load_timestamp TIMESTAMP COMMENT 'Timestamp when the record was loaded into the gold layer'

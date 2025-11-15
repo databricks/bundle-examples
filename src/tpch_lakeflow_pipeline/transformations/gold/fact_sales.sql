@@ -1,6 +1,6 @@
 -- Please edit the sample below
 
-CREATE MATERIALIZED VIEW gold_fact_sales AS
+CREATE MATERIALIZED VIEW ${gold_catalog}.${gold_schema}.fact_sales AS
 SELECT
     -- Foreign keys
     cast(date_format(orders.o_orderdate, 'yyyyMMdd') as int)        as calendar_order_id,
@@ -24,8 +24,8 @@ SELECT
     timediff(day, orders.o_orderdate, lineitem.l_shipdate)          as order_ship_lag_days
     
 FROM 
-    silver_lineitem as lineitem
+    ${silver_catalog}.${silver_schema}.lineitem as lineitem
 LEFT JOIN
-    silver_orders as orders ON lineitem.l_orderkey = orders.o_orderkey
+    ${silver_catalog}.${silver_schema}.orders as orders ON lineitem.l_orderkey = orders.o_orderkey
 LEFT JOIN
-    silver_partsupp as partsupp ON lineitem.l_partkey = partsupp.ps_partkey AND lineitem.l_suppkey = partsupp.ps_suppkey
+    ${silver_catalog}.${silver_schema}.partsupp as partsupp ON lineitem.l_partkey = partsupp.ps_partkey AND lineitem.l_suppkey = partsupp.ps_suppkey

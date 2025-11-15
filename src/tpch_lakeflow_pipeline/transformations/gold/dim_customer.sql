@@ -1,6 +1,6 @@
 -- Please edit the sample below
 
-CREATE MATERIALIZED VIEW gold_dim_customer AS
+CREATE MATERIALIZED VIEW ${gold_catalog}.${gold_schema}.dim_customer AS
 SELECT
     cust.c_custkey                      as customer_key,
     cust.c_name                         as customer_name,
@@ -10,8 +10,8 @@ SELECT
     coalesce(nat.n_name, 'Unknown')     as customer_nation,
     coalesce(reg.r_name, 'Unknown')     as customer_region
 FROM
-    silver_customer cust
+    ${silver_catalog}.${silver_schema}.customer cust
 LEFT JOIN
-    silver_nation nat ON cust.c_nationkey = nat.n_nationkey
+    ${silver_catalog}.${silver_schema}.nation nat ON cust.c_nationkey = nat.n_nationkey
 LEFT JOIN
-    silver_region reg ON nat.n_regionkey = reg.r_regionkey
+    ${silver_catalog}.${silver_schema}.region reg ON nat.n_regionkey = reg.r_regionkey

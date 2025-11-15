@@ -1,0 +1,14 @@
+resources:
+  schemas:
+    bronze_schema:
+      catalog_name: ${var.catalog}
+      name: lakeflow_bronze
+      comment: |
+        # Lakeflow Project Schema - Bronze
+        This schema is used for the **Lakeflow Pipelines Python** project.
+      grants:
+        - principal: ${workspace.current_user.userName}
+          privileges:
+            - MANAGE
+            - SELECT
+            - MODIFY

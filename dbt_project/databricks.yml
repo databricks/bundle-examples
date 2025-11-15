@@ -2,8 +2,7 @@
 # to production using Databricks Asset Bundles.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: dbt_sql
-  uuid: 5e5ca8d5-0388-473e-84a1-1414ed89c5df
+  name: dbt_project
 
 include:
   - resources/*.yml
@@ -20,7 +19,7 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://company.databricks.com
+      host: https://dbc-b208d150-24a9.cloud.databricks.com/
 
   prod:
     mode: production

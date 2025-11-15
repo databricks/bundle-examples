@@ -1,8 +1,7 @@
 # This is a Databricks asset bundle definition for lakeflow_pipelines_python.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: lakeflow_pipelines_python
-  uuid: 87a174ba-60e4-4867-a140-1936bc9b00de
+  name: lakeflow_project
 
 include:
   - resources/*.yml

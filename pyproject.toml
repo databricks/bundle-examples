@@ -19,7 +19,7 @@ dev = [
 ]
 
 [project.scripts]
-main = "lakeflow_pipelines_python.main:main"
+main = "lakehouse_framework.main:main"
 
 [build-system]
 requires = ["hatchling"]

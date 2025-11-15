@@ -2,8 +2,8 @@
 
 resources:
   pipelines:
-    lakeflow_tpch_etl_pipeline:
-      name: lakeflow_tpch_etl_pipeline
+    pipeline_lakeflow_tpch_etl:
+      name: pipeline_lakeflow_tpch_etl
       catalog: ${var.catalog}
       schema: ${resources.schemas.tpch_schema.name}
       serverless: true

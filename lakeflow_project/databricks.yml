@@ -12,8 +12,10 @@ include:
 variables:
   catalog:
     description: The catalog to use
+    default: workspace
   schema:
     description: The schema to use
+    default: lakeflow_project
 
 targets:
   dev:
@@ -25,9 +27,7 @@ targets:
     default: true
     workspace:
       host: https://dbc-b208d150-24a9.cloud.databricks.com/
-    variables:
-      catalog: catalog
-      schema: ${workspace.current_user.short_name}
+  
   prod:
     mode: production
     workspace:

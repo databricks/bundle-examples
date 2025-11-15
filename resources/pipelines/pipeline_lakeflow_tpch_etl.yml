@@ -13,6 +13,14 @@ resources:
         - glob:
             include: ../../src/lakeflow_tpch_etl/transformations/**
 
+      parameters:
+        bronze_catalog: ${var.bronze_catalog}
+        bronze_schema: ${resources.schemas.bronze_schema.name}
+        silver_catalog: ${var.silver_catalog}
+        silver_schema: ${resources.schemas.silver_schema.name}
+        gold_catalog: ${var.gold_catalog}
+        gold_schema: ${resources.schemas.silver_schema.name}
+
       # environment:
       #   dependencies:
       #     # We include every dependency defined by pyproject.toml by defining an editable environment

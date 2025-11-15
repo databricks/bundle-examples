@@ -55,3 +55,17 @@ def get_spark_config(key: str, default: Optional[str] = None) -> Optional[str]:
         return default
     except Exception:
         return default
+
+
+def add_metadata_columns(df):
+    """
+    Adds metadata columns to the input DataFrame.
+
+    Parameters:
+        df (DataFrame): Input Spark DataFrame.
+
+    Returns:
+        DataFrame: DataFrame with an additional 'ingest_timestamp' column containing the current timestamp.
+    """
+    from pyspark.sql.functions import current_timestamp
+    return df.withColumn("ingest_timestamp", current_timestamp())

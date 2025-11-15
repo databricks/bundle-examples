@@ -1,6 +1,6 @@
 import dlt
 from pyspark.sql.functions import col
-from utilities.util_library import add_metadata_columns
+from lakehouse_framework.utils import add_metadata_columns
 from lakehouse_framework.config import Config
 
 # Configuration

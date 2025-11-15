@@ -5,7 +5,7 @@ This module contains unit tests for the lakehouse framework package.
 """
 
 import pytest
-from lakehouse_framework.utils import get_catalog_schema, get_table_path
+from lakehouse_framework.utils import get_catalog_schema, get_table_path, add_metadata_columns
 from lakehouse_framework.config import Config
 
 
@@ -69,3 +69,47 @@ def test_medallion_config_invalid_layer():
     
     with pytest.raises(ValueError, match="Invalid layer"):
         config.get_layer_path("platinum")
+
+
+@pytest.mark.skipif(True, reason="Requires Spark/Java environment")
+def test_add_metadata_columns():
+    """Test adding metadata columns to a DataFrame with real Spark."""
+    from pyspark.sql import SparkSession
+    from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+    
+    # Create a local Spark session for testing
+    spark = SparkSession.builder \
+        .appName("test_add_metadata_columns") \
+        .master("local[1]") \
+        .getOrCreate()
+    
+    try:
+        # Create a sample DataFrame
+        schema = StructType([
+            StructField("id", IntegerType(), True),
+            StructField("name", StringType(), True)
+        ])
+        data = [(1, "Alice"), (2, "Bob"), (3, "Charlie")]
+        df = spark.createDataFrame(data, schema)
+        
+        # Verify original DataFrame has 2 columns
+        assert len(df.columns) == 2
+        assert "ingest_timestamp" not in df.columns
+        
+        # Add metadata columns
+        result_df = add_metadata_columns(df)
+        
+        # Verify new DataFrame has 3 columns
+        assert len(result_df.columns) == 3
+        assert "ingest_timestamp" in result_df.columns
+        assert "id" in result_df.columns
+        assert "name" in result_df.columns
+        
+        # Verify the ingest_timestamp column has values
+        assert result_df.count() == 3
+        timestamps = result_df.select("ingest_timestamp").collect()
+        for row in timestamps:
+            assert row.ingest_timestamp is not None
+            
+    finally:
+        spark.stop()

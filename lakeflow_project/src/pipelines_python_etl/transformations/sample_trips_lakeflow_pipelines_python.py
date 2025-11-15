@@ -1,12 +1,25 @@
-from pyspark import pipelines as dp
+import dlt
 from pyspark.sql.functions import col
 
+catalog = "workspace"
 
-# This file defines a sample transformation.
-# Edit the sample below or add new transformations
-# using "+ Add" in the file browser.
+tables_list = [
+    "customer",
+    "lineitem",
+    "orders",
+    "nation",
+    "part",
+    "partsupp",
+    "region",
+    "supplier"
+]
+
+def create_materialized_table(table):
+
+    @dlt.table(name=f"{table}")
+    def lakeflow_pipelines_table():
+        return spark.read.table(f"samples.tpch.{table}")
 
 
-@dp.table
-def sample_trips_lakeflow_pipelines_python():
-    return spark.read.table("samples.nyctaxi.trips")
+for table in tables_list:
+    create_materialized_table(table)

@@ -12,10 +12,8 @@ include:
 variables:
   catalog:
     description: The catalog to use
-    default: workspace
   schema:
     description: The schema to use
-    default: lakeflow_project
 
 targets:
   dev:
@@ -27,7 +25,10 @@ targets:
     default: true
     workspace:
       host: https://dbc-b208d150-24a9.cloud.databricks.com/
-  
+    variables:
+      catalog: workspace
+      schema: dev_${workspace.current_user}_lakeflow
+
   prod:
     mode: production
     workspace:
@@ -35,8 +36,8 @@ targets:
       # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
       root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
     variables:
-      catalog: catalog
-      schema: prod
+      catalog: workspace
+      schema: lakeflow
     permissions:
       - user_name: user@company.com
         level: CAN_MANAGE

@@ -1,0 +1,64 @@
+{
+  "source": {
+    "catalog": "samples",
+    "schema": "tpch",
+    "description": "TPC-H sample dataset provided by Databricks"
+  },
+  "tables": [
+    {
+      "name": "customer",
+      "description": "Customer dimension table",
+      "primary_key": "c_custkey",
+      "business_key": "c_custkey"
+    },
+    {
+      "name": "lineitem",
+      "description": "Line item fact table",
+      "primary_key": "l_orderkey, l_linenumber",
+      "business_key": "l_orderkey, l_linenumber"
+    },
+    {
+      "name": "orders",
+      "description": "Orders fact table",
+      "primary_key": "o_orderkey",
+      "business_key": "o_orderkey"
+    },
+    {
+      "name": "nation",
+      "description": "Nation dimension table",
+      "primary_key": "n_nationkey",
+      "business_key": "n_nationkey"
+    },
+    {
+      "name": "part",
+      "description": "Part dimension table",
+      "primary_key": "p_partkey",
+      "business_key": "p_partkey"
+    },
+    {
+      "name": "partsupp",
+      "description": "Part supplier associative table",
+      "primary_key": "ps_partkey, ps_suppkey",
+      "business_key": "ps_partkey, ps_suppkey"
+    },
+    {
+      "name": "region",
+      "description": "Region dimension table",
+      "primary_key": "r_regionkey",
+      "business_key": "r_regionkey"
+    },
+    {
+      "name": "supplier",
+      "description": "Supplier dimension table",
+      "primary_key": "s_suppkey",
+      "business_key": "s_suppkey"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2025-11-15",
+    "owner": "data_engineering_team",
+    "load_type": "full",
+    "refresh_frequency": "daily"
+  }
+}

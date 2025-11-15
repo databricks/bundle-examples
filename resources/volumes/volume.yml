@@ -1,9 +1,9 @@
 resources:
   volumes:
     lakeflow_bronze_volume:
-      catalog_name: ${var.catalog}
+      catalog_name: ${var.bronze_catalog}
       schema_name: ${resources.schemas.bronze_schema.name}
-      name: lakeflow_data
+      name: volume_example
       volume_type: MANAGED
       comment: |
         # Lakeflow Project Volume - Bronze
@@ -14,3 +14,4 @@ resources:
           privileges:
             - MANAGE
             - READ_VOLUME
+            - WRITE_VOLUME

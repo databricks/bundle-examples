@@ -33,13 +33,18 @@ def create_materialized_table(table_name):
     primary_keys = [key.strip() for key in table_metadata.get("primary_key", "").split(",")]
     expectations = table_metadata.get("expectations", {})
     
+    # Build table properties with primary key information
+    table_properties = {
+        "quality": "silver",
+        "pipelines.autoOptimize.managed": "true",
+        "primary_key": ", ".join(primary_keys)
+    }
+    
     @dlt.table(
         name=f"{silver_catalog}.{silver_schema}.{table_name}",
         comment=description,
-        table_properties={
-            "quality": "silver",
-            "pipelines.autoOptimize.managed": "true"
-        }
+        table_properties=table_properties,
+        primary_keys=primary_keys if primary_keys and primary_keys[0] else None
     )
     @dlt.expect_all_or_drop({f"{pk}_not_null": f"{pk} IS NOT NULL" for pk in primary_keys})
     @dlt.expect_all_or_drop(expectations)

@@ -37,7 +37,7 @@ resources:
           privileges:
             - MANAGE
             - SELECT
-            - 
+            - MODIFY
             
     test_schema:
       catalog_name: ${var.catalog}

@@ -10,19 +10,20 @@ resources:
         periodic:
           interval: 1
           unit: DAYS
+        pause_status: PAUSED
 
       #email_notifications:
       #  on_failure:
       #    - your_email@example.com
 
-      parameters:
-        - name: catalog
-          default: ${var.catalog}
+      # parameters:
+      #   - name: catalog
+      #     default: ${var.catalog}
 
       tasks:
         - task_key: refresh_pipeline
           pipeline_task:
-            pipeline_id: ${resources.pipelines.lakeflow_tpch_etl_pipeline.id}
+            pipeline_id: ${resources.pipelines.pipeline_lakeflow_tpch_etl.id}
 
       environments:
         - environment_key: default

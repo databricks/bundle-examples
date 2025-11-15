@@ -1,23 +1,12 @@
 import dlt
 from pyspark.sql.functions import col
 
+def create_materialized_table(table_name):
 
-tables_list = [
-    "customer",
-    "lineitem",
-    "orders",
-    "nation",
-    "part",
-    "partsupp",
-    "region",
-    "supplier"
-]
-
-def create_materialized_table(table):
-
-    @dlt.table(name=f"{silver_catalog}.{silver_schema}.{table}")
+    @dlt.table(name=f"{silver_catalog}.{silver_schema}.{table_name}")
     def lakeflow_pipelines_table():
-        return spark.read.table(f"{bronze_catalog}.{bronze_schema}.{table}")
+
+        return spark.read.table(f"{bronze_catalog}.{bronze_schema}.{table_name}")
 
 
 if __name__ == "__main__":
@@ -27,5 +16,16 @@ if __name__ == "__main__":
     silver_catalog = spark.conf.get("silver_catalog")
     silver_schema = spark.conf.get("silver_schema")
 
-    for table in tables_list:
-        create_materialized_table(table)
+    tables_list = [
+        "customer",
+        "lineitem",
+        "orders",
+        "nation",
+        "part",
+        "partsupp",
+        "region",
+        "supplier"
+    ]
+
+    for table_name in tables_list:
+        create_materialized_table(table_name)

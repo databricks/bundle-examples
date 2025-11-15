@@ -26,7 +26,7 @@ targets:
     workspace:
       host: https://dbc-b208d150-24a9.cloud.databricks.com/
     variables:
-      catalog: catalog
+      catalog: workspace
       schema: ${workspace.current_user.short_name}
   prod:
     mode: production

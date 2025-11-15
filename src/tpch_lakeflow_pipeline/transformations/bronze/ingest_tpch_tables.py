@@ -28,5 +28,5 @@ if __name__ == "__main__":
     bronze_schema = spark.conf.get("bronze_schema")
     tables_list = ["customer", "lineitem", "orders", "nation", "part", "partsupp", "region", "supplier"]
 
-    for table in tables_list:
-        create_materialized_table(table)
+    for table_name in tables_list:
+        create_materialized_table(table_name)

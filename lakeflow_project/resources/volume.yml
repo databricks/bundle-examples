@@ -1,0 +1,25 @@
+resources:
+  volumes:
+    lakeflow_volume:
+      catalog_name: ${var.catalog}
+      schema_name: ${var.schema}
+      name: lakeflow_data
+      volume_type: MANAGED
+      
+      comment: |
+        # Lakeflow Project Volume
+        
+        This volume is used for the **Lakeflow Pipelines Python** project.
+        
+        The volume stores data files and artifacts used by Delta Live Tables pipelines.
+        
+        **Created by**: ${workspace.current_user.displayName}
+        
+        ## Environment
+        - **Catalog**: ${var.catalog}
+        - **Schema**: ${var.schema}
+        - **Target**: ${bundle.target}
+      
+      permissions:
+        - user_name: ${workspace.current_user.userName}
+          level: CAN_MANAGE

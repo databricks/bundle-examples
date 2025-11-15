@@ -17,17 +17,7 @@ def create_materialized_table(table_name):
 
 if __name__ == "__main__":
 
-
-    tables_list = [
-        "customer",
-        "lineitem",
-        "orders",
-        "nation",
-        "part",
-        "partsupp",
-        "region",
-        "supplier"
-    ]
+    tables_list = ["customer", "lineitem", "orders", "nation", "part", "partsupp", "region", "supplier"]
 
     for table_name in tables_list:
         create_materialized_table(table_name)

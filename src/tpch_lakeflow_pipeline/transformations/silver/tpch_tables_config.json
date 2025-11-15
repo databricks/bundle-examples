@@ -1,0 +1,94 @@
+{
+  "source": {
+    "layer": "bronze",
+    "description": "Bronze layer tables for TPC-H dataset"
+  },
+  "tables": [
+    {
+      "name": "customer",
+      "description": "Cleaned customer dimension table",
+      "primary_key": "c_custkey",
+      "expectations": {
+        "valid_phone": "c_phone IS NOT NULL AND LENGTH(c_phone) > 0",
+        "valid_acctbal": "c_acctbal IS NOT NULL",
+        "valid_mktsegment": "c_mktsegment IN ('AUTOMOBILE', 'BUILDING', 'FURNITURE', 'HOUSEHOLD', 'MACHINERY')"
+      }
+    },
+    {
+      "name": "lineitem",
+      "description": "Cleaned line item fact table",
+      "primary_key": "l_orderkey, l_linenumber",
+      "expectations": {
+        "positive_quantity": "l_quantity > 0",
+        "positive_extendedprice": "l_extendedprice > 0",
+        "valid_discount": "l_discount >= 0 AND l_discount <= 1",
+        "valid_tax": "l_tax >= 0",
+        "valid_dates": "l_shipdate >= l_commitdate"
+      }
+    },
+    {
+      "name": "orders",
+      "description": "Cleaned orders fact table",
+      "primary_key": "o_orderkey",
+      "expectations": {
+        "positive_totalprice": "o_totalprice > 0",
+        "valid_orderstatus": "o_orderstatus IN ('O', 'F', 'P')",
+        "valid_orderpriority": "o_orderpriority IN ('1-URGENT', '2-HIGH', '3-MEDIUM', '4-NOT SPECIFIED', '5-LOW')"
+      }
+    },
+    {
+      "name": "nation",
+      "description": "Cleaned nation dimension table",
+      "primary_key": "n_nationkey",
+      "expectations": {
+        "valid_name": "n_name IS NOT NULL AND LENGTH(n_name) > 0",
+        "valid_regionkey": "n_regionkey IS NOT NULL"
+      }
+    },
+    {
+      "name": "part",
+      "description": "Cleaned part dimension table",
+      "primary_key": "p_partkey",
+      "expectations": {
+        "valid_name": "p_name IS NOT NULL",
+        "positive_size": "p_size > 0",
+        "positive_retailprice": "p_retailprice > 0"
+      }
+    },
+    {
+      "name": "partsupp",
+      "description": "Cleaned part supplier associative table",
+      "primary_key": "ps_partkey, ps_suppkey",
+      "expectations": {
+        "positive_availqty": "ps_availqty >= 0",
+        "positive_supplycost": "ps_supplycost > 0"
+      }
+    },
+    {
+      "name": "region",
+      "description": "Cleaned region dimension table",
+      "primary_key": "r_regionkey",
+      "expectations": {
+        "valid_name": "r_name IS NOT NULL AND LENGTH(r_name) > 0",
+        "valid_region": "r_name IN ('AFRICA', 'AMERICA', 'ASIA', 'EUROPE', 'MIDDLE EAST')"
+      }
+    },
+    {
+      "name": "supplier",
+      "description": "Cleaned supplier dimension table",
+      "primary_key": "s_suppkey",
+      "expectations": {
+        "valid_name": "s_name IS NOT NULL",
+        "valid_phone": "s_phone IS NOT NULL AND LENGTH(s_phone) > 0",
+        "valid_acctbal": "s_acctbal IS NOT NULL"
+      }
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2025-11-15",
+    "owner": "data_engineering_team",
+    "layer": "silver",
+    "quality_level": "cleaned"
+  }
+}

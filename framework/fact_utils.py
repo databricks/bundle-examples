@@ -128,6 +128,9 @@ def enrich_with_surrogate_keys(
             # Drop rows where surrogate key is NULL
             result_df = result_df.filter(F.col(f"{dimension_name}_id").isNotNull())
         # For 'keep_null', do nothing - keep the NULLs as is
+        
+        # Drop the original natural key column (business key ending with '_key')
+        result_df = result_df.drop(natural_key_col)
     
     return result_df
 

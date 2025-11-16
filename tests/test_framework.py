@@ -7,7 +7,7 @@ This module contains unit tests for the lakehouse framework package.
 import pytest
 from framework.utils import get_catalog_schema, get_table_path, add_metadata_columns, get_or_create_spark_session
 from framework.config import Config
-from framework.dimension_utils import add_dummy_row, create_dummy_row_dict
+from framework.dimension_utils import add_dummy_row, create_dummy_row_dict, add_dimension_metadata
 from framework.dimension_utils import add_dummy_row, create_dummy_row_dict
 
 # Try to create Spark session, skip Spark tests if not available
@@ -109,6 +109,41 @@ def test_create_dummy_row_dict():
     
     # Verify timestamp fields are epoch string
     assert dummy_row["created_at"] == "1970-01-01 00:00:00"
+
+
+@pytest.mark.skipif(not SPARK_AVAILABLE, reason="Requires Spark/Java environment")
+def test_add_dimension_metadata():
+    """Test adding metadata columns to a dimension DataFrame."""
+    from pyspark.sql.types import StructType, StructField, StringType, LongType
+    
+    # Create a sample dimension DataFrame
+    schema = StructType([
+        StructField("customer_key", LongType(), True),
+        StructField("customer_name", StringType(), True)
+    ])
+    
+    data = [
+        (1, "Alice"),
+        (2, "Bob")
+    ]
+    
+    df = spark.createDataFrame(data, schema)
+    
+    # Test default metadata (load_timestamp)
+    result_df = add_dimension_metadata(df)
+    assert "load_timestamp" in result_df.columns
+    assert result_df.count() == 2
+    
+    # Test multiple metadata columns
+    result_df2 = add_dimension_metadata(df, ['load_timestamp', 'source_system', 'is_current'])
+    assert "load_timestamp" in result_df2.columns
+    assert "source_system" in result_df2.columns
+    assert "is_current" in result_df2.columns
+    
+    # Verify source_system value
+    first_row = result_df2.first()
+    assert first_row.source_system == "TPC-H"
+    assert first_row.is_current == True
 
 
 @pytest.mark.skipif(not SPARK_AVAILABLE, reason="Requires Spark/Java environment")

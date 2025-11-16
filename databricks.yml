@@ -15,6 +15,8 @@ variables:
     description: Name of Silver catalog
   gold_catalog:
     description: Name of Gold catalog
+  warehouse_id:
+    description: Id of SQL Serverless Warehouse
 
 targets:
   dev:
@@ -30,6 +32,9 @@ targets:
       bronze_catalog: lakehouse_bronze_dev
       silver_catalog: lakehouse_silver_dev
       gold_catalog: lakehouse_gold_dev
+      warehouse_id:
+        lookup:
+          Serverless Starter Warehouse
 
   prod:
     mode: production
@@ -37,10 +42,15 @@ targets:
       host: https://company.databricks.com
       # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
       root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+    
     variables:
       bronze_catalog: lakehouse_bronze_prd
       silver_catalog: lakehouse_silver_prd
       gold_catalog: lakehouse_gold_prd
+      warehouse_id:
+        lookup:
+          Serverless Starter Warehouse
+    
     permissions:
       - user_name: user@company.com
         level: CAN_MANAGE

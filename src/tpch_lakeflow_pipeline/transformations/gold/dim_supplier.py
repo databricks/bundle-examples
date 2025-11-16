@@ -2,11 +2,13 @@
 Supplier dimension table with enriched attributes.
 """
 import dlt
+from pyspark.sql import SparkSession
 from framework.config import Config
-from framework.dimension_utils import add_dummy_row
+from framework.dimension_utils import add_dummy_row, add_surrogate_id
 
 # Configuration
 config = Config.from_spark_config()
+spark = SparkSession.getActiveSession()
 
 # Table definition
 @dlt.table(
@@ -44,4 +46,8 @@ def dim_supplier():
             {config.silver_catalog}.{config.silver_schema}.region reg ON nat.n_regionkey = reg.r_regionkey
     """)
     
-    return add_dummy_row(df, "supplier_key")
+    # Add dummy row first, then add surrogate ID
+    df = add_dummy_row(df, "supplier_key")
+    df = add_surrogate_id(df, "supplier_key", "supplier_id")
+    
+    return df

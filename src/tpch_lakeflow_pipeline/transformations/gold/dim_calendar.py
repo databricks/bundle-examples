@@ -1,11 +1,11 @@
 import dlt
 from framework.config import Config
-from framework.utils import add_metadata_columns, get_or_create_spark_session
+from framework.utils import add_metadata_columns
+from framework.dimension_utils import add_dummy_row
 
 
 # Configuration
 config = Config.from_spark_config()
-spark = get_or_create_spark_session()
 
 # Calendar configuration
 beginDate = '1990-01-01'
@@ -21,7 +21,7 @@ def calendar_mv():
       .createOrReplaceTempView('dates')
     )
 
-    return spark.sql("""
+    df = spark.sql("""
         select
           year(calendarDate) * 10000 + month(calendarDate) * 100 + day(calendarDate) as calendar_id,
           calendarDate as calendar_key,
@@ -45,3 +45,5 @@ def calendar_mv():
         from dates
         order by calendarDate
     """)
+
+    return add_dummy_row(add_metadata_columns(df), "calendar_id")

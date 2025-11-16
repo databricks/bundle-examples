@@ -7,7 +7,7 @@ This module contains unit tests for the lakehouse framework package.
 import pytest
 from framework.utils import get_catalog_schema, get_table_path, add_metadata_columns, get_or_create_spark_session
 from framework.config import Config
-from framework.dimension_utils import add_dummy_row, create_dummy_row_dict, add_dimension_metadata
+from framework.dimension_utils import add_dummy_row, create_dummy_row_dict, add_dimension_metadata, add_surrogate_id
 from framework.fact_utils import extract_dimension_names, build_dimension_mappings, enrich_with_surrogate_keys
 
 # Try to create Spark session, skip Spark tests if not available
@@ -176,6 +176,48 @@ def test_add_dummy_row():
     assert first_row.customer_key == -1
     assert first_row.customer_name == "N/A"
     assert first_row.customer_balance is None
+
+
+@pytest.mark.skipif(not SPARK_AVAILABLE, reason="Requires Spark/Java environment")
+def test_add_surrogate_id():
+    """Test adding a surrogate ID column to a dimension DataFrame."""
+    from pyspark.sql.types import StructType, StructField, StringType, LongType
+    
+    # Create a sample dimension DataFrame
+    schema = StructType([
+        StructField("customer_key", LongType(), True),
+        StructField("customer_name", StringType(), True)
+    ])
+    
+    data = [
+        (100, "Alice"),
+        (200, "Bob"),
+        (150, "Charlie")
+    ]
+    
+    df = spark.createDataFrame(data, schema)
+    
+    # Add surrogate ID
+    result_df = add_surrogate_id(df, "customer_key", "customer_id")
+    
+    # Verify new column exists
+    assert "customer_id" in result_df.columns
+    
+    # Verify row count unchanged
+    assert result_df.count() == 3
+    
+    # Collect and sort by customer_key to verify surrogate IDs
+    rows = result_df.orderBy("customer_key").collect()
+    
+    # Verify surrogate IDs are sequential starting from 1
+    assert rows[0].customer_key == 100
+    assert rows[0].customer_id == 1
+    
+    assert rows[1].customer_key == 150
+    assert rows[1].customer_id == 2
+    
+    assert rows[2].customer_key == 200
+    assert rows[2].customer_id == 3
 
 
 def test_extract_dimension_names():

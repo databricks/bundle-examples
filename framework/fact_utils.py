@@ -1,11 +1,9 @@
 """
 Utility functions for fact table operations.
 """
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 from typing import List, Dict, Optional
-from framework.utils import get_or_create_spark_session
-spark = get_or_create_spark_session()
 
 
 def extract_dimension_names(df: DataFrame) -> List[str]:
@@ -79,6 +77,9 @@ def enrich_with_surrogate_keys(
         ... }
         >>> enriched_fact = enrich_with_surrogate_keys(fact_df, mappings, 'gold_catalog', 'gold_schema')
     """
+    spark = SparkSession.getActiveSession()
+    if spark is None:
+        raise RuntimeError("No active Spark session found")
     
     result_df = fact_df
     

@@ -5,8 +5,6 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 from pyspark.sql.types import StringType, TimestampType
 from typing import Dict, Any, List
-from framework.utils import get_or_create_spark_session
-spark = get_or_create_spark_session()
 
 
 def add_dimension_metadata(df: DataFrame, metadata_columns: List[str] = None) -> DataFrame:
@@ -73,6 +71,11 @@ def add_dummy_row(df: DataFrame, surrogate_key_column: str) -> DataFrame:
     Example:
         >>> dim_customer_df = add_dummy_row(dim_customer_df, "customer_id")
     """
+    from pyspark.sql import SparkSession
+    
+    spark = SparkSession.getActiveSession()
+    if spark is None:
+        raise RuntimeError("No active Spark session found")
     
     # Build dummy row data based on column types
     dummy_data: Dict[str, Any] = {}
@@ -133,3 +136,26 @@ def create_dummy_row_dict(schema_fields: list, surrogate_key_column: str) -> Dic
             dummy_data[column_name] = None
     
     return dummy_data
+
+
+def add_surrogate_id(df: DataFrame, surrogate_id_column: str) -> DataFrame:
+    """
+    Adds a surrogate ID column to a dimension table based on the natural key.
+    
+    The surrogate ID is generated using monotonically_increasing_id() to ensure uniqueness,
+    then adjusted to start from 1 (with -1 reserved for dummy/unknown rows).
+    
+    Args:
+        df (DataFrame): The dimension DataFrame
+        surrogate_id_column (str): Name of the surrogate ID column to create (e.g., 'customer_id')
+    
+    Returns:
+        DataFrame: The dimension DataFrame with surrogate ID column added
+        
+    Example:
+        >>> df = add_surrogate_id(df, "customer_key", "customer_id")
+    """
+    # Add surrogate ID using monotonically_increasing_id
+    result_df = df.withColumn(surrogate_id_column, F.monotonically_increasing_id() + 1)
+    
+    return result_df

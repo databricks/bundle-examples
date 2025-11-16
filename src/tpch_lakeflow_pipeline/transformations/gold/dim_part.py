@@ -2,11 +2,13 @@
 Part dimension table with product attributes.
 """
 import dlt
+from pyspark.sql import SparkSession
 from framework.config import Config
-from framework.dimension_utils import add_dummy_row
+from framework.dimension_utils import add_dummy_row, add_surrogate_id
 
 # Configuration
 config = Config.from_spark_config()
+spark = SparkSession.getActiveSession()
 
 # Table definition
 @dlt.table(
@@ -41,4 +43,8 @@ def dim_part():
             {config.silver_catalog}.{config.silver_schema}.part part
     """)
     
-    return add_dummy_row(df, "part_key")
+    # Add dummy row first, then add surrogate ID
+    df = add_dummy_row(df, "part_key")
+    df = add_surrogate_id(df, "part_key", "part_id")
+    
+    return df

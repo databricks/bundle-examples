@@ -1,0 +1,23 @@
+resources:
+  volumes:
+    autoloader_landing_zone:
+      catalog_name: ${var.bronze_catalog}
+      schema_name: ${resources.schemas.autoloader_bronze_schema.name}
+      name: landing_zone
+      volume_type: MANAGED
+      comment: |
+        # AutoLoader Landing Zone Volume
+        Unity Catalog Volume for incoming data files processed by AutoLoader.
+        
+        Structure:
+        - /data - Generic data files
+        - /json - JSON files
+        - /csv - CSV files
+        - /parquet - Parquet files
+      
+      grants:
+        - principal: ${workspace.current_user.userName}
+          privileges:
+            - MANAGE
+            - READ_VOLUME
+            - WRITE_VOLUME

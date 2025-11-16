@@ -1,0 +1,14 @@
+resources:
+  schemas:
+    autoloader_bronze_schema:
+      catalog_name: ${var.bronze_catalog}
+      name: autoloader_data
+      comment: |
+        # AutoLoader Pipeline Schema - Bronze
+        This schema contains data ingested from Unity Catalog Volumes using AutoLoader.
+      grants:
+        - principal: ${workspace.current_user.userName}
+          privileges:
+            - MANAGE
+            - SELECT
+            - MODIFY

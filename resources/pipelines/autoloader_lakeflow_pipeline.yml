@@ -16,11 +16,7 @@ resources:
       configuration:
         bronze_catalog: ${var.bronze_catalog}
         bronze_schema: ${resources.schemas.autoloader_bronze_schema.name}
-        # Volume paths for AutoLoader ingestion
-        volume_path: /Volumes/${var.bronze_catalog}/${resources.schemas.autoloader_bronze_schema.name}/landing_zone/data
-        json_volume_path: /Volumes/${var.bronze_catalog}/${resources.schemas.autoloader_bronze_schema.name}/landing_zone/json
-        csv_volume_path: /Volumes/${var.bronze_catalog}/${resources.schemas.autoloader_bronze_schema.name}/landing_zone/csv
-        file_format: json
+        volume_path: /Volumes/${var.bronze_catalog}/${resources.schemas.autoloader_bronze_schema.name}
 
       environment:
         dependencies:

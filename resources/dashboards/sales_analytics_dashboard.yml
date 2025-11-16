@@ -4,15 +4,6 @@ resources:
       display_name: "Sales Analytics Dashboard"
       warehouse_id: "${var.warehouse_id}"
       
-      # Dashboard metadata
-      tags:
-        - key: "environment"
-          value: "${var.environment}"
-        - key: "layer"
-          value: "gold"
-        - key: "purpose"
-          value: "sales_reporting"
-      
       # Dashboard definition
       serialized_dashboard: |
         {

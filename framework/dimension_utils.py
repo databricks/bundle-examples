@@ -90,17 +90,11 @@ def add_dummy_row(df: DataFrame, surrogate_key_column: str, spark: SparkSession 
         elif isinstance(column_type, (StringType,)):
             # String fields get 'N/A'
             dummy_data[column_name] = "N/A"
-        elif isinstance(column_type, (IntegerType, LongType)):
-            # Numeric fields get -1
-            dummy_data[column_name] = -1
-        elif isinstance(column_type, DecimalType):
-            # Decimal fields get 0.0
-            dummy_data[column_name] = 0.0
         elif isinstance(column_type, TimestampType):
             # Timestamp fields get epoch time (1970-01-01)
             dummy_data[column_name] = F.to_timestamp(F.lit("1970-01-01 00:00:00"))
         else:
-            # Default to None for other types
+            # Decimal, Integer, and other numeric types get NULL
             dummy_data[column_name] = None
     
     # Create dummy row DataFrame
@@ -133,14 +127,11 @@ def create_dummy_row_dict(schema_fields: list, surrogate_key_column: str) -> Dic
             dummy_data[column_name] = -1
         elif isinstance(column_type, (StringType,)):
             dummy_data[column_name] = "N/A"
-        elif isinstance(column_type, (IntegerType, LongType)):
-            dummy_data[column_name] = -1
-        elif isinstance(column_type, DecimalType):
-            dummy_data[column_name] = 0.0
         elif isinstance(column_type, TimestampType):
             # Return string representation for timestamp
             dummy_data[column_name] = "1970-01-01 00:00:00"
         else:
+            # Decimal, Integer, Long, and other numeric types get NULL
             dummy_data[column_name] = None
     
     return dummy_data

@@ -102,11 +102,11 @@ def test_create_dummy_row_dict():
     # Verify string fields are 'N/A'
     assert dummy_row["customer_name"] == "N/A"
     
-    # Verify decimal fields are 0.0
-    assert dummy_row["customer_balance"] == 0.0
+    # Verify decimal fields are NULL
+    assert dummy_row["customer_balance"] is None
     
-    # Verify integer fields are -1
-    assert dummy_row["age"] == -1
+    # Verify integer fields are NULL
+    assert dummy_row["age"] is None
     
     # Verify timestamp fields are epoch string
     assert dummy_row["created_at"] == "1970-01-01 00:00:00"
@@ -176,7 +176,7 @@ def test_add_dummy_row():
     first_row = result_df.first()
     assert first_row.customer_key == -1
     assert first_row.customer_name == "N/A"
-    assert first_row.customer_balance == 0.0
+    assert first_row.customer_balance is None
 
 
 def test_extract_dimension_names():

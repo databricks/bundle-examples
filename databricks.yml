@@ -34,8 +34,8 @@ targets:
       gold_catalog: lakehouse_gold_dev
       warehouse_id:
         lookup:
-          Serverless Starter Warehouse
-
+          warehouse: Serverless Starter Warehouse
+  
   prod:
     mode: production
     workspace:
@@ -49,7 +49,7 @@ targets:
       gold_catalog: lakehouse_gold_prd
       warehouse_id:
         lookup:
-          Serverless Starter Warehouse
+          warehouse: Serverless Starter Warehouse
     
     permissions:
       - user_name: user@company.com

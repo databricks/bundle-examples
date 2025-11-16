@@ -1,17 +1,16 @@
-%pip install faker
+# Databricks notebook source
+# MAGIC %pip install faker
+
+# COMMAND ----------
 
 # Get input parameters from job
 dbutils.widgets.text("bronze_catalog", "", "Bronze Catalog")
 dbutils.widgets.text("bronze_schema", "", "Bronze Schema")
 dbutils.widgets.text("bronze_volume", "raw_data", "Bronze Volume")
 
-catalog = dbutils.widgets.get("bronze_catalog")
-schema = dbName = db = dbutils.widgets.get("bronze_schema")
-volume_name = dbutils.widgets.get("bronze_volume")
+volume_folder = f"/Volumes/{bronze_catalog}/{bronze_schema}/{bronze_volume}"
 
-spark.sql(f'USE CATALOG `{catalog}`')
-spark.sql(f'USE SCHEMA `{schema}`')
-volume_folder = f"/Volumes/{catalog}/{db}/{volume_name}"
+# COMMAND ----------
 
 try:
   dbutils.fs.ls(volume_folder+"/customers")

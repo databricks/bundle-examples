@@ -4,6 +4,7 @@ Sales fact table containing transactional sales data.
 import dlt
 from framework.config import Config
 from framework.utils import get_or_create_spark_session
+from framework.fact_utils import extract_dimension_names, build_dimension_mappings, enrich_with_surrogate_keys
 
 # Configuration
 config = Config.from_spark_config()
@@ -26,13 +27,15 @@ gold_schema = config.gold_schema
 def fact_sales():
     """
     Creates sales fact table with measures and foreign keys to dimensions.
+    Enriches natural keys with surrogate keys from dimension tables.
     
     Returns:
-        DataFrame: Sales fact table with transactional data
+        DataFrame: Sales fact table with transactional data and surrogate keys
     """
-    return spark.sql(f"""
+    # Get base fact table with natural keys
+    base_fact_df = spark.sql(f"""
         SELECT
-            -- Foreign keys
+            -- Foreign keys (natural keys)
             cast(date_format(orders.o_orderdate, 'yyyyMMdd') as int)        as calendar_order_id,
             cast(date_format(lineitem.l_commitdate, 'yyyyMMdd') as int)     as calendar_commit_id,
             cast(date_format(lineitem.l_receiptdate, 'yyyyMMdd') as int)    as calendar_receipt_id,
@@ -67,3 +70,19 @@ def fact_sales():
         LEFT JOIN
             {silver_catalog}.{silver_schema}.partsupp as partsupp ON lineitem.l_partkey = partsupp.ps_partkey AND lineitem.l_suppkey = partsupp.ps_suppkey
     """)
+    
+    # Extract dimension names and build mappings
+    dimension_names = extract_dimension_names(base_fact_df)
+    dimension_mappings = build_dimension_mappings(dimension_names)
+    
+    # Enrich with surrogate keys from dimension tables
+    enriched_fact_df = enrich_with_surrogate_keys(
+        fact_df=base_fact_df,
+        dimension_mappings=dimension_mappings,
+        catalog=gold_catalog,
+        schema=gold_schema,
+        spark=spark,
+        handle_missing='use_default'  # Use -1 for missing dimension keys
+    )
+    
+    return enriched_fact_df

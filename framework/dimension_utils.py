@@ -7,53 +7,6 @@ from pyspark.sql.types import StringType, TimestampType
 from typing import Dict, Any, List
 spark = SparkSession.getActiveSession()
 
-def add_dimension_metadata(df: DataFrame, metadata_columns: List[str] = None) -> DataFrame:
-    """
-    Adds metadata columns to a dimension DataFrame.
-    
-    By default, adds 'load_timestamp' column. Can be extended to add other metadata columns
-    like 'created_by', 'updated_timestamp', 'source_system', etc.
-    
-    Args:
-        df (DataFrame): The dimension DataFrame to add metadata to
-        metadata_columns (List[str], optional): List of metadata columns to add.
-            Supported values: 'load_timestamp', 'created_timestamp', 'updated_timestamp',
-            'source_system', 'is_current', 'valid_from', 'valid_to'
-            If None, defaults to ['load_timestamp']
-    
-    Returns:
-        DataFrame: The dimension DataFrame with metadata columns added
-        
-    Example:
-        >>> df = add_dimension_metadata(df)  # Adds load_timestamp
-        >>> df = add_dimension_metadata(df, ['load_timestamp', 'source_system'])
-    """
-    if metadata_columns is None:
-        metadata_columns = ['load_timestamp']
-    
-    result_df = df
-    
-    for column in metadata_columns:
-        if column == 'load_timestamp':
-            result_df = result_df.withColumn('load_timestamp', F.current_timestamp())
-        elif column == 'created_timestamp':
-            result_df = result_df.withColumn('created_timestamp', F.current_timestamp())
-        elif column == 'updated_timestamp':
-            result_df = result_df.withColumn('updated_timestamp', F.current_timestamp())
-        elif column == 'source_system':
-            result_df = result_df.withColumn('source_system', F.lit('TPC-H'))
-        elif column == 'is_current':
-            result_df = result_df.withColumn('is_current', F.lit(True))
-        elif column == 'valid_from':
-            result_df = result_df.withColumn('valid_from', F.current_timestamp())
-        elif column == 'valid_to':
-            result_df = result_df.withColumn('valid_to', F.lit(None).cast(TimestampType()))
-        else:
-            raise ValueError(f"Unsupported metadata column: {column}")
-    
-    return result_df
-
-
 def add_dummy_row(df: DataFrame) -> DataFrame:
     """
     Adds a dummy row to a dimension table with surrogate key -1 and 'N/A' for text fields.

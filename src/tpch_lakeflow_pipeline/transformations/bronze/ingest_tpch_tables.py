@@ -1,16 +1,14 @@
 import dlt
 from pathlib import Path
 from pyspark.sql.functions import col
-from framework.utils import add_metadata_columns, get_or_create_spark_session, load_table_configs
+from framework.utils import add_metadata_columns, load_table_configs
 from framework.config import Config
 from framework.write import create_dlt_table
 
 # Configuration
 config = Config.from_spark_config()
-spark = get_or_create_spark_session()
-bronze_catalog = config.bronze_catalog
-bronze_schema = config.bronze_schema
 
+# Table definitions
 def create_bronze_table(table_name: str):
     """
     Creates a materialized view in Lakeflow Declarative Pipelines for the specified table.
@@ -43,8 +41,8 @@ def create_bronze_table(table_name: str):
     # Create DLT table using shared function
     return create_dlt_table(
         table_name=table_name,
-        catalog=bronze_catalog,
-        schema=bronze_schema,
+        catalog=config.bronze_catalog,
+        schema=config.bronze_schema,
         description=description,
         primary_keys=primary_keys,
         quality_level="bronze",

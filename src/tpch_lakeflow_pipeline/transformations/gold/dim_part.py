@@ -3,20 +3,14 @@ Part dimension table with product attributes.
 """
 import dlt
 from framework.config import Config
-from framework.utils import get_or_create_spark_session
 from framework.dimension_utils import add_dummy_row
 
 # Configuration
 config = Config.from_spark_config()
-spark = get_or_create_spark_session()
-silver_catalog = config.silver_catalog
-silver_schema = config.silver_schema
-gold_catalog = config.gold_catalog
-gold_schema = config.gold_schema
 
-
+# Table definition
 @dlt.table(
-    name=f"{gold_catalog}.{gold_schema}.dim_part",
+    name=f"{config.gold_catalog}.{config.gold_schema}.dim_part",
     comment="Part dimension table with product attributes",
     table_properties={
         "quality": "gold",
@@ -44,7 +38,7 @@ def dim_part():
             part.p_retailprice                  as part_retailprice,
             current_timestamp()                 as load_timestamp
         FROM
-            {silver_catalog}.{silver_schema}.part part
+            {config.silver_catalog}.{config.silver_schema}.part part
     """)
     
     return add_dummy_row(df, "part_key", spark)

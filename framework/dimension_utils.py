@@ -1,10 +1,12 @@
 """
 Utility functions for dimension table operations.
 """
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
-from pyspark.sql.types import StringType, IntegerType, LongType, DecimalType, TimestampType
+from pyspark.sql.types import StringType, TimestampType
 from typing import Dict, Any, List
+from framework.utils import get_or_create_spark_session
+spark = get_or_create_spark_session()
 
 
 def add_dimension_metadata(df: DataFrame, metadata_columns: List[str] = None) -> DataFrame:
@@ -54,7 +56,7 @@ def add_dimension_metadata(df: DataFrame, metadata_columns: List[str] = None) ->
     return result_df
 
 
-def add_dummy_row(df: DataFrame, surrogate_key_column: str, spark: SparkSession = None) -> DataFrame:
+def add_dummy_row(df: DataFrame, surrogate_key_column: str) -> DataFrame:
     """
     Adds a dummy row to a dimension table with surrogate key -1 and 'N/A' for text fields.
     
@@ -64,7 +66,6 @@ def add_dummy_row(df: DataFrame, surrogate_key_column: str, spark: SparkSession 
     Args:
         df (DataFrame): The dimension DataFrame to add a dummy row to
         surrogate_key_column (str): Name of the surrogate key column
-        spark (SparkSession, optional): Spark session. If None, will get the active session
     
     Returns:
         DataFrame: The dimension DataFrame with a dummy row prepended
@@ -72,10 +73,6 @@ def add_dummy_row(df: DataFrame, surrogate_key_column: str, spark: SparkSession 
     Example:
         >>> dim_customer_df = add_dummy_row(dim_customer_df, "customer_id")
     """
-    if spark is None:
-        spark = SparkSession.getActiveSession()
-        if spark is None:
-            raise RuntimeError("No active Spark session found")
     
     # Build dummy row data based on column types
     dummy_data: Dict[str, Any] = {}

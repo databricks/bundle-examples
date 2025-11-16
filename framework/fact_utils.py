@@ -1,10 +1,11 @@
 """
 Utility functions for fact table operations.
 """
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 from typing import List, Dict, Optional
-import re
+from framework.utils import get_or_create_spark_session
+spark = get_or_create_spark_session()
 
 
 def extract_dimension_names(df: DataFrame) -> List[str]:
@@ -40,7 +41,6 @@ def enrich_with_surrogate_keys(
     dimension_mappings: Dict[str, Dict[str, str]],
     catalog: str,
     schema: str,
-    spark: SparkSession = None,
     handle_missing: str = 'use_default'
 ) -> DataFrame:
     """
@@ -64,7 +64,6 @@ def enrich_with_surrogate_keys(
             }
         catalog (str): Target catalog where dimension tables reside
         schema (str): Target schema where dimension tables reside
-        spark (SparkSession, optional): Spark session. If None, will get the active session
         handle_missing (str): How to handle missing dimension keys.
             'use_default': Use -1 for missing keys (default)
             'drop': Drop rows with missing keys
@@ -80,10 +79,6 @@ def enrich_with_surrogate_keys(
         ... }
         >>> enriched_fact = enrich_with_surrogate_keys(fact_df, mappings, 'gold_catalog', 'gold_schema')
     """
-    if spark is None:
-        spark = SparkSession.getActiveSession()
-        if spark is None:
-            raise RuntimeError("No active Spark session found")
     
     result_df = fact_df
     

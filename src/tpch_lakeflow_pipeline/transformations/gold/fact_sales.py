@@ -75,7 +75,6 @@ def fact_sales():
         dimension_mappings=dimension_mappings,
         catalog=config.gold_catalog,
         schema=config.gold_schema,
-        spark=spark,
         handle_missing='use_default'  # Use -1 for missing dimension keys
     )
     

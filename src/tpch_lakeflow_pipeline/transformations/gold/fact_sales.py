@@ -3,20 +3,14 @@ Sales fact table containing transactional sales data.
 """
 import dlt
 from framework.config import Config
-from framework.utils import get_or_create_spark_session
 from framework.fact_utils import extract_dimension_names, build_dimension_mappings, enrich_with_surrogate_keys
 
 # Configuration
 config = Config.from_spark_config()
-spark = get_or_create_spark_session()
-silver_catalog = config.silver_catalog
-silver_schema = config.silver_schema
-gold_catalog = config.gold_catalog
-gold_schema = config.gold_schema
 
-
+# Table definition
 @dlt.table(
-    name=f"{gold_catalog}.{gold_schema}.fact_sales",
+    name=f"{config.gold_catalog}.{config.gold_schema}.fact_sales",
     comment="Sales fact table containing transactional sales data with measures and foreign keys to dimension tables",
     table_properties={
         "quality": "gold",
@@ -64,11 +58,11 @@ def fact_sales():
             current_timestamp()                                             as load_timestamp
             
         FROM 
-            {silver_catalog}.{silver_schema}.lineitem as lineitem
+            {config.silver_catalog}.{config.silver_schema}.lineitem as lineitem
         LEFT JOIN
-            {silver_catalog}.{silver_schema}.orders as orders ON lineitem.l_orderkey = orders.o_orderkey
+            {config.silver_catalog}.{config.silver_schema}.orders as orders ON lineitem.l_orderkey = orders.o_orderkey
         LEFT JOIN
-            {silver_catalog}.{silver_schema}.partsupp as partsupp ON lineitem.l_partkey = partsupp.ps_partkey AND lineitem.l_suppkey = partsupp.ps_suppkey
+            {config.silver_catalog}.{config.silver_schema}.partsupp as partsupp ON lineitem.l_partkey = partsupp.ps_partkey AND lineitem.l_suppkey = partsupp.ps_suppkey
     """)
     
     # Extract dimension names and build mappings
@@ -79,8 +73,8 @@ def fact_sales():
     enriched_fact_df = enrich_with_surrogate_keys(
         fact_df=base_fact_df,
         dimension_mappings=dimension_mappings,
-        catalog=gold_catalog,
-        schema=gold_schema,
+        catalog=config.gold_catalog,
+        schema=config.gold_schema,
         spark=spark,
         handle_missing='use_default'  # Use -1 for missing dimension keys
     )

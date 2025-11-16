@@ -6,23 +6,21 @@ from framework.utils import add_metadata_columns, get_or_create_spark_session
 # Configuration
 config = Config.from_spark_config()
 spark = get_or_create_spark_session()
-gold_catalog = config.gold_catalog
-gold_schema = config.gold_schema
+
+# Calendar configuration
 beginDate = '1990-01-01'
 endDate = '2029-12-31'
 
-(
-  spark.sql(f"select explode(sequence(to_date('{beginDate}'), to_date('{endDate}'), interval 1 day)) as calendarDate")
-    .createOrReplaceTempView('dates')
-)
-
-
-
 @dlt.table(
-    name=f"{gold_catalog}.{gold_schema}.dim_calendar",
+    name=f"{config.gold_catalog}.{config.gold_schema}.dim_calendar",
     comment="Materialized view of the calendar table"
 )
 def calendar_mv():
+    (
+      spark.sql(f"select explode(sequence(to_date('{beginDate}'), to_date('{endDate}'), interval 1 day)) as calendarDate")
+      .createOrReplaceTempView('dates')
+    )
+
     return spark.sql("""
         select
           year(calendarDate) * 10000 + month(calendarDate) * 100 + day(calendarDate) as calendar_id,

@@ -39,6 +39,5 @@ class FakeDataSource(DataSource):
     def reader(self, schema: StructType):
         return FakeDataSourceReader(schema, self.options)
     
-
 # Register data source
 spark.dataSource.register(FakeDataSource)

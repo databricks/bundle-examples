@@ -8,12 +8,6 @@ resources:
       comment: |
         # AutoLoader Landing Zone Volume
         Unity Catalog Volume for incoming data files processed by AutoLoader.
-        
-        Structure:
-        - /data - Generic data files
-        - /json - JSON files
-        - /csv - CSV files
-        - /parquet - Parquet files
       
       grants:
         - principal: ${workspace.current_user.userName}

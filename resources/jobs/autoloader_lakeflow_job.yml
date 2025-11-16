@@ -6,9 +6,17 @@ resources:
       name: autoloader_lakeflow_job
 
       tasks:
-        - task_key: refresh_pipeline
-          pipeline_task:
-            pipeline_id: ${resources.pipelines.pipeline_autoloader_lakeflow_pipeline.id}
+        - task_key: create_fake_data
+          notebook_task:
+            notebook_path: ../../src/notebooks/create_fake_data_in_volume.py
+            base_parameters:
+              bronze_catalog: ${var.bronze_catalog}
+              bronze_schema: ${resources.schemas.autoloader_bronze_schema.name}
+              bronze_volume: ${resources.volumes.autoloader_landing_zone.name}
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: Standard_DS3_v2
+            num_workers: 1
 
       environments:
         - environment_key: default

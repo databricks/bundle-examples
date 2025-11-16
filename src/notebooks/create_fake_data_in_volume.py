@@ -1,13 +1,17 @@
 %pip install faker
-# Update these to match the catalog and schema
-# that you used for the pipeline in step 1.
-catalog = "<my_catalog>"
-schema = dbName = db = "<my_schema>"
+
+# Get input parameters from job
+dbutils.widgets.text("bronze_catalog", "", "Bronze Catalog")
+dbutils.widgets.text("bronze_schema", "", "Bronze Schema")
+dbutils.widgets.text("bronze_volume", "raw_data", "Bronze Volume")
+
+catalog = dbutils.widgets.get("bronze_catalog")
+schema = dbName = db = dbutils.widgets.get("bronze_schema")
+volume_name = dbutils.widgets.get("bronze_volume")
 
 spark.sql(f'USE CATALOG `{catalog}`')
 spark.sql(f'USE SCHEMA `{schema}`')
-spark.sql(f'CREATE VOLUME IF NOT EXISTS `{catalog}`.`{db}`.`raw_data`')
-volume_folder =  f"/Volumes/{catalog}/{db}/raw_data"
+volume_folder = f"/Volumes/{catalog}/{db}/{volume_name}"
 
 try:
   dbutils.fs.ls(volume_folder+"/customers")

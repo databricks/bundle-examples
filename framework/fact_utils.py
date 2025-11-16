@@ -96,11 +96,7 @@ def enrich_with_surrogate_keys(
     for dimension_name, mapping in dimension_mappings.items():
         natural_key_col = mapping['natural_key']
         surrogate_key_col = mapping['surrogate_key']
-        
-        # Check if the natural key column exists in the fact table
-        if natural_key_col not in fact_df.columns:
-            continue
-        
+               
         # Read dimension table
         dim_table_path = f"{catalog}.{schema}.dim_{dimension_name}"
         
@@ -112,32 +108,28 @@ def enrich_with_surrogate_keys(
         
         # Select only the natural key and surrogate key from dimension
         dim_lookup = dim_df.select(
-            F.col(natural_key_col).alias(f"dim_{natural_key_col}"),
-            F.col(surrogate_key_col).alias(f"{dimension_name}_id")
+            F.col(natural_key_col),
+            F.col(surrogate_key_col)
         )
         
         # Join fact table with dimension lookup
         fact_df = fact_df.join(
             dim_lookup,
-            fact_df[natural_key_col] == dim_lookup[f"dim_{natural_key_col}"],
+            fact_df[natural_key_col] == dim_lookup[natural_key_col],
             "left"
-        ).drop(f"dim_{natural_key_col}")
+        ).drop(natural_key_col)
         
         # Handle missing keys based on strategy
         if handle_missing == 'use_default':
             # Replace NULL surrogate keys with -1
             fact_df = fact_df.withColumn(
-                f"{dimension_name}_id",
-                F.coalesce(F.col(f"{dimension_name}_id"), F.lit(-1))
+                surrogate_key_col,
+                F.coalesce(F.col(surrogate_key_col), F.lit(-1))
             )
+            
         elif handle_missing == 'drop':
             # Drop rows where surrogate key is NULL
-            fact_df = fact_df.filter(F.col(f"{dimension_name}_id").isNotNull())
-        # For 'keep_null', do nothing - keep the NULLs as is
-        
-        # Drop the original natural key column (business key ending with '_key')
-        fact_df = fact_df.drop(natural_key_col)
-    
+            fact_df = fact_df.filter(F.col(surrogate_key_col).isNotNull())
+
+
     return fact_df
-
-

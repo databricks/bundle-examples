@@ -13,6 +13,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "faker",
     "pytest",
     "databricks-dlt",
     "databricks-connect>=15.4,<15.5",

@@ -1,4 +1,5 @@
 import dlt
+from pyspark.sql import SparkSession
 from framework.config import Config
 from framework.utils import add_metadata_columns
 from framework.dimension_utils import add_dummy_row
@@ -6,6 +7,7 @@ from framework.dimension_utils import add_dummy_row
 
 # Configuration
 config = Config.from_spark_config()
+spark = SparkSession.getActiveSession()
 
 # Calendar configuration
 beginDate = '1990-01-01'

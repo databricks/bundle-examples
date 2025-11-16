@@ -36,7 +36,7 @@ def autoloader_data():
         DataFrame: Streaming data from volume with metadata columns
     """
     # Configure AutoLoader options
-    VOLUME_PATH = f"{config.bronze_catalog}.{config.bronze_schema}.landing_zone"
+    VOLUME_PATH = f"/Volumes/{config.bronze_catalog}/{config.bronze_schema}/landing_zone"
 
     autoloader_options = {
         "cloudFiles.format": "json",

@@ -40,5 +40,5 @@ class FakeDataSource(DataSource):
         return FakeDataSourceReader(schema, self.options)
     
 
+# Register data source
 spark.dataSource.register(FakeDataSource)
-spark.read.format("fake").load().show()

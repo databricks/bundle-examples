@@ -1,0 +1,22 @@
+# A job to orchestrate the fake_lakeflow_pipeline
+
+resources:
+  jobs:
+    orchestrate_fake_lakeflow_pipeline:
+      name: orchestrate_fake_lakeflow_pipeline
+
+      trigger:
+        periodic:
+          interval: 1
+          unit: HOURS
+        pause_status: PAUSED
+
+      tasks:
+        - task_key: refresh_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.pipeline_fake_lakeflow_pipeline.id}
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "2"

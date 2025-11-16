@@ -1,0 +1,14 @@
+resources:
+  schemas:
+    fake_bronze_schema:
+      catalog_name: ${var.bronze_catalog}
+      name: fake_data
+      comment: |
+        # Fake Lakeflow Project Schema - Bronze
+        This schema contains raw synthetic data from the Faker data source.
+      grants:
+        - principal: ${workspace.current_user.userName}
+          privileges:
+            - MANAGE
+            - SELECT
+            - MODIFY

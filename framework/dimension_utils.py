@@ -1,0 +1,99 @@
+"""
+Utility functions for dimension table operations.
+"""
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.types import StringType, IntegerType, LongType, DecimalType, TimestampType
+from typing import Dict, Any
+
+
+def add_dummy_row(df: DataFrame, surrogate_key_column: str, spark: SparkSession = None) -> DataFrame:
+    """
+    Adds a dummy row to a dimension table with surrogate key -1 and 'N/A' for text fields.
+    
+    This is useful for handling missing or unknown dimension values in fact tables,
+    following the Kimball methodology for data warehousing.
+    
+    Args:
+        df (DataFrame): The dimension DataFrame to add a dummy row to
+        surrogate_key_column (str): Name of the surrogate key column
+        spark (SparkSession, optional): Spark session. If None, will get the active session
+    
+    Returns:
+        DataFrame: The dimension DataFrame with a dummy row prepended
+        
+    Example:
+        >>> dim_customer_df = add_dummy_row(dim_customer_df, "customer_id")
+    """
+    if spark is None:
+        spark = SparkSession.getActiveSession()
+        if spark is None:
+            raise RuntimeError("No active Spark session found")
+    
+    # Build dummy row data based on column types
+    dummy_data: Dict[str, Any] = {}
+    
+    for field in df.schema.fields:
+        column_name = field.name
+        column_type = field.dataType
+        
+        if column_name == surrogate_key_column:
+            # Surrogate key is always -1
+            dummy_data[column_name] = -1
+        elif isinstance(column_type, (StringType,)):
+            # String fields get 'N/A'
+            dummy_data[column_name] = "N/A"
+        elif isinstance(column_type, (IntegerType, LongType)):
+            # Numeric fields get -1
+            dummy_data[column_name] = -1
+        elif isinstance(column_type, DecimalType):
+            # Decimal fields get 0.0
+            dummy_data[column_name] = 0.0
+        elif isinstance(column_type, TimestampType):
+            # Timestamp fields get epoch time (1970-01-01)
+            dummy_data[column_name] = F.to_timestamp(F.lit("1970-01-01 00:00:00"))
+        else:
+            # Default to None for other types
+            dummy_data[column_name] = None
+    
+    # Create dummy row DataFrame
+    dummy_row_df = spark.createDataFrame([dummy_data], schema=df.schema)
+    
+    # Union dummy row with original DataFrame
+    result_df = dummy_row_df.union(df)
+    
+    return result_df
+
+
+def create_dummy_row_dict(schema_fields: list, surrogate_key_column: str) -> Dict[str, Any]:
+    """
+    Creates a dictionary representing a dummy row based on schema fields.
+    
+    Args:
+        schema_fields (list): List of StructField objects from DataFrame schema
+        surrogate_key_column (str): Name of the surrogate key column
+    
+    Returns:
+        Dict[str, Any]: Dictionary with column names as keys and dummy values
+    """
+    dummy_data: Dict[str, Any] = {}
+    
+    for field in schema_fields:
+        column_name = field.name
+        column_type = field.dataType
+        
+        if column_name == surrogate_key_column:
+            dummy_data[column_name] = -1
+        elif isinstance(column_type, (StringType,)):
+            dummy_data[column_name] = "N/A"
+        elif isinstance(column_type, (IntegerType, LongType)):
+            dummy_data[column_name] = -1
+        elif isinstance(column_type, DecimalType):
+            dummy_data[column_name] = 0.0
+        elif isinstance(column_type, TimestampType):
+            # Return string representation for timestamp
+            dummy_data[column_name] = "1970-01-01 00:00:00"
+        else:
+            dummy_data[column_name] = None
+    
+    return dummy_data

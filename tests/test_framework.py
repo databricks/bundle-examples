@@ -7,6 +7,8 @@ This module contains unit tests for the lakehouse framework package.
 import pytest
 from framework.utils import get_catalog_schema, get_table_path, add_metadata_columns, get_or_create_spark_session
 from framework.config import Config
+from framework.dimension_utils import add_dummy_row, create_dummy_row_dict
+from framework.dimension_utils import add_dummy_row, create_dummy_row_dict
 
 # Try to create Spark session, skip Spark tests if not available
 try:
@@ -76,6 +78,69 @@ def test_medallion_config_invalid_layer():
     
     with pytest.raises(ValueError, match="Invalid layer"):
         config.get_layer_path("platinum")
+
+
+def test_create_dummy_row_dict():
+    """Test creating a dummy row dictionary from schema fields."""
+    from pyspark.sql.types import StructField, StringType, IntegerType, LongType, DecimalType, TimestampType
+    
+    # Create mock schema fields
+    schema_fields = [
+        StructField("customer_id", LongType(), True),
+        StructField("customer_name", StringType(), True),
+        StructField("customer_balance", DecimalType(18, 2), True),
+        StructField("age", IntegerType(), True),
+        StructField("created_at", TimestampType(), True)
+    ]
+    
+    dummy_row = create_dummy_row_dict(schema_fields, "customer_id")
+    
+    # Verify surrogate key is -1
+    assert dummy_row["customer_id"] == -1
+    
+    # Verify string fields are 'N/A'
+    assert dummy_row["customer_name"] == "N/A"
+    
+    # Verify decimal fields are 0.0
+    assert dummy_row["customer_balance"] == 0.0
+    
+    # Verify integer fields are -1
+    assert dummy_row["age"] == -1
+    
+    # Verify timestamp fields are epoch string
+    assert dummy_row["created_at"] == "1970-01-01 00:00:00"
+
+
+@pytest.mark.skipif(not SPARK_AVAILABLE, reason="Requires Spark/Java environment")
+def test_add_dummy_row():
+    """Test adding a dummy row to a dimension DataFrame."""
+    from pyspark.sql.types import StructType, StructField, StringType, LongType, DecimalType
+    
+    # Create a sample dimension DataFrame
+    schema = StructType([
+        StructField("customer_key", LongType(), True),
+        StructField("customer_name", StringType(), True),
+        StructField("customer_balance", DecimalType(18, 2), True)
+    ])
+    
+    data = [
+        (1, "Alice", 100.50),
+        (2, "Bob", 200.75)
+    ]
+    
+    df = spark.createDataFrame(data, schema)
+    
+    # Add dummy row
+    result_df = add_dummy_row(df, "customer_key", spark)
+    
+    # Verify row count increased by 1
+    assert result_df.count() == 3
+    
+    # Verify dummy row is first (after union)
+    first_row = result_df.first()
+    assert first_row.customer_key == -1
+    assert first_row.customer_name == "N/A"
+    assert first_row.customer_balance == 0.0
 
 
 @pytest.mark.skipif(True, reason="Requires Spark/Java environment")

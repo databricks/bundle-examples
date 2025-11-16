@@ -4,6 +4,7 @@ Part dimension table with product attributes.
 import dlt
 from framework.config import Config
 from framework.utils import get_or_create_spark_session
+from framework.dimension_utils import add_dummy_row
 
 # Configuration
 config = Config.from_spark_config()
@@ -26,11 +27,12 @@ gold_schema = config.gold_schema
 def dim_part():
     """
     Creates part dimension with natural key and product attributes.
+    Includes a dummy row with part_key = -1 for unknown parts.
     
     Returns:
         DataFrame: Part dimension with product attributes
     """
-    return spark.sql(f"""
+    df = spark.sql(f"""
         SELECT
             part.p_partkey                      as part_key,
             part.p_name                         as part_name,
@@ -44,3 +46,5 @@ def dim_part():
         FROM
             {silver_catalog}.{silver_schema}.part part
     """)
+    
+    return add_dummy_row(df, "part_key", spark)

@@ -4,6 +4,7 @@ Customer dimension table with enriched attributes.
 import dlt
 from framework.config import Config
 from framework.utils import get_or_create_spark_session
+from framework.dimension_utils import add_dummy_row
 
 # Configuration
 config = Config.from_spark_config()
@@ -26,11 +27,12 @@ gold_schema = config.gold_schema
 def dim_customer():
     """
     Creates customer dimension with natural key and enriched attributes.
+    Includes a dummy row with customer_key = -1 for unknown customers.
     
     Returns:
         DataFrame: Customer dimension with attributes from customer, nation, and region
     """
-    return spark.sql(f"""
+    df = spark.sql(f"""
         SELECT
             cust.c_custkey                      as customer_key,
             cust.c_name                         as customer_name,
@@ -48,3 +50,5 @@ def dim_customer():
         LEFT JOIN
             {silver_catalog}.{silver_schema}.region reg ON nat.n_regionkey = reg.r_regionkey
     """)
+    
+    return add_dummy_row(df, "customer_key", spark)

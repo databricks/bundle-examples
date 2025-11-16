@@ -4,6 +4,7 @@ Supplier dimension table with enriched attributes.
 import dlt
 from framework.config import Config
 from framework.utils import get_or_create_spark_session
+from framework.dimension_utils import add_dummy_row
 
 # Configuration
 config = Config.from_spark_config()
@@ -26,11 +27,12 @@ gold_schema = config.gold_schema
 def dim_supplier():
     """
     Creates supplier dimension with natural key and enriched attributes.
+    Includes a dummy row with supplier_key = -1 for unknown suppliers.
     
     Returns:
         DataFrame: Supplier dimension with attributes from supplier, nation, and region
     """
-    return spark.sql(f"""
+    df = spark.sql(f"""
         SELECT
             sup.s_suppkey                      as supplier_key,
             sup.s_name                         as supplier_name,
@@ -47,3 +49,5 @@ def dim_supplier():
         LEFT JOIN
             {silver_catalog}.{silver_schema}.region reg ON nat.n_regionkey = reg.r_regionkey
     """)
+    
+    return add_dummy_row(df, "supplier_key", spark)

@@ -2,8 +2,8 @@
 
 resources:
   pipelines:
-    autoloader_lakeflow_pipeline:
-      name: autoloader_lakeflow_pipeline
+    pipeline_autoloader_lakeflow_pipeline:
+      name: pipeline_autoloader_lakeflow_pipeline
       catalog: ${var.bronze_catalog}
       schema: ${resources.schemas.autoloader_bronze_schema.name}
       serverless: true
@@ -16,10 +16,13 @@ resources:
       configuration:
         bronze_catalog: ${var.bronze_catalog}
         bronze_schema: ${resources.schemas.autoloader_bronze_schema.name}
+        # Volume paths for AutoLoader ingestion
+        volume_path: /Volumes/${var.bronze_catalog}/${resources.schemas.autoloader_bronze_schema.name}/landing_zone/data
+        json_volume_path: /Volumes/${var.bronze_catalog}/${resources.schemas.autoloader_bronze_schema.name}/landing_zone/json
+        csv_volume_path: /Volumes/${var.bronze_catalog}/${resources.schemas.autoloader_bronze_schema.name}/landing_zone/csv
+        file_format: json
 
       environment:
         dependencies:
-          # Include the framework package and autoloaderr library
           - --editable ${workspace.file_path}
-          - autoloaderr
 

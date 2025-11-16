@@ -49,5 +49,5 @@ def calendar_mv():
     """)
 
     df = add_metadata_columns(df)
-    df = add_dummy_row(df)
+
     return df

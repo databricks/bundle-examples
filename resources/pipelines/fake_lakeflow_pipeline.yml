@@ -1,0 +1,28 @@
+# The main pipeline for lakeflow_pipelines_python
+
+resources:
+  pipelines:
+    pipeline_fake_lakeflow_pipeline:
+      name: pipeline_fake_lakeflow_pipeline
+      catalog: ${var.bronze_catalog}
+      schema: ${resources.schemas.bronze_schema.name}
+      serverless: true
+      root_path: "../../src/fake_lakeflow_pipeline"
+
+      libraries:
+        - glob:
+            include: ../../src/fake_lakeflow_pipeline/transformations/**
+
+      configuration:
+        bronze_catalog: ${var.bronze_catalog}
+        bronze_schema: ${resources.schemas.bronze_schema.name}
+        silver_catalog: ${var.silver_catalog}
+        silver_schema: ${resources.schemas.silver_schema.name}
+        gold_catalog: ${var.gold_catalog}
+        gold_schema: ${resources.schemas.gold_schema.name}
+
+      environment:
+        dependencies:
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}

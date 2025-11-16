@@ -9,7 +9,6 @@ from framework.utils import get_catalog_schema, get_table_path, add_metadata_col
 from framework.config import Config
 from framework.dimension_utils import add_dummy_row, create_dummy_row_dict, add_dimension_metadata
 from framework.fact_utils import extract_dimension_names, build_dimension_mappings, enrich_with_surrogate_keys
-from framework.dimension_utils import add_dummy_row, create_dummy_row_dict
 
 # Try to create Spark session, skip Spark tests if not available
 try:
@@ -167,7 +166,7 @@ def test_add_dummy_row():
     df = spark.createDataFrame(data, schema)
     
     # Add dummy row
-    result_df = add_dummy_row(df, "customer_key", spark)
+    result_df = add_dummy_row(df, "customer_key")
     
     # Verify row count increased by 1
     assert result_df.count() == 3

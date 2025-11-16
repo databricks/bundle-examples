@@ -44,4 +44,4 @@ def dim_supplier():
             {config.silver_catalog}.{config.silver_schema}.region reg ON nat.n_regionkey = reg.r_regionkey
     """)
     
-    return add_dummy_row(df, "supplier_key", spark)
+    return add_dummy_row(df, "supplier_key")

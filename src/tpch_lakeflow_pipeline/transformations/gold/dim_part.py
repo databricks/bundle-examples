@@ -41,4 +41,4 @@ def dim_part():
             {config.silver_catalog}.{config.silver_schema}.part part
     """)
     
-    return add_dummy_row(df, "part_key", spark)
+    return add_dummy_row(df, "part_key")

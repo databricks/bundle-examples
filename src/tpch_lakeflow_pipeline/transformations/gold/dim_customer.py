@@ -45,4 +45,4 @@ def dim_customer():
             {config.silver_catalog}.{config.silver_schema}.region reg ON nat.n_regionkey = reg.r_regionkey
     """)
     
-    return add_dummy_row(df, "customer_key", spark)
+    return add_dummy_row(df, "customer_key")

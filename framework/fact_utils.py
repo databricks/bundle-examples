@@ -4,24 +4,30 @@ Utility functions for fact table operations.
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 from typing import List, Dict, Optional
+spark = SparkSession.getActiveSession()
 
 
-def extract_dimension_names(df: DataFrame) -> List[str]:
+def build_dimension_mappings(df: DataFrame) -> Dict[str, Dict[str, str]]:
     """
-    Extracts dimension names from fact table schema by finding columns ending with '_key'.
+    Builds dimension mappings following standard naming conventions.
     
-    Follows the naming convention where dimension foreign keys are named '<dimension>_key'.
-    For example: 'customer_key', 'part_key', 'supplier_key'
+    Assumes:
+    - Natural key column: <dimension>_key
+    - Surrogate key column: <dimension>_id
     
     Args:
-        df (DataFrame): The fact table DataFrame
+        dimension_names (List[str]): List of dimension names
     
     Returns:
-        List[str]: List of dimension names (without the '_key' suffix)
+        Dict[str, Dict[str, str]]: Mapping configuration for enrich_with_surrogate_keys
         
     Example:
-        >>> dim_names = extract_dimension_names(fact_df)
-        >>> # Returns: ['customer', 'part', 'supplier']
+        >>> mappings = build_dimension_mappings(['customer', 'part', 'supplier'])
+        >>> # Returns: {
+        >>> #     'customer': {'natural_key': 'customer_key', 'surrogate_key': 'customer_id'},
+        >>> #     'part': {'natural_key': 'part_key', 'surrogate_key': 'part_id'},
+        >>> #     'supplier': {'natural_key': 'supplier_key', 'surrogate_key': 'supplier_id'}
+        >>> # }
     """
     dimension_names = []
     
@@ -31,7 +37,16 @@ def extract_dimension_names(df: DataFrame) -> List[str]:
             dimension_name = column_name[:-4]  # Remove last 4 characters ('_key')
             dimension_names.append(dimension_name)
     
-    return dimension_names
+    mappings = {}
+    
+    for dim_name in dimension_names:
+        mappings[dim_name] = {
+            'natural_key': f'{dim_name}_key',
+            'surrogate_key': f'{dim_name}_id'
+        }
+    
+    return mappings
+
 
 
 def enrich_with_surrogate_keys(
@@ -77,18 +92,13 @@ def enrich_with_surrogate_keys(
         ... }
         >>> enriched_fact = enrich_with_surrogate_keys(fact_df, mappings, 'gold_catalog', 'gold_schema')
     """
-    spark = SparkSession.getActiveSession()
-    if spark is None:
-        raise RuntimeError("No active Spark session found")
-    
-    result_df = fact_df
     
     for dimension_name, mapping in dimension_mappings.items():
         natural_key_col = mapping['natural_key']
         surrogate_key_col = mapping['surrogate_key']
         
         # Check if the natural key column exists in the fact table
-        if natural_key_col not in result_df.columns:
+        if natural_key_col not in fact_df.columns:
             continue
         
         # Read dimension table
@@ -107,58 +117,27 @@ def enrich_with_surrogate_keys(
         )
         
         # Join fact table with dimension lookup
-        result_df = result_df.join(
+        fact_df = fact_df.join(
             dim_lookup,
-            result_df[natural_key_col] == dim_lookup[f"dim_{natural_key_col}"],
+            fact_df[natural_key_col] == dim_lookup[f"dim_{natural_key_col}"],
             "left"
         ).drop(f"dim_{natural_key_col}")
         
         # Handle missing keys based on strategy
         if handle_missing == 'use_default':
             # Replace NULL surrogate keys with -1
-            result_df = result_df.withColumn(
+            fact_df = fact_df.withColumn(
                 f"{dimension_name}_id",
                 F.coalesce(F.col(f"{dimension_name}_id"), F.lit(-1))
             )
         elif handle_missing == 'drop':
             # Drop rows where surrogate key is NULL
-            result_df = result_df.filter(F.col(f"{dimension_name}_id").isNotNull())
+            fact_df = fact_df.filter(F.col(f"{dimension_name}_id").isNotNull())
         # For 'keep_null', do nothing - keep the NULLs as is
         
         # Drop the original natural key column (business key ending with '_key')
-        result_df = result_df.drop(natural_key_col)
+        fact_df = fact_df.drop(natural_key_col)
     
-    return result_df
+    return fact_df
 
 
-def build_dimension_mappings(dimension_names: List[str]) -> Dict[str, Dict[str, str]]:
-    """
-    Builds dimension mappings following standard naming conventions.
-    
-    Assumes:
-    - Natural key column: <dimension>_key
-    - Surrogate key column: <dimension>_id
-    
-    Args:
-        dimension_names (List[str]): List of dimension names
-    
-    Returns:
-        Dict[str, Dict[str, str]]: Mapping configuration for enrich_with_surrogate_keys
-        
-    Example:
-        >>> mappings = build_dimension_mappings(['customer', 'part', 'supplier'])
-        >>> # Returns: {
-        >>> #     'customer': {'natural_key': 'customer_key', 'surrogate_key': 'customer_id'},
-        >>> #     'part': {'natural_key': 'part_key', 'surrogate_key': 'part_id'},
-        >>> #     'supplier': {'natural_key': 'supplier_key', 'surrogate_key': 'supplier_id'}
-        >>> # }
-    """
-    mappings = {}
-    
-    for dim_name in dimension_names:
-        mappings[dim_name] = {
-            'natural_key': f'{dim_name}_key',
-            'surrogate_key': f'{dim_name}_id'
-        }
-    
-    return mappings

@@ -69,9 +69,9 @@ def fact_sales():
     """)
     
     # Extract dimension names and build mappings
-    dimension_names = extract_dimension_names(base_fact_df)
-    dimension_mappings = build_dimension_mappings(dimension_names)
-    
+    dimension_mappings = build_dimension_mappings(base_fact_df)
+    print(dimension_mappings)
+
     # Enrich with surrogate keys from dimension tables
     fact_df = enrich_with_surrogate_keys(
         fact_df=base_fact_df,

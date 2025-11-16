@@ -47,8 +47,8 @@ def dim_customer():
             {config.silver_catalog}.{config.silver_schema}.region reg ON nat.n_regionkey = reg.r_regionkey
     """)
     
-    # Add dummy row first, then add surrogate ID
-    df = add_dummy_row(df, "customer_key")
-    df = add_surrogate_id(df, "customer_key", "customer_id")
+    # Add surrogate ID first, then add dummy row
+    df = add_surrogate_id(df, "customer_id")
+    df = add_dummy_row(df, "customer_id")
     
     return df

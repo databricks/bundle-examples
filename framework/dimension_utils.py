@@ -153,7 +153,7 @@ def add_surrogate_id(df: DataFrame, surrogate_id_column: str) -> DataFrame:
         DataFrame: The dimension DataFrame with surrogate ID column added
         
     Example:
-        >>> df = add_surrogate_id(df, "customer_key", "customer_id")
+        >>> df = add_surrogate_id(df, "customer_id")
     """
     # Add surrogate ID using monotonically_increasing_id
     result_df = df.withColumn(surrogate_id_column, F.monotonically_increasing_id() + 1)

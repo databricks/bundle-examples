@@ -43,8 +43,8 @@ def dim_part():
             {config.silver_catalog}.{config.silver_schema}.part part
     """)
     
-    # Add dummy row first, then add surrogate ID
-    df = add_dummy_row(df, "part_key")
-    df = add_surrogate_id(df, "part_key", "part_id")
+    # Add surrogate ID first, then add dummy row
+    df = add_surrogate_id(df, "part_id")
+    df = add_dummy_row(df, "part_id")
     
     return df

@@ -118,7 +118,7 @@ def enrich_with_surrogate_keys(
             fact_df[natural_key_col] == dim_lookup[natural_key_col],
             "left"
         ).drop(natural_key_col)
-        
+
         # Handle missing keys based on strategy
         if handle_missing == 'use_default':
             # Replace NULL surrogate keys with -1
@@ -131,5 +131,9 @@ def enrich_with_surrogate_keys(
             # Drop rows where surrogate key is NULL
             fact_df = fact_df.filter(F.col(surrogate_key_col).isNotNull())
 
+    # Reorder columns: all _id columns first, then all other columns
+    id_columns = [col for col in fact_df.columns if col.endswith('_id')]
+    other_columns = [col for col in fact_df.columns if not col.endswith('_id')]
+    fact_df = fact_df.select(id_columns + other_columns)
 
     return fact_df

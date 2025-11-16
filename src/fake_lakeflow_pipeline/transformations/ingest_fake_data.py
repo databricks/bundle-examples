@@ -2,8 +2,6 @@
 Ingest data from custom Faker data source into bronze layer.
 """
 import dlt
-import sys
-from pathlib import Path
 from pyspark.sql import SparkSession
 from pyspark.sql.datasource import DataSource, DataSourceReader
 from pyspark.sql.types import StructType

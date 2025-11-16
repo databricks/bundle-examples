@@ -1,7 +1,6 @@
 from pyspark.sql.datasource import DataSource, DataSourceReader
 from pyspark.sql.types import StructType
 
-%pip install faker
 
 class FakeDataSourceReader(DataSourceReader):
 
@@ -38,6 +37,3 @@ class FakeDataSource(DataSource):
 
     def reader(self, schema: StructType):
         return FakeDataSourceReader(schema, self.options)
-    
-# Register data source
-spark.dataSource.register(FakeDataSource)

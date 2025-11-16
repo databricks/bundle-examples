@@ -91,8 +91,9 @@ def add_dummy_row(df: DataFrame, surrogate_key_column: str, spark: SparkSession 
             # String fields get 'N/A'
             dummy_data[column_name] = "N/A"
         elif isinstance(column_type, TimestampType):
-            # Timestamp fields get epoch time (1970-01-01)
-            dummy_data[column_name] = F.to_timestamp(F.lit("1970-01-01 00:00:00"))
+            # Timestamp fields get epoch time (1970-01-01) as a Python datetime
+            from datetime import datetime
+            dummy_data[column_name] = datetime(1970, 1, 1, 0, 0, 0)
         else:
             # Decimal, Integer, and other numeric types get NULL
             dummy_data[column_name] = None

@@ -40,8 +40,8 @@ resources:
                       {
                         "name": "total_revenue_query",
                         "query": {
-                          "dataset_name": "${var.gold_catalog}.${var.gold_schema}.fact_sales",
-                          "query_string": "SELECT SUM(order_extended_price_usd) as total_revenue FROM ${var.gold_catalog}.${var.gold_schema}.fact_sales"
+                          "dataset_name": "${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales",
+                          "query_string": "SELECT SUM(order_extended_price_usd) as total_revenue FROM ${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales"
                         }
                       }
                     ],
@@ -70,8 +70,8 @@ resources:
                       {
                         "name": "total_orders_query",
                         "query": {
-                          "dataset_name": "${var.gold_catalog}.${var.gold_schema}.fact_sales",
-                          "query_string": "SELECT COUNT(DISTINCT order_header_code) as total_orders FROM ${var.gold_catalog}.${var.gold_schema}.fact_sales"
+                          "dataset_name": "${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales",
+                          "query_string": "SELECT COUNT(DISTINCT order_header_code) as total_orders FROM ${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales"
                         }
                       }
                     ],
@@ -100,8 +100,8 @@ resources:
                       {
                         "name": "revenue_by_segment_query",
                         "query": {
-                          "dataset_name": "${var.gold_catalog}.${var.gold_schema}.fact_sales",
-                          "query_string": "SELECT c.customer_segment, SUM(f.order_extended_price_usd) as total_revenue FROM ${var.gold_catalog}.${var.gold_schema}.fact_sales f JOIN ${var.gold_catalog}.${var.gold_schema}.dim_customer c ON f.customer_id = c.customer_id GROUP BY c.customer_segment ORDER BY total_revenue DESC"
+                          "dataset_name": "${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales",
+                          "query_string": "SELECT c.customer_segment, SUM(f.order_extended_price_usd) as total_revenue FROM ${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales f JOIN ${var.gold_catalog}.${resources.schemas.gold_schema.name}.dim_customer c ON f.customer_id = c.customer_id GROUP BY c.customer_segment ORDER BY total_revenue DESC"
                         }
                       }
                     ],
@@ -134,8 +134,8 @@ resources:
                       {
                         "name": "revenue_by_region_query",
                         "query": {
-                          "dataset_name": "${var.gold_catalog}.${var.gold_schema}.fact_sales",
-                          "query_string": "SELECT c.customer_region, SUM(f.order_extended_price_usd) as total_revenue FROM ${var.gold_catalog}.${var.gold_schema}.fact_sales f JOIN ${var.gold_catalog}.${var.gold_schema}.dim_customer c ON f.customer_id = c.customer_id GROUP BY c.customer_region ORDER BY total_revenue DESC"
+                          "dataset_name": "${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales",
+                          "query_string": "SELECT c.customer_region, SUM(f.order_extended_price_usd) as total_revenue FROM ${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales f JOIN ${var.gold_catalog}.${resources.schemas.gold_schema.name}.dim_customer c ON f.customer_id = c.customer_id GROUP BY c.customer_region ORDER BY total_revenue DESC"
                         }
                       }
                     ],
@@ -168,8 +168,8 @@ resources:
                       {
                         "name": "top_products_query",
                         "query": {
-                          "dataset_name": "${var.gold_catalog}.${var.gold_schema}.fact_sales",
-                          "query_string": "SELECT p.part_name, SUM(f.order_quantity) as total_quantity, SUM(f.order_extended_price_usd) as total_revenue FROM ${var.gold_catalog}.${var.gold_schema}.fact_sales f JOIN ${var.gold_catalog}.${var.gold_schema}.dim_part p ON f.part_id = p.part_id GROUP BY p.part_name ORDER BY total_revenue DESC LIMIT 10"
+                          "dataset_name": "${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales",
+                          "query_string": "SELECT p.part_name, SUM(f.order_quantity) as total_quantity, SUM(f.order_extended_price_usd) as total_revenue FROM ${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales f JOIN ${var.gold_catalog}.${resources.schemas.gold_schema.name}.dim_part p ON f.part_id = p.part_id GROUP BY p.part_name ORDER BY total_revenue DESC LIMIT 10"
                         }
                       }
                     ],
@@ -208,8 +208,8 @@ resources:
                       {
                         "name": "avg_lag_query",
                         "query": {
-                          "dataset_name": "${var.gold_catalog}.${var.gold_schema}.fact_sales",
-                          "query_string": "SELECT AVG(order_ship_lag_days) as avg_ship_lag, AVG(order_receipt_lag_days) as avg_receipt_lag FROM ${var.gold_catalog}.${var.gold_schema}.fact_sales"
+                          "dataset_name": "${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales",
+                          "query_string": "SELECT AVG(order_ship_lag_days) as avg_ship_lag, AVG(order_receipt_lag_days) as avg_receipt_lag FROM ${var.gold_catalog}.${resources.schemas.gold_schema.name}.fact_sales"
                         }
                       }
                     ],

@@ -22,7 +22,7 @@ class FakeDataSourceReader(DataSourceReader):
 
     def read(self, partition):
         # Library imports must be within the method.
-        from src.autoloader_lakeflow_pipeline.data_sources.faker import Faker
+        from faker import Faker
         fake = Faker()
 
         # Every value in this `self.options` dictionary is a string.

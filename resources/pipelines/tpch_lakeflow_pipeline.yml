@@ -2,8 +2,8 @@
 
 resources:
   pipelines:
-    pipeline_tpch_lakeflow_pipeline:
-      name: pipeline_tpch_lakeflow_pipeline
+    tpch_lakeflow_pipeline:
+      name: tpch_lakeflow_pipeline
       catalog: ${var.bronze_catalog}
       schema: ${resources.schemas.bronze_schema.name}
       serverless: true

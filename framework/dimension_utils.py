@@ -60,18 +60,23 @@ def add_surrogate_id(df: DataFrame, surrogate_id_column: str) -> DataFrame:
     
     The surrogate ID is generated using monotonically_increasing_id() to ensure uniqueness,
     then adjusted to start from 1 (with -1 reserved for dummy/unknown rows).
+    The surrogate ID column is placed as the first column in the DataFrame.
     
     Args:
         df (DataFrame): The dimension DataFrame
         surrogate_id_column (str): Name of the surrogate ID column to create (e.g., 'customer_id')
     
     Returns:
-        DataFrame: The dimension DataFrame with surrogate ID column added
+        DataFrame: The dimension DataFrame with surrogate ID column added as the first column
         
     Example:
         >>> df = add_surrogate_id(df, "customer_id")
     """
     # Add surrogate ID using monotonically_increasing_id
     result_df = df.withColumn(surrogate_id_column, F.monotonically_increasing_id() + 1)
+    
+    # Reorder columns to put surrogate_id_column first
+    other_columns = [col for col in result_df.columns if col != surrogate_id_column]
+    result_df = result_df.select(surrogate_id_column, *other_columns)
     
     return result_df

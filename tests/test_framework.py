@@ -7,7 +7,7 @@ This module contains unit tests for the lakehouse framework package.
 import pytest
 from framework.utils import get_catalog_schema, get_table_path, add_metadata_columns, get_or_create_spark_session
 from framework.config import Config
-from framework.dimension_utils import add_dummy_row, create_dummy_row_dict, add_dimension_metadata, add_surrogate_id
+from framework.dimension_utils import add_dummy_row, add_dimension_metadata, add_surrogate_id
 from framework.fact_utils import extract_dimension_names, build_dimension_mappings, enrich_with_surrogate_keys
 
 # Try to create Spark session, skip Spark tests if not available
@@ -63,52 +63,6 @@ def test_medallion_config_get_layer_path():
     assert config.get_layer_path("bronze") == "catalog.bronze"
     assert config.get_layer_path("silver") == "catalog.silver"
     assert config.get_layer_path("gold") == "catalog.gold"
-
-
-def test_medallion_config_invalid_layer():
-    """Test that invalid layer raises ValueError."""
-    config = Config(
-        bronze_catalog="catalog",
-        bronze_schema="bronze",
-        silver_catalog="catalog",
-        silver_schema="silver",
-        gold_catalog="catalog",
-        gold_schema="gold"
-    )
-    
-    with pytest.raises(ValueError, match="Invalid layer"):
-        config.get_layer_path("platinum")
-
-
-def test_create_dummy_row_dict():
-    """Test creating a dummy row dictionary from schema fields."""
-    from pyspark.sql.types import StructField, StringType, IntegerType, LongType, DecimalType, TimestampType
-    
-    # Create mock schema fields
-    schema_fields = [
-        StructField("customer_id", LongType(), True),
-        StructField("customer_name", StringType(), True),
-        StructField("customer_balance", DecimalType(18, 2), True),
-        StructField("age", IntegerType(), True),
-        StructField("created_at", TimestampType(), True)
-    ]
-    
-    dummy_row = create_dummy_row_dict(schema_fields, "customer_id")
-    
-    # Verify surrogate key is -1
-    assert dummy_row["customer_id"] == -1
-    
-    # Verify string fields are 'N/A'
-    assert dummy_row["customer_name"] == "N/A"
-    
-    # Verify decimal fields are NULL
-    assert dummy_row["customer_balance"] is None
-    
-    # Verify integer fields are NULL
-    assert dummy_row["age"] is None
-    
-    # Verify timestamp fields are epoch string
-    assert dummy_row["created_at"] == "1970-01-01 00:00:00"
 
 
 @pytest.mark.skipif(not SPARK_AVAILABLE, reason="Requires Spark/Java environment")

@@ -1,11 +1,11 @@
 """
 Utility functions for dimension table operations.
 """
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import StringType, TimestampType
 from typing import Dict, Any, List
-
+spark = SparkSession.getActiveSession()
 
 def add_dimension_metadata(df: DataFrame, metadata_columns: List[str] = None) -> DataFrame:
     """
@@ -105,37 +105,6 @@ def add_dummy_row(df: DataFrame, surrogate_key_column: str) -> DataFrame:
     result_df = dummy_row_df.union(df)
     
     return result_df
-
-
-def create_dummy_row_dict(schema_fields: list, surrogate_key_column: str) -> Dict[str, Any]:
-    """
-    Creates a dictionary representing a dummy row based on schema fields.
-    
-    Args:
-        schema_fields (list): List of StructField objects from DataFrame schema
-        surrogate_key_column (str): Name of the surrogate key column
-    
-    Returns:
-        Dict[str, Any]: Dictionary with column names as keys and dummy values
-    """
-    dummy_data: Dict[str, Any] = {}
-    
-    for field in schema_fields:
-        column_name = field.name
-        column_type = field.dataType
-        
-        if column_name == surrogate_key_column:
-            dummy_data[column_name] = -1
-        elif isinstance(column_type, (StringType,)):
-            dummy_data[column_name] = "N/A"
-        elif isinstance(column_type, TimestampType):
-            # Return string representation for timestamp
-            dummy_data[column_name] = "1970-01-01 00:00:00"
-        else:
-            # Decimal, Integer, Long, and other numeric types get NULL
-            dummy_data[column_name] = None
-    
-    return dummy_data
 
 
 def add_surrogate_id(df: DataFrame, surrogate_id_column: str) -> DataFrame:

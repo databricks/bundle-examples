@@ -45,6 +45,6 @@ def dim_part():
     
     # Add surrogate ID first, then add dummy row
     df = add_surrogate_id(df, "part_id")
-    df = add_dummy_row(df, "part_id")
+    df = add_dummy_row(df)
     
     return df

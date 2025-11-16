@@ -48,6 +48,6 @@ def dim_supplier():
     
     # Add surrogate ID first, then add dummy row
     df = add_surrogate_id(df, "supplier_id")
-    df = add_dummy_row(df, "supplier_id")
+    df = add_dummy_row(df)
     
     return df

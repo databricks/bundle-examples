@@ -54,7 +54,7 @@ def add_dimension_metadata(df: DataFrame, metadata_columns: List[str] = None) ->
     return result_df
 
 
-def add_dummy_row(df: DataFrame, surrogate_key_column: str) -> DataFrame:
+def add_dummy_row(df: DataFrame) -> DataFrame:
     """
     Adds a dummy row to a dimension table with surrogate key -1 and 'N/A' for text fields.
     
@@ -63,20 +63,14 @@ def add_dummy_row(df: DataFrame, surrogate_key_column: str) -> DataFrame:
     
     Args:
         df (DataFrame): The dimension DataFrame to add a dummy row to
-        surrogate_key_column (str): Name of the surrogate key column
-    
+
     Returns:
         DataFrame: The dimension DataFrame with a dummy row prepended
         
     Example:
-        >>> dim_customer_df = add_dummy_row(dim_customer_df, "customer_id")
+        >>> dim_customer_df = add_dummy_row(dim_customer_df)
     """
-    from pyspark.sql import SparkSession
-    
-    spark = SparkSession.getActiveSession()
-    if spark is None:
-        raise RuntimeError("No active Spark session found")
-    
+
     # Build dummy row data based on column types
     dummy_data: Dict[str, Any] = {}
     
@@ -84,8 +78,8 @@ def add_dummy_row(df: DataFrame, surrogate_key_column: str) -> DataFrame:
         column_name = field.name
         column_type = field.dataType
         
-        if column_name == surrogate_key_column:
-            # Surrogate key is always -1
+        # All columns ending with _id or _key get -1
+        if column_name.endswith('_id') or column_name.endswith('_key'):
             dummy_data[column_name] = -1
         elif isinstance(column_type, (StringType,)):
             # String fields get 'N/A'

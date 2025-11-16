@@ -49,6 +49,6 @@ def dim_customer():
     
     # Add surrogate ID first, then add dummy row
     df = add_surrogate_id(df, "customer_id")
-    df = add_dummy_row(df, "customer_id")
+    df = add_dummy_row(df)
     
     return df

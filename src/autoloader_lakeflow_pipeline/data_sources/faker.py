@@ -14,7 +14,7 @@ try:
 except:
   print(f"folder doesn't exist, generating the data under {volume_folder}...")
   from pyspark.sql import functions as F
-  from faker import Faker
+  from src.autoloader_lakeflow_pipeline.data_sources.faker import Faker
   from collections import OrderedDict
   import uuid
   fake = Faker()

@@ -4,6 +4,7 @@ Customer dimension table with enriched attributes.
 import dlt
 from pyspark.sql import SparkSession
 from framework.config import Config
+from framework.utils import add_metadata_columns
 from framework.dimension_utils import add_dummy_row, add_surrogate_id
 
 # Configuration
@@ -49,6 +50,7 @@ def dim_customer():
     
     # Add surrogate ID first, then add dummy row
     df = add_surrogate_id(df, "customer_id")
+    df = add_metadata_columns(df)
     df = add_dummy_row(df)
     
     return df

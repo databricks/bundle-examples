@@ -2,11 +2,14 @@
 Sales fact table containing transactional sales data.
 """
 import dlt
+from pyspark.sql import SparkSession
 from framework.config import Config
+from framework.utils import add_metadata_columns
 from framework.fact_utils import extract_dimension_names, build_dimension_mappings, enrich_with_surrogate_keys
 
 # Configuration
 config = Config.from_spark_config()
+spark = SparkSession.getActiveSession()
 
 # Table definition
 @dlt.table(
@@ -70,12 +73,15 @@ def fact_sales():
     dimension_mappings = build_dimension_mappings(dimension_names)
     
     # Enrich with surrogate keys from dimension tables
-    enriched_fact_df = enrich_with_surrogate_keys(
+    fact_df = enrich_with_surrogate_keys(
         fact_df=base_fact_df,
         dimension_mappings=dimension_mappings,
         catalog=config.gold_catalog,
         schema=config.gold_schema,
         handle_missing='use_default'  # Use -1 for missing dimension keys
     )
-    
-    return enriched_fact_df
+
+    # Add metadata columns
+    fact_df = add_metadata_columns(fact_df)
+
+    return fact_df

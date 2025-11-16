@@ -48,4 +48,6 @@ def calendar_mv():
         order by calendarDate
     """)
 
-    return add_dummy_row(add_metadata_columns(df), "calendar_id")
+    df = add_metadata_columns(df)
+    df = add_dummy_row(df)
+    return df

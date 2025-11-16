@@ -4,16 +4,17 @@
 # COMMAND ----------
 
 # Get input parameters from job
-dbutils.widgets.get("bronze_catalog")
-dbutils.widgets.get("bronze_schema")
-dbutils.widgets.get("bronze_volume")
+bronze_catalog = dbutils.widgets.get("bronze_catalog")
+bronze_schema = dbutils.widgets.get("bronze_schema")
+bronze_volume = dbutils.widgets.get("bronze_volume")
 
+# Set volume path
 volume_folder = f"/Volumes/{bronze_catalog}/{bronze_schema}/{bronze_volume}"
 
 # COMMAND ----------
 
 from pyspark.sql import functions as F
-from src.notebooks.create_fake_data_in_volume import Faker
+from faker import Faker
 from collections import OrderedDict
 import uuid
 fake = Faker()

@@ -5,7 +5,7 @@ import dlt
 from pyspark.sql import SparkSession
 from framework.config import Config
 from framework.utils import add_metadata_columns
-from framework.fact_utils import extract_dimension_names, build_dimension_mappings, enrich_with_surrogate_keys
+from framework.fact_utils import build_dimension_mappings, enrich_with_surrogate_keys
 
 # Configuration
 config = Config.from_spark_config()

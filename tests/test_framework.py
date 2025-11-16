@@ -8,7 +8,7 @@ import pytest
 from framework.utils import get_catalog_schema, get_table_path, add_metadata_columns, get_or_create_spark_session
 from framework.config import Config
 from framework.dimension_utils import add_dummy_row, add_surrogate_id
-from framework.fact_utils import extract_dimension_names, build_dimension_mappings, enrich_with_surrogate_keys
+from framework.fact_utils import build_dimension_mappings, enrich_with_surrogate_keys
 
 # Try to create Spark session, skip Spark tests if not available
 try:
@@ -141,42 +141,17 @@ def test_add_surrogate_id():
     assert rows[2].customer_id == 3
 
 
-def test_extract_dimension_names():
-    """Test extracting dimension names from fact table schema."""
-    from pyspark.sql.types import StructType, StructField, LongType, IntegerType, DecimalType
-    
-    # Create a mock fact table schema
-    schema = StructType([
-        StructField("customer_key", LongType(), True),
-        StructField("part_key", LongType(), True),
-        StructField("supplier_key", LongType(), True),
-        StructField("order_quantity", DecimalType(18, 2), True),
-        StructField("order_date_id", IntegerType(), True)  # Not a dimension key
-    ])
-    
-    # Create empty DataFrame with schema (no Spark needed for schema inspection)
-    # We'll create a mock DataFrame-like object
+
+def test_build_dimension_mappings():
+    """Test building dimension mappings from DataFrame columns."""
+    # Create a mock DataFrame-like object with columns ending in _key
     class MockDataFrame:
         def __init__(self, columns):
             self.columns = columns
     
     mock_df = MockDataFrame(['customer_key', 'part_key', 'supplier_key', 'order_quantity', 'order_date_id'])
     
-    # Extract dimension names
-    dim_names = extract_dimension_names(mock_df)
-    
-    # Verify correct dimensions extracted
-    assert 'customer' in dim_names
-    assert 'part' in dim_names
-    assert 'supplier' in dim_names
-    assert len(dim_names) == 3
-
-
-def test_build_dimension_mappings():
-    """Test building dimension mappings from dimension names."""
-    dimension_names = ['customer', 'part', 'supplier']
-    
-    mappings = build_dimension_mappings(dimension_names)
+    mappings = build_dimension_mappings(mock_df)
     
     # Verify structure
     assert 'customer' in mappings

@@ -1,0 +1,21 @@
+# This is a Databricks asset bundle definition for pydabs_airflow.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: pydabs_job_conditional_execution
+
+python:
+  venv_path: .venv
+  # Functions called to load resources defined in Python. See resources/__init__.py
+  resources:
+    - "resources:load_resources"
+
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://myworkspace.databricks.com

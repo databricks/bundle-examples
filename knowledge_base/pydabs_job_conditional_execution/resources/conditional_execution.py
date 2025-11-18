@@ -1,0 +1,54 @@
+from databricks.bundles.jobs import (
+    ConditionTask,
+    Job,
+    NotebookTask,
+    Task,
+    TaskDependency,
+)
+
+pydabs_job_conditional_execution = Job(
+    name="pydabs_job_conditional_execution",
+    tasks=[
+        Task(
+            task_key="check_data_quality",
+            notebook_task=NotebookTask(
+                notebook_path="src/check_quality.ipynb"
+            ),
+        ),
+        Task(
+            task_key="evaluate_quality",
+            condition_task=ConditionTask(
+                left="{{tasks.check_data_quality.values.bad_records}}",
+                op="GREATER_THAN",
+                right="100"
+            ),
+            depends_on=[
+                TaskDependency(task_key="check_data_quality")
+            ],
+        ),
+        Task(
+            task_key="handle_bad_data",
+            notebook_task=NotebookTask(
+                notebook_path="src/process_bad_data.ipynb"
+            ),
+            depends_on=[
+                TaskDependency(
+                    task_key="evaluate_quality",
+                    outcome="true"
+                )
+            ],
+        ),
+        Task(
+            task_key="continue_pipeline",
+            notebook_task=NotebookTask(
+                notebook_path="src/process_good_data.ipynb"
+            ),
+            depends_on=[
+                TaskDependency(
+                    task_key="evaluate_quality",
+                    outcome="false"
+                )
+            ],
+        )
+    ]
+)

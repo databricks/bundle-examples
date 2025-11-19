@@ -17,38 +17,31 @@ spark = SparkSession.getActiveSession()
     comment="TEST: Orders table with strict data quality expectations",
     private=True
 )
-# Null percentage expectations - these are intentionally strict and may fail
+# Null percentage expectations
 @dlt.expect_or_fail("expect_custkey_null_percentage", 
-                    "(SUM(CASE WHEN o_custkey IS NULL THEN 1 ELSE 0 END) / COUNT(*) * 100) < 0.1")
+                    "custkey_null_pct < 0.01")
 @dlt.expect_or_fail("expect_orderstatus_null_percentage", 
-                    "(SUM(CASE WHEN o_orderstatus IS NULL THEN 1 ELSE 0 END) / COUNT(*) * 100) < 0.5")
+                    "orderstatus_null_pct < 0.01")
 @dlt.expect_or_fail("expect_totalprice_null_percentage", 
-                    "(SUM(CASE WHEN o_totalprice IS NULL THEN 1 ELSE 0 END) / COUNT(*) * 100) < 0.01")
+                    "totalprice_null_pct < 0.01")
 def test_orders():
     """
-    Creates test view for orders with strict data quality expectations.
+    Creates test view for orders with strict data quality expectations:
+    - No more than 1% null values in o_custkey
+    - No more than 1% null values in o_orderstatus  
+    - No more than 1% null values in o_totalprice
     
-    Expectations that will likely fail:
-    - No more than 0.1% null values in o_custkey
-    - No more than 0.5% null values in o_orderstatus  
-    - No more than 0.01% null values in o_totalprice (extremely strict)
-    
-    Returns:
-        DataFrame: Orders data with calculated quality metrics
     """
     df = spark.sql(f"""
         SELECT
-            o_orderkey,
-            o_custkey,
-            o_orderstatus,
-            o_totalprice,
-            
+           
             -- Add calculated quality metrics for testing
-            CASE WHEN o_custkey IS NULL THEN 1 ELSE 0 END as has_null_custkey,
-            CASE WHEN o_orderstatus IS NULL THEN 1 ELSE 0 END as has_null_status,
-            CASE WHEN o_totalprice IS NULL THEN 1 ELSE 0 END as has_null_price
+            SUM(CASE WHEN o_custkey IS NULL THEN 1 ELSE 0 END) / COUNT(*) as custkey_null_pct,
+            SUM(CASE WHEN o_orderstatus IS NULL THEN 1 ELSE 0 END) / COUNT(*) as orderstatus_null_pct,
+            SUM(CASE WHEN o_totalprice IS NULL THEN 1 ELSE 0 END) / COUNT(*) as totalprice_null_pct
             
         FROM {config.silver_catalog}.{config.silver_schema}.orders
+        GROUP BY ALL
     """)
     
     return df

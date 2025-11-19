@@ -11,7 +11,6 @@ from framework.utils import add_metadata_columns
 
 # Configuration
 config = Config.from_spark_config()
-spark = SparkSession.getActiveSession()
 
 # # Custom Faker data source implementation
 # class FakeDataSourceReader(DataSourceReader):

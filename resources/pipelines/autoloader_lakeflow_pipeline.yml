@@ -11,10 +11,7 @@ resources:
 
       libraries:
         - glob:
-            include: 
-              ../../src/autoloader_lakeflow_pipeline/transformations/**
-              ../../src/autoloader_lakeflow_pipeline/data_sources/**
-              ../../src/autoloader_lakeflow_pipeline/utilities/**
+            include: ../../src/autoloader_lakeflow_pipeline/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

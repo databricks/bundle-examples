@@ -12,13 +12,9 @@ from framework.config import Config
 config = Config.from_spark_config()
 spark = SparkSession.getActiveSession()
 
-@dlt.table(
+@dlt.temporary_view(
     name=f"{config.silver_catalog}.{config.silver_schema}.test_orders",
-    comment="Test view for orders table with strict data quality expectations",
-    table_properties={
-        "quality": "test",
-        "pipelines.autoOptimize.managed": "true"
-    }
+    comment="Test view for orders table with strict data quality expectations"
 )
 # Null percentage expectations - these are intentionally strict and may fail
 @dlt.expect_or_fail("expect_custkey_null_percentage", 

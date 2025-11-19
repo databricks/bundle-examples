@@ -1,0 +1,16 @@
+# This job is responsible for running the monitoring ETL
+
+resources:
+  jobs:
+    monitoring_etl_scheduled_runner:
+      name: "Scheduled runner for the Monitoring ETL Pipeline for CDC Connector Pipelines"
+      schedule:
+        pause_status: ${var.monitoring_etl_schedule_state}
+        quartz_cron_expression: ${var.monitoring_etl_cron_schedule}
+        timezone_id: UTC
+      email_notifications:
+        on_failure: ${var.notification_emails}
+      tasks:
+        - task_key: etl_runner
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.cdc_connector_monitoring_etl.id}

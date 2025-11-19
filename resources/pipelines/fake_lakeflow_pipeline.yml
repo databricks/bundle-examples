@@ -11,7 +11,10 @@ resources:
 
       libraries:
         - glob:
-            include: ../../src/fake_lakeflow_pipeline/transformations/**
+            include: 
+              ../../src/fake_lakeflow_pipeline/transformations/**
+              ../../src/fake_lakeflow_pipeline/data_sources/**
+              ../../src/fake_lakeflow_pipeline/utilities/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

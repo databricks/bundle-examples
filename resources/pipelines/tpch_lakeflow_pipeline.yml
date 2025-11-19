@@ -11,7 +11,10 @@ resources:
 
       libraries:
         - glob:
-            include: ../../src/tpch_lakeflow_pipeline/transformations/**
+            include: 
+              ../../src/tpch_lakeflow_pipeline/transformations/**
+              ../../src/tpch_lakeflow_pipeline/data_sources/**
+              ../../src/tpch_lakeflow_pipeline/utilities/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

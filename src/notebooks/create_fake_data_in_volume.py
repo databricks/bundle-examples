@@ -4,10 +4,11 @@
 # COMMAND ----------
 
 # Get input parameters from job
-dbutils.widgets.get("bronze_catalog")
-dbutils.widgets.get("bronze_schema")
-dbutils.widgets.get("bronze_volume")
+bronze_catalog = dbutils.widgets.get("bronze_catalog")
+bronze_schema = dbutils.widgets.get("bronze_schema")
+bronze_volume = dbutils.widgets.get("bronze_volume")
 
+# Set volume path
 volume_folder = f"/Volumes/{bronze_catalog}/{bronze_schema}/{bronze_volume}"
 
 # COMMAND ----------

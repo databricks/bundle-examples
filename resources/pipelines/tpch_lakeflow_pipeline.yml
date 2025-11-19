@@ -11,7 +11,7 @@ resources:
 
       libraries:
         - glob:
-            include: ../../src/tpch_lakeflow_pipeline/transformations/**
+            include: ../../src/tpch_lakeflow_pipeline/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

@@ -2,8 +2,8 @@
 
 resources:
   pipelines:
-    pipeline_autoloader_lakeflow_pipeline:
-      name: pipeline_autoloader_lakeflow_pipeline
+    autoloader_lakeflow_pipeline:
+      name: autoloader_lakeflow_pipeline
       catalog: ${var.bronze_catalog}
       schema: ${resources.schemas.autoloader_bronze_schema.name}
       serverless: true
@@ -11,7 +11,7 @@ resources:
 
       libraries:
         - glob:
-            include: ../../src/autoloader_lakeflow_pipeline/transformations/**
+            include: ../../src/autoloader_lakeflow_pipeline/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

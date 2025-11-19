@@ -13,8 +13,8 @@ config = Config.from_spark_config()
 spark = SparkSession.getActiveSession()
 
 @dlt.table(
-    name=f"{config.silver_catalog}.{config.silver_schema}.TEST_tpch_orders",
-    comment="TEST: Orders table with strict data quality expectations",
+    name=f"{config.silver_catalog}.{config.silver_schema}.test_tpch_orders",
+    comment="Test orders table with strict data quality expectations",
     private=True
 )
 # Null percentage expectations
@@ -34,8 +34,6 @@ def test_orders():
     """
     df = spark.sql(f"""
         SELECT
-           
-            -- Add calculated quality metrics for testing
             SUM(CASE WHEN o_custkey IS NULL THEN 1 ELSE 0 END) / COUNT(*) as custkey_null_pct,
             SUM(CASE WHEN o_orderstatus IS NULL THEN 1 ELSE 0 END) / COUNT(*) as orderstatus_null_pct,
             SUM(CASE WHEN o_totalprice IS NULL THEN 1 ELSE 0 END) / COUNT(*) as totalprice_null_pct

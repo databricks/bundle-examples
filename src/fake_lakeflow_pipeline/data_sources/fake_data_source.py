@@ -11,7 +11,7 @@ class FakeDataSourceReader(DataSourceReader):
 
     def read(self, partition):
         # Library imports must be within the method.
-        from src.notebooks.create_fake_data_in_volume import Faker
+        from faker import Faker
         fake = Faker()
 
         # Every value in this `self.options` dictionary is a string.

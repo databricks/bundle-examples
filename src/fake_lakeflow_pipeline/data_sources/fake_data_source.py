@@ -38,7 +38,3 @@ class FakeDataSource(DataSource):
 
     def reader(self, schema: StructType):
         return FakeDataSourceReader(schema, self.options)
-    
-
-# Register the data source
-spark.dataSource.register(FakeDataSource)

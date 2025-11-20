@@ -1,0 +1,24 @@
+# This job builds an inverted index mapping pipeline tags to pipeline IDs.
+# The index is stored in a Delta table and used by import_event_logs and monitoring ETL pipelines
+# to efficiently discover pipelines by tags without having to query the Databricks API for every pipeline.
+#
+# The job should be scheduled to run periodically (e.g., daily) to keep the index up-to-date.
+
+resources:
+  jobs:
+    build_pipeline_tags_index:
+      name: Build ${var.dab_type} pipeline tags index
+      schedule:
+        pause_status: ${var.pipeline_tags_index_schedule_state}
+        quartz_cron_expression: ${var.pipeline_tags_index_cron_schedule}
+        timezone_id: UTC
+      email_notifications:
+        on_failure: ${var.notification_emails}
+      tasks:
+        - task_key: build_index
+          notebook_task:
+            notebook_path: ../jobs/build_pipeline_tags_index.ipynb
+            base_parameters:
+              monitoring_catalog: ${var.monitoring_catalog}
+              monitoring_schema: ${resources.schemas.monitoring_schema.name}
+              pipeline_tags_index_table_name: ${var.pipeline_tags_index_table_name}

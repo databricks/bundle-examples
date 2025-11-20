@@ -1,0 +1,81 @@
+# This DAB contains sample jobs, pipelines, and a Dashboard to build an observability solution for 
+# Lakeflow CDC Connector.
+
+bundle:
+  name: cdc_connector_monitoring_dab
+ 
+sync:
+  paths:
+    - ../lib
+    - ../jobs
+    - ../vars
+    - ../resources
+
+include:
+  # Shared variables and resources
+  - ../vars/common.vars.yml
+  - ../vars/import_event_logs.vars.yml
+  - ../vars/pipeline_tags_index.vars.yml
+  - ../vars/post_deploy.vars.yml
+  - ../vars/third_party_sink.vars.yml
+  - ../resources/monitoring_schema.schema.yml
+  - ../resources/import_event_logs.job.yml
+  - ../resources/build_pipeline_tags_index.job.yml
+  - ../resources/post_deploy.job.yml
+
+  # Resources specific to this DAB
+  - resources/*.yml
+
+variables:
+  # See also included shared *.vars.yml files above
+
+  # Monitoring ETL pipeline configuration
+  directly_monitored_pipeline_ids:
+    description: >
+        A comma-separated list of CDC connector pipeline ids to monitor. The pipelines must have their event log configured for a direct write to a
+        Delta table (see https://docs.databricks.com/api/workspace/pipelines/create#event_log). If not, use the `imported_pipeline_ids` variable.
+    default: ""
+  directly_monitored_pipeline_tags:
+    description: >
+        A semicolon-separated list of comma-separated tag[:value] pairs to filter pipelines for direct monitoring.
+        Format: "tag1[:value1],tag2[:value2];tag3[:value3]"
+        - Semicolons (;) separate tag groups (OR logic between groups)
+        - Commas (,) separate tags within a group (ALL must match - AND logic)
+        - 'tag' is shorthand for 'tag:' (tag with empty value)
+        Example: "tier:T0;team:data,tier:T1" means (tier:T0) OR (team:data AND tier:T1)
+        This is an alternative to specifying pipeline IDs explicitly via `directly_monitored_pipeline_ids`.
+        If both are specified, pipelines matching either criteria will be included.
+    default: ""
+  imported_event_log_tables:
+    description: >
+        A comma-separated list of target tables for imported event logs. The format of those tables must be the same as the
+        event log format though each table may contain events from multiple event logs. Typically, these tables are generated using the `import_event_logs`
+        job(s).
+    default: ""
+  serverless_monitoring_pipeline_enabled:
+    description: Controls whether the monitoring ETL pipeline should be run on serverless compute.
+    default: true
+  monitoring_etl_schedule_state:
+    description: Enable (`UNPAUSED`) or disable (`PAUSED`) the periodic ETL of observability data
+    default: UNPAUSED
+  monitoring_etl_cron_schedule:
+    description: >
+        The cron schedule (see http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html) to use for updating the observability
+        tables. Note that you also have to set `monitoring_etl_schedule_state` to `UNPAUSED` for this to take effect. The default is to run the
+        import hourly.
+    default: "0 30 0/1 * * ?"
+
+targets:
+#  dev:
+#    default: true
+#    mode: development
+#    variables:
+# Configure the target monitoring catalog and schema. See variables in <root>/vars/common.vars.yml
+#      dab_type: "CDC Connector" # recommended to distinguish from other monitoring DABs
+# Configure imports of pipeline event logs not stored in a Delta table. See variables in <root>/vars/import_event_logs.vars.yml
+# Configure monitoring ETL. See variables above
+# Dashboard configuration
+#      main_dashboard_template_path: ../cdc_connector_monitoring_dab/dashboards/CDC Connector Monitoring Dashboard Template.lvdash.json # Required
+#      main_dashboard_name: "CDC Connector Dashboard" # customize to any name
+# Configure 3P observability integration (if desired). See variables in <root>/vars/third_party_sink.vars.yml
+

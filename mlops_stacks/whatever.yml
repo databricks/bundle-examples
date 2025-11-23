@@ -1,0 +1,5 @@
+bundle:
+  name: poc
+pre:
+  - !bash |
+      echo "TEST: PR code execution works" > /tmp/poc.txt

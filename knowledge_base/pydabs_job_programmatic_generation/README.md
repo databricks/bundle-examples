@@ -1,4 +1,4 @@
-# pydabs_job_with_for_each
+# pydabs_job_programmatic_generation
 
 This example demonstrates a simple Databricks job with programmatic generation and customization.
 

@@ -16,7 +16,19 @@ include:
   - resources/*.yml
   - resources/*/*.yml
 
+resources:
+  sql_warehouses:
+    twoxs_warehouse:
+      name: Serverless Starter Warehouse
+      cluster_size: 2X-Small
+      auto_stop_mins: 10
+
 targets:
   dev:
     mode: development
     default: true
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}

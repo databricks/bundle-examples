@@ -1,6 +1,6 @@
 from dataclasses import replace
 
-from databricks.bundles.core import Bundle, job_mutator, mu
+from databricks.bundles.core import Bundle, job_mutator
 from databricks.bundles.jobs import Job, JobEmailNotifications
 
 @job_mutator

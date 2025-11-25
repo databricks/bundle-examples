@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+dist/
+build/
+.venv/
+.pytest_cache/
+
+# Scala/SBT
+target/
+
+# Databricks
+.databricks
+
+# Editors
+.vscode/
+
+# Build artifacts
+*.jar
+*.class

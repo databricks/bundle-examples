@@ -1,6 +1,6 @@
 [
   {
-    "source": "bronze.customer",
+    "source": "customer",
     "destination": "customer",
     "primary_keys": ["c_custkey"],
     "description": "Cleaned customer dimension table",
@@ -17,7 +17,7 @@
     }
   },
   {
-    "source": "bronze.lineitem",
+    "source": "lineitem",
     "destination": "lineitem",
     "primary_keys": ["l_orderkey", "l_linenumber"],
     "description": "Cleaned line item fact table",
@@ -36,7 +36,7 @@
     }
   },
   {
-    "source": "bronze.orders",
+    "source": "orders",
     "destination": "orders",
     "primary_keys": ["o_orderkey"],
     "description": "Cleaned orders fact table",
@@ -53,7 +53,7 @@
     }
   },
   {
-    "source": "bronze.nation",
+    "source": "nation",
     "destination": "nation",
     "primary_keys": ["n_nationkey"],
     "description": "Cleaned nation dimension table",
@@ -67,7 +67,7 @@
     }
   },
   {
-    "source": "bronze.part",
+    "source": "part",
     "destination": "part",
     "primary_keys": ["p_partkey"],
     "description": "Cleaned part dimension table",
@@ -84,7 +84,7 @@
     }
   },
   {
-    "source": "bronze.partsupp",
+    "source": "partsupp",
     "destination": "partsupp",
     "primary_keys": ["ps_partkey", "ps_suppkey"],
     "description": "Cleaned part supplier associative table",
@@ -96,7 +96,7 @@
     }
   },
   {
-    "source": "bronze.region",
+    "source": "region",
     "destination": "region",
     "primary_keys": ["r_regionkey"],
     "description": "Cleaned region dimension table",
@@ -110,7 +110,7 @@
     }
   },
   {
-    "source": "bronze.supplier",
+    "source": "supplier",
     "destination": "supplier",
     "primary_keys": ["s_suppkey"],
     "description": "Cleaned supplier dimension table",

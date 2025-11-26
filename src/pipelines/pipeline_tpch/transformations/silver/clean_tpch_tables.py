@@ -32,14 +32,9 @@ def create_silver_table(table_config: dict):
     # Define source function
     def source_function():
         """Reads the source table from bronze layer and returns it as a DataFrame."""
-        # Parse source to get catalog and schema
-        source_parts = source_table.split(".")
-        if len(source_parts) == 2:
-            # If source is "bronze.table", use config catalogs
-            df = spark.read.table(f"{config.bronze_catalog}.{config.bronze_schema}.{source_parts[1]}")
-        else:
-            # If fully qualified, use as-is
-            df = spark.read.table(source_table)
+        # Source table name (without catalog/schema prefix)
+        # Construct full table path using bronze catalog and schema from config
+        df = spark.read.table(f"{config.bronze_catalog}.{config.bronze_schema}.{source_table}")
         return df
     
     # Create DLT table using shared function

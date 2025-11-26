@@ -49,7 +49,6 @@ def create_silver_table(table_config: dict):
         schema=config.silver_schema,
         description=description,
         primary_keys=primary_keys,
-        quality_level="silver",
         source_function=source_function,
         expectations_warn=expectations_warn,
         expectations_fail_update=expectations_fail_update,

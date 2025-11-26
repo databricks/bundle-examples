@@ -12,7 +12,6 @@ def create_dlt_table(
     schema: str,
     description: str,
     primary_keys: List[str],
-    quality_level: str,
     source_function: Callable[[], DataFrame],
     expectations_warn: Optional[Dict[str, str]] = None,
     expectations_fail_update: Optional[Dict[str, str]] = None,
@@ -29,7 +28,6 @@ def create_dlt_table(
         schema (str): Target schema name
         description (str): Table description/comment
         primary_keys (List[str]): List of primary key column names
-        quality_level (str): Quality level (bronze, silver, gold)
         source_function (Callable): Function that returns the source DataFrame
         expectations_warn (Dict[str, str], optional): Expectations that log warnings but allow data through
         expectations_fail_update (Dict[str, str], optional): Expectations that fail the pipeline update if violated
@@ -42,7 +40,6 @@ def create_dlt_table(
     """
     # Build table properties
     table_properties = {
-        "quality": quality_level,
         "pipelines.autoOptimize.managed": "true",
         "primary_key": ", ".join(primary_keys)
     }

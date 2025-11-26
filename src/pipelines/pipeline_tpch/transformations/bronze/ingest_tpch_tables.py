@@ -43,7 +43,6 @@ def create_bronze_table(table_config: dict):
         schema=config.bronze_schema,
         description=description,
         primary_keys=primary_keys,
-        quality_level="bronze",
         source_function=source_function,
         expectations_warn=expectations_warn,
         expectations_fail_update=expectations_fail_update,

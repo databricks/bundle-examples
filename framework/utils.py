@@ -167,7 +167,7 @@ def validate_table_config_schema(config: dict, filename: str = "") -> bool:
 def load_table_configs(config_dir: str, validate: bool = True) -> list:
     """
     Load and merge all JSON configuration files from a directory.
-    Each JSON file should contain a list of table configuration dictionaries.
+    Each JSON file should contain either a list of table configuration dictionaries or a single dictionary.
     Optionally validates the schema of each configuration entry.
     
     Args:
@@ -204,9 +204,11 @@ def load_table_configs(config_dir: str, validate: bool = True) -> list:
             with open(json_file, "r") as f:
                 file_configs = json.load(f)
             
-            # Ensure it's a list
-            if not isinstance(file_configs, list):
-                raise ValueError(f"File '{json_file.name}' must contain a list of configurations")
+            # Convert single dict to list for uniform processing
+            if isinstance(file_configs, dict):
+                file_configs = [file_configs]
+            elif not isinstance(file_configs, list):
+                raise ValueError(f"File '{json_file.name}' must contain either a dictionary or a list of dictionaries")
             
             # Validate each config entry if requested
             if validate:

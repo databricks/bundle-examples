@@ -9,32 +9,25 @@ from framework.write import create_dlt_table
 config = Config.from_spark_config()
 
 # Table definitions
-def create_bronze_table(table_name: str):
+def create_bronze_table(table_config: dict):
     """
     Creates a materialized view in Lakeflow Declarative Pipelines for the specified table.
     
     Args:
-        table_name (str): Name of the table to create as a materialized view.
+        table_config (dict): Table configuration with source, destination, and primary_keys.
         
     The materialized view is created in the catalog and schema specified by
     the bronze_catalog and bronze_schema Spark configuration variables.
-    The source data is read from the samples.tpch schema.
     """
-    # Find table metadata from config
-    table_metadata = next((t for t in tables_config["tables"] if t["name"] == table_name), None)
-    
-    if table_metadata is None:
-        raise ValueError(f"Table {table_name} not found in configuration")
-    
-    description = table_metadata.get("description", f"Bronze layer table for {table_name}")
-    primary_keys = [key.strip() for key in table_metadata.get("primary_key", "").split(",")]
+    table_name = table_config["destination"]
+    source_table = table_config["source"]
+    description = table_config.get("description", f"Bronze layer table for {table_name}")
+    primary_keys = table_config["primary_keys"]
     
     # Define source function
     def source_function():
-        """Reads the source table from samples.tpch and returns it as a DataFrame."""
-        source_catalog = tables_config["source"]["catalog"]
-        source_schema = tables_config["source"]["schema"]
-        df = spark.read.table(f"{source_catalog}.{source_schema}.{table_name}")
+        """Reads the source table and returns it as a DataFrame."""
+        df = spark.read.table(source_table)
         df = add_metadata_columns(df)
         return df
     
@@ -46,17 +39,14 @@ def create_bronze_table(table_name: str):
         description=description,
         primary_keys=primary_keys,
         quality_level="bronze",
-        source_function=source_function,
-        metadata=tables_config.get("metadata")
+        source_function=source_function
     )
 
 if __name__ == "__main__":
 
-    # Load table configuration from all JSON files in the directory 
-    tables_config = load_table_configs("./")
+    # Load table configuration from all JSON files in the metadata directory 
+    tables_config = load_table_configs("./metadata")
 
-    # Extract table names from configuration
-    tables_list = [table["name"] for table in tables_config["tables"]]
-
-    for table_name in tables_list:
-        create_bronze_table(table_name)
+    # Create table for each configuration
+    for table_config in tables_config:
+        create_bronze_table(table_config)

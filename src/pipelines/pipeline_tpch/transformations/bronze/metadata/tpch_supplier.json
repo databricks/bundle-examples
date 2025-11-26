@@ -1,0 +1,10 @@
+{
+    "source": "samples.tpch.supplier",
+    "destination": "supplier",
+    "primary_keys": ["s_suppkey"],
+    "description": "Supplier dimension table",
+    "tags": ["dimension", "tpch"],
+    "expectations_fail_update": {
+        "has_rows": "COUNT(*) > 0"
+    }
+}

@@ -95,7 +95,7 @@ def get_or_create_spark_session(app_name: str = "lakehouse_framework"):
     return spark
 
 
-def validate_table_config_schema(config: dict, filename: str = "") -> bool:
+def validate_table_metadata(config: dict, filename: str = "") -> bool:
     """
     Validate the schema of a table configuration dictionary.
     
@@ -213,7 +213,7 @@ def load_table_configs(config_dir: str, validate: bool = True) -> list:
             # Validate each config entry if requested
             if validate:
                 for idx, config in enumerate(file_configs):
-                    validate_table_config_schema(config, f"{json_file.name}[{idx}]")
+                    validate_table_metadata(config, f"{json_file.name}[{idx}]")
             
             # Add all configs from this file
             all_configs.extend(file_configs)

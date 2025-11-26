@@ -1,6 +1,6 @@
 resources:
   schemas:
-    bronze_schema:
+    schema_tpch_bronze:
       catalog_name: ${var.bronze_catalog}
       name: tpch
       comment: |
@@ -13,7 +13,7 @@ resources:
             - SELECT
             - MODIFY
     
-    silver_schema:
+    schema_tpch_silver:
       catalog_name: ${var.silver_catalog}
       name: tpch
       comment: |
@@ -26,7 +26,7 @@ resources:
             - SELECT
             - MODIFY
     
-    gold_schema:
+    schema_tpch_gold:
       catalog_name: ${var.gold_catalog}
       name: sales_model
       comment: |

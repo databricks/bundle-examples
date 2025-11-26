@@ -1,11 +1,11 @@
 resources:
   schemas:
-    fake_bronze_schema:
+    schema_autoloader_bronze:
       catalog_name: ${var.bronze_catalog}
-      name: fake_data
+      name: autoloader_data
       comment: |
-        # Fake Lakeflow Project Schema - Bronze
-        This schema contains raw synthetic data from the Faker data source.
+        # AutoLoader Pipeline Schema - Bronze
+        This schema contains data ingested from Unity Catalog Volumes using AutoLoader.
       grants:
         - principal: ${workspace.current_user.userName}
           privileges:

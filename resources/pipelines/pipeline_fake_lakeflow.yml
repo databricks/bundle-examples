@@ -2,21 +2,21 @@
 
 resources:
   pipelines:
-    fake_lakeflow_pipeline:
+    pipeline_fake_lakeflow:
       name: fake_lakeflow_pipeline
       catalog: ${var.bronze_catalog}
-      schema: ${resources.schemas.fake_bronze_schema.name}
+      schema: ${resources.schemas.schema_fake_bronze.name}
       serverless: true
-      root_path: ../../src/pipelines/fake_lakeflow_pipeline
+      root_path: ../../src/pipelines/pipeline_fake_lakeflow
 
       libraries:
         - glob:
             include: 
-              ../../src/pipelines/fake_lakeflow_pipeline/**
+              ../../src/pipelines/pipeline_fake_lakeflow/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}
-        bronze_schema: ${resources.schemas.fake_bronze_schema.name}
+        bronze_schema: ${resources.schemas.schema_fake_bronze.name}
 
       environment:
         dependencies:

@@ -2,24 +2,24 @@
 
 resources:
   pipelines:
-    tpch_lakeflow_pipeline:
+    pipeline_tpch_lakeflow:
       name: tpch_lakeflow_pipeline
       catalog: ${var.bronze_catalog}
-      schema: ${resources.schemas.bronze_schema.name}
+      schema: ${resources.schemas.schema_tpch_bronze.name}
       serverless: true
-      root_path: ../../src/pipelines/tpch_lakeflow_pipeline
+      root_path: ../../src/pipelines/pipeline_tpch_lakeflow
 
       libraries:
         - glob:
-            include: ../../src/pipelines/tpch_lakeflow_pipeline/**
+            include: ../../src/pipelines/pipeline_tpch_lakeflow/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}
-        bronze_schema: ${resources.schemas.bronze_schema.name}
+        bronze_schema: ${resources.schemas.schema_tpch_bronze.name}
         silver_catalog: ${var.silver_catalog}
-        silver_schema: ${resources.schemas.silver_schema.name}
+        silver_schema: ${resources.schemas.schema_tpch_silver.name}
         gold_catalog: ${var.gold_catalog}
-        gold_schema: ${resources.schemas.gold_schema.name}
+        gold_schema: ${resources.schemas.schema_tpch_gold.name}
 
       environment:
         dependencies:

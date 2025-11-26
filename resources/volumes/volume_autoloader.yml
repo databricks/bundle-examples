@@ -1,8 +1,8 @@
 resources:
   volumes:
-    autoloader_landing_zone:
+    volume_autoloader_landing_zone:
       catalog_name: ${var.bronze_catalog}
-      schema_name: ${resources.schemas.autoloader_bronze_schema.name}
+      schema_name: ${resources.schemas.schema_autoloader_bronze.name}
       name: landing_zone
       volume_type: MANAGED
       comment: |

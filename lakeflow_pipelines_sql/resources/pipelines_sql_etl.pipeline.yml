@@ -3,7 +3,7 @@
 resources:
   pipelines:
     pipelines_sql_etl:
-      name: pipelines_sql_etl
+      name: pipelines_sql_etl_nada
       catalog: ${var.catalog}
       schema: ${var.schema}
       serverless: true

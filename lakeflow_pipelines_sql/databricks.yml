@@ -24,19 +24,19 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://company.databricks.com
+      host: https://e2-demo-field-eng.cloud.databricks.com/
     variables:
-      catalog: catalog
-      schema: ${workspace.current_user.short_name}
+      catalog: nada_catalog
+      schema: lsdp_cicd
   prod:
     mode: production
     workspace:
-      host: https://company.databricks.com
+      host: https://e2-demo-field-eng.cloud.databricks.com/
       # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
-      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+      # root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
     variables:
-      catalog: catalog
-      schema: prod
+      catalog: nada_catalog
+      schema: lsdp_cicd
     permissions:
-      - user_name: user@company.com
+      - user_name: nada.elatlassi@databricks.com
         level: CAN_MANAGE

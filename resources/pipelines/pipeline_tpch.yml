@@ -7,11 +7,11 @@ resources:
       catalog: ${var.bronze_catalog}
       schema: ${resources.schemas.schema_tpch_bronze.name}
       serverless: true
-      root_path: ../../src/pipelines/pipeline_tpch_lakeflow
+      root_path: ../../src/pipelines/pipeline_tpch
 
       libraries:
         - glob:
-            include: ../../src/pipelines/pipeline_tpch_lakeflow/**
+            include: ../../src/pipelines/pipeline_tpch/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

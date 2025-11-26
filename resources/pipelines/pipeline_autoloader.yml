@@ -7,11 +7,11 @@ resources:
       catalog: ${var.bronze_catalog}
       schema: ${resources.schemas.schema_autoloader_bronze.name}
       serverless: true
-      root_path: ../../src/pipelines/pipeline_autoloader_lakeflow
+      root_path: ../../src/pipelines/pipeline_autoloader
 
       libraries:
         - glob:
-            include: ../../src/pipelines/pipeline_autoloader_lakeflow/**
+            include: ../../src/pipelines/pipeline_autoloader/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

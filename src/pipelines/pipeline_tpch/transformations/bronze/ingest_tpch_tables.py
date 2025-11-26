@@ -1,6 +1,3 @@
-import dlt
-from pathlib import Path
-from pyspark.sql.functions import col
 from framework.utils import add_metadata_columns, load_table_configs
 from framework.config import Config
 from framework.write import create_dlt_table
@@ -50,9 +47,16 @@ def create_bronze_table(table_config: dict):
     )
 
 if __name__ == "__main__":
-
+    from pathlib import Path
+    
+    # Get the directory containing this script
+    script_dir = Path(__file__).parent
+    metadata_dir = script_dir / "metadata"
+    
     # Load table configuration from all JSON files in the metadata directory 
-    tables_config = load_table_configs("./metadata")
+    tables_config = load_table_configs(str(metadata_dir))
+
+    print(tables_config)
 
     # Create table for each configuration
     for table_config in tables_config:

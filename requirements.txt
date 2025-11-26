@@ -1,5 +1,5 @@
 # Delta Live Tables
-dlt>=0.1.0
+databricks-dlt>=0.3.0
 
 # PySpark (provided by Databricks runtime)
 pyspark>=3.5.0

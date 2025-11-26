@@ -15,7 +15,7 @@ resources:
       tasks:
         - task_key: refresh_pipeline
           pipeline_task:
-            pipeline_id: ${resources.pipelines.pipeline_tpch_lakeflow.id}
+            pipeline_id: ${resources.pipelines.tpch_pipeline.id}
 
       environments:
         - environment_key: default

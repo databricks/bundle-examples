@@ -2,7 +2,7 @@
 
 resources:
   pipelines:
-    pipeline_faker_lakeflow:
+    faker_pipeline:
       name: faker_pipeline
       catalog: ${var.bronze_catalog}
       schema: ${resources.schemas.schema_fake_bronze.name}

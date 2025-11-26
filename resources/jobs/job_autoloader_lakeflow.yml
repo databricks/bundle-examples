@@ -2,8 +2,8 @@
 
 resources:
   jobs:
-    job_autoloader_lakeflow:
-      name: autoloader_lakeflow_job
+    autoloader_job:
+      name: autoloader_job
 
       tasks:
         - task_key: create_fake_data

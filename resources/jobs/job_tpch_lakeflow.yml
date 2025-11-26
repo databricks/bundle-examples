@@ -2,8 +2,8 @@
 
 resources:
   jobs:
-    job_tpch_lakeflow:
-      name: tpch_lakeflow_job
+    tpch_job:
+      name: tpch_job
 
       trigger:
         # Run this job every day, exactly one day from the last run; see https://docs.databricks.com/api/workspace/jobs/create#trigger

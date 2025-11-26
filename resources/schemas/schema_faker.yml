@@ -2,7 +2,7 @@ resources:
   schemas:
     schema_faker_bronze:
       catalog_name: ${var.bronze_catalog}
-      name: faker_data
+      name: faker
       comment: |
         # Faker Pipeline Schema - Bronze
         This schema contains raw synthetic data from the Faker data source.

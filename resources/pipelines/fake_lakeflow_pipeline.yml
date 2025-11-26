@@ -7,12 +7,12 @@ resources:
       catalog: ${var.bronze_catalog}
       schema: ${resources.schemas.fake_bronze_schema.name}
       serverless: true
-      root_path: ../../src/fake_lakeflow_pipeline
+      root_path: ../../src/pipelines/fake_lakeflow_pipeline
 
       libraries:
         - glob:
             include: 
-              ../../src/fake_lakeflow_pipeline/**
+              ../../src/pipelines/fake_lakeflow_pipeline/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

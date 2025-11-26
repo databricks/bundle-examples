@@ -141,8 +141,14 @@ def validate_table_config_schema(config: dict, filename: str = "") -> bool:
             raise ValueError(f"primary_keys[{idx}]{file_info} must be a string")
     
     # Validate optional fields
-    if "expectations" in config and not isinstance(config["expectations"], dict):
-        raise ValueError(f"'expectations'{file_info} must be a dictionary")
+    if "expectations_warn" in config and not isinstance(config["expectations_warn"], dict):
+        raise ValueError(f"'expectations_warn'{file_info} must be a dictionary")
+    
+    if "expectations_fail_update" in config and not isinstance(config["expectations_fail_update"], dict):
+        raise ValueError(f"'expectations_fail_update'{file_info} must be a dictionary")
+    
+    if "expectations_drop_row" in config and not isinstance(config["expectations_drop_row"], dict):
+        raise ValueError(f"'expectations_drop_row'{file_info} must be a dictionary")
     
     if "description" in config and not isinstance(config["description"], str):
         raise ValueError(f"'description'{file_info} must be a string")

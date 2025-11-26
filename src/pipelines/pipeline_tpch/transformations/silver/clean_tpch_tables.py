@@ -23,7 +23,11 @@ def create_silver_table(table_config: dict):
     source_table = table_config["source"]
     description = table_config.get("description", f"Silver layer table for {table_name}")
     primary_keys = table_config["primary_keys"]
-    expectations = table_config.get("expectations", {})
+    
+    # Get the three types of expectations
+    expectations_warn = table_config.get("expectations_warn", {})
+    expectations_fail_update = table_config.get("expectations_fail_update", {})
+    expectations_drop_row = table_config.get("expectations_drop_row", {})
     
     # Define source function
     def source_function():
@@ -47,7 +51,9 @@ def create_silver_table(table_config: dict):
         primary_keys=primary_keys,
         quality_level="silver",
         source_function=source_function,
-        expectations=expectations
+        expectations_warn=expectations_warn,
+        expectations_fail_update=expectations_fail_update,
+        expectations_drop_row=expectations_drop_row
     )
 
 

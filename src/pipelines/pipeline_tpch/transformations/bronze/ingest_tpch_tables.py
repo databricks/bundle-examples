@@ -24,6 +24,11 @@ def create_bronze_table(table_config: dict):
     description = table_config.get("description", f"Bronze layer table for {table_name}")
     primary_keys = table_config["primary_keys"]
     
+    # Get the three types of expectations
+    expectations_warn = table_config.get("expectations_warn", {})
+    expectations_fail_update = table_config.get("expectations_fail_update", {})
+    expectations_drop_row = table_config.get("expectations_drop_row", {})
+    
     # Define source function
     def source_function():
         """Reads the source table and returns it as a DataFrame."""
@@ -39,7 +44,10 @@ def create_bronze_table(table_config: dict):
         description=description,
         primary_keys=primary_keys,
         quality_level="bronze",
-        source_function=source_function
+        source_function=source_function,
+        expectations_warn=expectations_warn,
+        expectations_fail_update=expectations_fail_update,
+        expectations_drop_row=expectations_drop_row
     )
 
 if __name__ == "__main__":

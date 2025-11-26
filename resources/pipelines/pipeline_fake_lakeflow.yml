@@ -2,8 +2,8 @@
 
 resources:
   pipelines:
-    pipeline_fake_lakeflow:
-      name: fake_lakeflow_pipeline
+    pipeline_faker_lakeflow:
+      name: faker_pipeline
       catalog: ${var.bronze_catalog}
       schema: ${resources.schemas.schema_fake_bronze.name}
       serverless: true

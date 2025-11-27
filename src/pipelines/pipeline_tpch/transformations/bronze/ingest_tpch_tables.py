@@ -37,9 +37,9 @@ def create_bronze_table(table_config: dict):
     # Create DLT table using shared function
     return create_dlt_table(
         table_name=full_table_name,
+        source_function=source_function,
         # description=description,
         # primary_keys=primary_keys,
-        # source_function=source_function,
         # expectations_warn=expectations_warn,
         # expectations_fail_update=expectations_fail_update,
         # expectations_drop_row=expectations_drop_row

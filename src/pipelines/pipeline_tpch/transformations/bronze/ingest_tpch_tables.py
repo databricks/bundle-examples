@@ -38,11 +38,11 @@ def create_bronze_table(table_config: dict):
     return create_dlt_table(
         table_name=full_table_name,
         source_function=source_function,
-        description=description,
-        primary_keys=primary_keys,
-        expectations_warn=expectations_warn,
-        expectations_fail_update=expectations_fail_update,
-        expectations_drop_row=expectations_drop_row
+        # description=description,
+        # primary_keys=primary_keys,
+        # expectations_warn=expectations_warn,
+        # expectations_fail_update=expectations_fail_update,
+        # expectations_drop_row=expectations_drop_row
     )
 
 if __name__ == "__main__":

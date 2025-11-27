@@ -9,7 +9,7 @@ from pyspark.sql import DataFrame
 def create_dlt_table(
     table_name: str,
     source_function: Callable[[], DataFrame],
-    description: Optional[str] = None,
+    description: Optional[str] = "",
     primary_keys: Optional[List[str]] = [],
     expectations_warn: Optional[Dict[str, str]] = {},
     expectations_fail_update: Optional[Dict[str, str]] = {},
@@ -32,7 +32,7 @@ def create_dlt_table(
     Returns:
         Function: The decorated DLT table function
     """
-    
+
     # Create the DLT table decorator
     @dlt.table(
         name=table_name,
@@ -40,17 +40,17 @@ def create_dlt_table(
         table_properties=table_properties
     )
     @dlt.expect_all_or_drop({f"{pk}_not_null": f"{pk} IS NOT NULL" for pk in primary_keys})
-    # @dlt.expect_all({rule: name for rule, name in expectations_warn.items()})
-    # @dlt.expect_all_or_fail({rule: name for rule, name in expectations_fail_update.items()})
-    # @dlt.expect_all_or_drop({rule: name for rule, name in expectations_drop_row.items()})
-
-    @dlt.expect_all(expectations_warn)
-    @dlt.expect_all_or_fail(expectations_fail_update)
-    @dlt.expect_all_or_drop(expectations_drop_row)
     def table_function():
         """
         Generated table function that applies expectations and returns the source DataFrame.
         """
         return source_function()
-        
+    
+    # @dlt.expect_all(expectations_warn)
+    # @dlt.expect_all_or_fail(expectations_fail_update)
+    # @dlt.expect_all_or_drop(expectations_drop_row)
+    # @dlt.expect_all({rule: name for rule, name in expectations_warn.items()})
+    # @dlt.expect_all_or_fail({rule: name for rule, name in expectations_fail_update.items()})
+    # @dlt.expect_all_or_drop({rule: name for rule, name in expectations_drop_row.items()})
+
     return table_function

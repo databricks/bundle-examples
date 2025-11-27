@@ -22,9 +22,9 @@ def create_silver_table(table_config: dict):
     # Get optional input parameters
     description = table_config.get("description")
     primary_keys = table_config.get("primary_keys")
-    expectations_warn = table_config.get("expectations_warn")
-    expectations_fail_update = table_config.get("expectations_fail_update")
-    expectations_drop_row = table_config.get("expectations_drop_row")
+    expectations_warn = table_config.get("expectations_warn", {})
+    expectations_fail_update = table_config.get("expectations_fail_update", {})
+    expectations_drop_row = table_config.get("expectations_drop_row", {})
     
     # Define source function
     def source_function():

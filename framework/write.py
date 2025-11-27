@@ -10,11 +10,11 @@ def create_dlt_table(
     table_name: str,
     source_function: Callable[[], DataFrame],
     description: Optional[str] = None,
-    primary_keys: Optional[List[str]] = None,
-    expectations_warn: Optional[Dict[str, str]] = None,
-    expectations_fail_update: Optional[Dict[str, str]] = None,
-    expectations_drop_row: Optional[Dict[str, str]] = None,
-    table_properties: Optional[Dict[str, str]] = None
+    primary_keys: Optional[List[str]] = [],
+    expectations_warn: Optional[Dict[str, str]] = {},
+    expectations_fail_update: Optional[Dict[str, str]] = {},
+    expectations_drop_row: Optional[Dict[str, str]] = {},
+    table_properties: Optional[Dict[str, str]] = {}
 ):
     """
     Creates a Delta Live Table (materialized view) with metadata and data quality expectations.
@@ -33,14 +33,6 @@ def create_dlt_table(
         Function: The decorated DLT table function
     """
     
-    # Set defaults for optional parameters
-    if primary_keys is None:
-        primary_keys = []
-    if table_properties is None:
-        table_properties = {}
-    if description is None:
-        description = ""
-    
     # Create the DLT table decorator
     @dlt.table(
         name=table_name,
@@ -48,22 +40,17 @@ def create_dlt_table(
         table_properties=table_properties
     )
     @dlt.expect_all_or_drop({f"{pk}_not_null": f"{pk} IS NOT NULL" for pk in primary_keys})
+    # @dlt.expect_all({rule: name for rule, name in expectations_warn.items()})
+    # @dlt.expect_all_or_fail({rule: name for rule, name in expectations_fail_update.items()})
+    # @dlt.expect_all_or_drop({rule: name for rule, name in expectations_drop_row.items()})
+
+    @dlt.expect_all(expectations_warn)
+    @dlt.expect_all_or_fail(expectations_fail_update)
+    @dlt.expect_all_or_drop(expectations_drop_row)
     def table_function():
         """
         Generated table function that applies expectations and returns the source DataFrame.
         """
         return source_function()
-    
-    # Apply warn expectations (log warnings but don't drop or fail)
-    if expectations_warn:
-        table_function = dlt.expect_all(expectations_warn)(table_function)
-    
-    # Apply fail_update expectations (fail the pipeline if violated)
-    if expectations_fail_update:
-        table_function = dlt.expect_all_or_fail(expectations_fail_update)(table_function)
-    
-    # Apply drop_row expectations (drop rows that don't meet criteria)
-    if expectations_drop_row:
-        table_function = dlt.expect_all_or_drop(expectations_drop_row)(table_function)
-    
+        
     return table_function

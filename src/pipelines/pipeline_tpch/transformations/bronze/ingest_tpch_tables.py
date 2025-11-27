@@ -19,13 +19,13 @@ def create_bronze_table(table_config: dict):
 
     full_table_name = f"{config.bronze_catalog}.{config.bronze_schema}.{table_config['destination']}"
     source_table = table_config["source"]
+
+    # Get optional input parameters
     description = table_config.get("description")
     primary_keys = table_config.get("primary_keys")
-    
-    # Get the three types of expectations
-    expectations_warn = table_config.get("expectations_warn", {})
-    expectations_fail_update = table_config.get("expectations_fail_update", {})
-    expectations_drop_row = table_config.get("expectations_drop_row", {})
+    expectations_warn = table_config.get("expectations_warn")
+    expectations_fail_update = table_config.get("expectations_fail_update")
+    expectations_drop_row = table_config.get("expectations_drop_row")
 
     # Define source function
     def source_function():
@@ -38,11 +38,11 @@ def create_bronze_table(table_config: dict):
     return create_dlt_table(
         table_name=full_table_name,
         source_function=source_function,
-        # description=description,
-        # primary_keys=primary_keys,
-        # expectations_warn=expectations_warn,
-        # expectations_fail_update=expectations_fail_update,
-        # expectations_drop_row=expectations_drop_row
+        description=description,
+        primary_keys=primary_keys,
+        expectations_warn=expectations_warn,
+        expectations_fail_update=expectations_fail_update,
+        expectations_drop_row=expectations_drop_row
     )
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@ def create_bronze_table(table_config: dict):
     expectations_warn = table_config.get("expectations_warn", {})
     expectations_fail_update = table_config.get("expectations_fail_update", {})
     expectations_drop_row = table_config.get("expectations_drop_row", {})
-    
+
     # Define source function
     def source_function():
         """Reads the source table and returns it as a DataFrame."""
@@ -47,16 +47,22 @@ def create_bronze_table(table_config: dict):
     )
 
 if __name__ == "__main__":
-    from pathlib import Path
-    
-    # Get the directory containing this script
-    script_dir = Path(__file__).parent
-    metadata_dir = script_dir / "metadata"
     
     # Load table configuration from all JSON files in the metadata directory 
-    tables_config = load_table_configs(str(metadata_dir))
+    tables_config = load_table_configs("./metadata")
 
-    print(tables_config)
+    # tables_config = [
+    #     {
+    #         "source": "samples.tpch.supplier",
+    #         "destination": "supplier",
+    #         "primary_keys": ["s_suppkey"],
+    #         "description": "Supplier dimension table",
+    #         "tags": ["dimension", "tpch"],
+    #         "expectations_fail_update": {
+    #             "has_rows": "COUNT(*) > 0"
+    #         }
+    #     }
+    # ]
 
     # Create table for each configuration
     for table_config in tables_config:

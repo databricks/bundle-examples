@@ -8,11 +8,9 @@ from pyspark.sql import DataFrame
 
 def create_dlt_table(
     table_name: str,
-    catalog: str,
-    schema: str,
-    description: str,
-    primary_keys: List[str],
     source_function: Callable[[], DataFrame],
+    description: Optional[str] = None,
+    primary_keys: Optional[List[str]] = None,
     expectations_warn: Optional[Dict[str, str]] = None,
     expectations_fail_update: Optional[Dict[str, str]] = None,
     expectations_drop_row: Optional[Dict[str, str]] = None,
@@ -22,12 +20,10 @@ def create_dlt_table(
     Creates a Delta Live Table (materialized view) with metadata and data quality expectations.
     
     Args:
-        table_name (str): Name of the table to create
-        catalog (str): Target catalog name
-        schema (str): Target schema name
-        description (str): Table description/comment
-        primary_keys (List[str]): List of primary key column names
+        table_name (str): Full name of the table to create (catalog.schema.table)
         source_function (Callable): Function that returns the source DataFrame
+        description (str, optional): Table description/comment
+        primary_keys (List[str], optional): List of primary key column names
         expectations_warn (Dict[str, str], optional): Expectations that log warnings but allow data through
         expectations_fail_update (Dict[str, str], optional): Expectations that fail the pipeline update if violated
         expectations_drop_row (Dict[str, str], optional): Expectations that drop rows that don't meet criteria
@@ -37,9 +33,17 @@ def create_dlt_table(
         Function: The decorated DLT table function
     """
     
+    # Set defaults for optional parameters
+    if primary_keys is None:
+        primary_keys = []
+    if table_properties is None:
+        table_properties = {}
+    if description is None:
+        description = ""
+    
     # Create the DLT table decorator
     @dlt.table(
-        name=f"{catalog}.{schema}.{table_name}",
+        name=table_name,
         comment=description,
         table_properties=table_properties
     )
@@ -50,7 +54,6 @@ def create_dlt_table(
         """
         return source_function()
     
-    # Apply expectations based on type
     # Apply warn expectations (log warnings but don't drop or fail)
     if expectations_warn:
         table_function = dlt.expect_all(expectations_warn)(table_function)

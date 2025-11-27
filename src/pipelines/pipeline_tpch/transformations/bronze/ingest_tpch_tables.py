@@ -16,10 +16,11 @@ def create_bronze_table(table_config: dict):
     The materialized view is created in the catalog and schema specified by
     the bronze_catalog and bronze_schema Spark configuration variables.
     """
-    table_name = table_config["destination"]
+
+    full_table_name = f"{config.bronze_catalog}.{config.bronze_schema}.{table_config['destination']}"
     source_table = table_config["source"]
-    description = table_config.get("description", f"Bronze layer table for {table_name}")
-    primary_keys = table_config["primary_keys"]
+    description = table_config.get("description")
+    primary_keys = table_config.get("primary_keys")
     
     # Get the three types of expectations
     expectations_warn = table_config.get("expectations_warn", {})
@@ -35,34 +36,19 @@ def create_bronze_table(table_config: dict):
     
     # Create DLT table using shared function
     return create_dlt_table(
-        table_name=table_name,
-        catalog=config.bronze_catalog,
-        schema=config.bronze_schema,
-        description=description,
-        primary_keys=primary_keys,
-        source_function=source_function,
-        expectations_warn=expectations_warn,
-        expectations_fail_update=expectations_fail_update,
-        expectations_drop_row=expectations_drop_row
+        table_name=full_table_name,
+        # description=description,
+        # primary_keys=primary_keys,
+        # source_function=source_function,
+        # expectations_warn=expectations_warn,
+        # expectations_fail_update=expectations_fail_update,
+        # expectations_drop_row=expectations_drop_row
     )
 
 if __name__ == "__main__":
     
     # Load table configuration from all JSON files in the metadata directory 
     tables_config = load_table_configs("./metadata")
-
-    # tables_config = [
-    #     {
-    #         "source": "samples.tpch.supplier",
-    #         "destination": "supplier",
-    #         "primary_keys": ["s_suppkey"],
-    #         "description": "Supplier dimension table",
-    #         "tags": ["dimension", "tpch"],
-    #         "expectations_fail_update": {
-    #             "has_rows": "COUNT(*) > 0"
-    #         }
-    #     }
-    # ]
 
     # Create table for each configuration
     for table_config in tables_config:

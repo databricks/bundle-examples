@@ -15,7 +15,8 @@ def create_dlt_table(
     source_function: Callable[[], DataFrame],
     expectations_warn: Optional[Dict[str, str]] = None,
     expectations_fail_update: Optional[Dict[str, str]] = None,
-    expectations_drop_row: Optional[Dict[str, str]] = None
+    expectations_drop_row: Optional[Dict[str, str]] = None,
+    table_properties: Optional[Dict[str, str]] = None
 ):
     """
     Creates a Delta Live Table (materialized view) with metadata and data quality expectations.
@@ -30,6 +31,7 @@ def create_dlt_table(
         expectations_warn (Dict[str, str], optional): Expectations that log warnings but allow data through
         expectations_fail_update (Dict[str, str], optional): Expectations that fail the pipeline update if violated
         expectations_drop_row (Dict[str, str], optional): Expectations that drop rows that don't meet criteria
+        table_properties (Dict[str, str], optional): Table properties to set
     
     Returns:
         Function: The decorated DLT table function

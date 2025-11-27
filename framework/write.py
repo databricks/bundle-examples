@@ -32,6 +32,34 @@ def create_dlt_table(
     Returns:
         Function: The decorated DLT table function
     """
+    
+    # Validate argument types
+    if not isinstance(table_name, str):
+        raise TypeError(f"table_name must be a str, got {type(table_name).__name__}")
+    
+    if not callable(source_function):
+        raise TypeError(f"source_function must be callable, got {type(source_function).__name__}")
+    
+    if description is not None and not isinstance(description, str):
+        raise TypeError(f"description must be a str or None, got {type(description).__name__}")
+    
+    if primary_keys is not None and not isinstance(primary_keys, list):
+        raise TypeError(f"primary_keys must be a list or None, got {type(primary_keys).__name__}")
+    
+    if primary_keys is not None and not all(isinstance(pk, str) for pk in primary_keys):
+        raise TypeError("All items in primary_keys must be strings")
+    
+    if expectations_warn is not None and not isinstance(expectations_warn, dict):
+        raise TypeError(f"expectations_warn must be a dict or None, got {type(expectations_warn).__name__}")
+    
+    if expectations_fail_update is not None and not isinstance(expectations_fail_update, dict):
+        raise TypeError(f"expectations_fail_update must be a dict or None, got {type(expectations_fail_update).__name__}")
+    
+    if expectations_drop_row is not None and not isinstance(expectations_drop_row, dict):
+        raise TypeError(f"expectations_drop_row must be a dict or None, got {type(expectations_drop_row).__name__}")
+    
+    if table_properties is not None and not isinstance(table_properties, dict):
+        raise TypeError(f"table_properties must be a dict or None, got {type(table_properties).__name__}")
 
     # Create the DLT table decorator
     @dlt.table(

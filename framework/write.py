@@ -46,11 +46,17 @@ def create_dlt_table(
         """
         return source_function()
     
-    # @dlt.expect_all(expectations_warn)
-    # @dlt.expect_all_or_fail(expectations_fail_update)
-    # @dlt.expect_all_or_drop(expectations_drop_row)
-    # @dlt.expect_all({rule: name for rule, name in expectations_warn.items()})
-    # @dlt.expect_all_or_fail({rule: name for rule, name in expectations_fail_update.items()})
-    # @dlt.expect_all_or_drop({rule: name for rule, name in expectations_drop_row.items()})
+    # Apply expectations based on type
+    # Apply warn expectations (log warnings but don't drop or fail)
+    if expectations_warn:
+        table_function = dlt.expect_all(expectations_warn)(table_function)
+    
+    # Apply fail_update expectations (fail the pipeline if violated)
+    if expectations_fail_update:
+        table_function = dlt.expect_all_or_fail(expectations_fail_update)(table_function)
+    
+    # Apply drop_row expectations (drop rows that don't meet criteria)
+    if expectations_drop_row:
+        table_function = dlt.expect_all_or_drop(expectations_drop_row)(table_function)
 
     return table_function

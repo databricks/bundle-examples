@@ -83,14 +83,18 @@ black src/ tests/
 ## Project Structure
 
 ```
-src/lakehouse_framework/
+framework/
 ├── __init__.py      # Package initialization
 ├── main.py          # Main entry point
 ├── config.py        # Configuration management
-└── utils.py         # Utility functions
+├── utils.py         # Common utility functions
+├── metadata.py      # Table configuration loading and validation
+├── dlt.py           # DLT table creation utilities
+└── dw.py            # Data Warehouse utilities (dimensions & facts)
 
 tests/
-└── test_lakehouse_framework.py  # Unit tests
+└── test_framework.py        # Unit tests
+└── test_validation.py       # Metadata validation tests
 ```
 
 ## Dependencies

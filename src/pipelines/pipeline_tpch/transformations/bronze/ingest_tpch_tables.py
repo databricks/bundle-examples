@@ -1,7 +1,7 @@
 from framework.utils import add_metadata_columns
 from framework.metadata import load_table_configs
 from framework.config import Config
-from framework.write import create_dlt_table
+from framework.dlt import create_dlt_table
 
 # Configuration
 config = Config.from_spark_config()

@@ -79,10 +79,9 @@ def create_dlt_table(
         comment=description,
         table_properties=table_properties
     )
-
     @dlt.expect_all_or_drop({f"{pk}_not_null": f"{pk} IS NOT NULL" for pk in primary_keys})
     @dlt.expect_all(expectations_warn)
-    # @dlt.expect_all_or_fail(expectations_fail_update)
+    @dlt.expect_all_or_fail(expectations_fail_update)
     @dlt.expect_all_or_drop(expectations_drop_row)
     def table_function():
         """

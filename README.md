@@ -73,14 +73,16 @@ The gold layer fact table implements the star schema with foreign key relationsh
 The `framework/` package provides reusable utilities for implementing medallion architecture patterns:
 
 - **`config.py`**: Configuration management for medallion layers (catalog/schema names)
-- **`dimension_utils.py`**: Dimension table utilities
+- **`dw.py`**: Data Warehouse utilities for dimension and fact tables
   - `add_surrogate_id()`: Generate surrogate keys using monotonically_increasing_id()
   - `add_dummy_row()`: Add unknown dimension row with -1 keys
-- **`fact_utils.py`**: Fact table utilities
   - `build_dimension_mappings()`: Extract dimension mappings from column names
   - `enrich_with_surrogate_keys()`: Join with dimensions and replace natural keys with surrogate IDs
+- **`metadata.py`**: Table configuration loading and validation
+  - `load_table_configs()`: Load JSON configuration files from a directory
+  - `validate_table_metadata()`: Validate configuration schema with allowed keys
 - **`utils.py`**: Common utilities (metadata columns, table paths, Spark config)
-- **`write.py`**: DLT table creation with metadata and expectations
+- **`dlt.py`**: DLT table creation with metadata and data quality expectations
 
 ## Getting started
 

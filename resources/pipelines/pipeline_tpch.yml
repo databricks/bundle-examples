@@ -11,7 +11,7 @@ resources:
 
       libraries:
         - glob:
-            include: ../../src/pipelines/pipeline_tpch/**
+            include: ../../src/pipelines/pipeline_tpch/**/*.py
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

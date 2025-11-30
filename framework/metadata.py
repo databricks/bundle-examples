@@ -16,6 +16,7 @@ REQUIRED_KEYS: Set[str] = {
     "primary_keys"
 }
 
+# Optional keys in table configuration
 OPTIONAL_KEYS: Set[str] = {
     "description",
     "tags",

@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from framework.config import Config
-from framework.utils import add_metadata_columns, get_metadata_path
+from framework.utils import add_metadata_columns
 from framework.metadata import load_table_configs
 from framework.dlt import create_dlt_table
 
@@ -50,11 +50,11 @@ def create_silver_table(table_config: dict):
 
 if __name__ == "__main__":
 
-    # Load table configuration from metadata directory
-       
+    # Determine metadata path dynamically
     pipeline_root = Path(os.getcwd()).parents[1]
     metadata_path = os.path.join(pipeline_root, "metadata", "silver")
 
+    # Load table configuration from metadata directory
     tables_config = load_table_configs(metadata_path)
 
     # Create table for each configuration

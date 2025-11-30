@@ -5,37 +5,6 @@ This module provides common utility functions used across the lakeflow pipelines
 """
 
 from typing import Optional
-from pathlib import Path
-import os
-
-
-def get_metadata_path(pipeline_name: str, layer: str) -> Path:
-    """Get metadata path from Spark config or use relative path for local development.
-    
-    Args:
-        pipeline_name: Name of the pipeline (e.g., 'pipeline_tpch')
-        layer: Data layer (e.g., 'bronze', 'silver', 'gold')
-        
-    Returns:
-        Path to the metadata directory
-    """
-    # Try to get workspace path from Spark config
-    workspace_path = get_spark_config("workspace_path")
-    
-    if workspace_path:
-        base_path = Path(workspace_path)
-    else:
-        # Fallback: try to find project root by looking for pyproject.toml or databricks.yml
-        current = Path(os.getcwd())
-        for parent in [current] + list(current.parents):
-            if (parent / "databricks.yml").exists() or (parent / "pyproject.toml").exists():
-                base_path = parent
-                break
-        else:
-            # Last resort: use current working directory
-            base_path = current
-    
-    return base_path / "pipelines" / pipeline_name / "metadata" / layer
 
 
 def get_catalog_schema(catalog: str, schema: str) -> str:

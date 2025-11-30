@@ -1,11 +1,99 @@
 """
-Utility functions for fact table operations.
+Data Warehouse utility functions for dimension and fact table operations.
+
+This module provides common utility functions used for building star schema
+data warehouses following the Kimball methodology.
 """
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
-from typing import List, Dict, Optional
+from pyspark.sql.types import StringType, TimestampType
+from typing import Dict, Any, List
+
 spark = SparkSession.getActiveSession()
 
+
+# =============================================================================
+# Dimension Table Utilities
+# =============================================================================
+
+def add_dummy_row(df: DataFrame) -> DataFrame:
+    """
+    Adds a dummy row to a dimension table with surrogate key -1 and 'N/A' for text fields.
+    
+    This is useful for handling missing or unknown dimension values in fact tables,
+    following the Kimball methodology for data warehousing.
+    
+    Args:
+        df (DataFrame): The dimension DataFrame to add a dummy row to
+
+    Returns:
+        DataFrame: The dimension DataFrame with a dummy row prepended
+        
+    Example:
+        >>> dim_customer_df = add_dummy_row(dim_customer_df)
+    """
+
+    # Build dummy row data based on column types
+    dummy_data: Dict[str, Any] = {}
+    
+    for field in df.schema.fields:
+        column_name = field.name
+        column_type = field.dataType
+        
+        # All columns ending with _id or _key get -1
+        if column_name.endswith('_id') or column_name.endswith('_key'):
+            dummy_data[column_name] = -1
+        elif isinstance(column_type, (StringType,)):
+            # String fields get 'N/A'
+            dummy_data[column_name] = "N/A"
+        elif isinstance(column_type, TimestampType):
+            # Timestamp fields get epoch time (1970-01-01) as a Python datetime
+            from datetime import datetime
+            dummy_data[column_name] = datetime(1970, 1, 1, 0, 0, 0)
+        else:
+            # Decimal, Integer, and other numeric types get NULL
+            dummy_data[column_name] = None
+    
+    # Create dummy row DataFrame
+    dummy_row_df = spark.createDataFrame([dummy_data], schema=df.schema)
+    
+    # Union dummy row with original DataFrame
+    result_df = dummy_row_df.union(df)
+    
+    return result_df
+
+
+def add_surrogate_id(df: DataFrame, surrogate_id_column: str) -> DataFrame:
+    """
+    Adds a surrogate ID column to a dimension table based on the natural key.
+    
+    The surrogate ID is generated using monotonically_increasing_id() to ensure uniqueness,
+    then adjusted to start from 1 (with -1 reserved for dummy/unknown rows).
+    The surrogate ID column is placed as the first column in the DataFrame.
+    
+    Args:
+        df (DataFrame): The dimension DataFrame
+        surrogate_id_column (str): Name of the surrogate ID column to create (e.g., 'customer_id')
+    
+    Returns:
+        DataFrame: The dimension DataFrame with surrogate ID column added as the first column
+        
+    Example:
+        >>> df = add_surrogate_id(df, "customer_id")
+    """
+    # Add surrogate ID using monotonically_increasing_id
+    result_df = df.withColumn(surrogate_id_column, F.monotonically_increasing_id() + 1)
+    
+    # Reorder columns to put surrogate_id_column first
+    other_columns = [col for col in result_df.columns if col != surrogate_id_column]
+    result_df = result_df.select(surrogate_id_column, *other_columns)
+    
+    return result_df
+
+
+# =============================================================================
+# Fact Table Utilities
+# =============================================================================
 
 def build_dimension_mappings(df: DataFrame) -> Dict[str, Dict[str, str]]:
     """
@@ -16,13 +104,13 @@ def build_dimension_mappings(df: DataFrame) -> Dict[str, Dict[str, str]]:
     - Surrogate key column: <dimension>_id
     
     Args:
-        dimension_names (List[str]): List of dimension names
+        df (DataFrame): The fact DataFrame to extract dimension mappings from
     
     Returns:
         Dict[str, Dict[str, str]]: Mapping configuration for enrich_with_surrogate_keys
         
     Example:
-        >>> mappings = build_dimension_mappings(['customer', 'part', 'supplier'])
+        >>> mappings = build_dimension_mappings(fact_df)
         >>> # Returns: {
         >>> #     'customer': {'natural_key': 'customer_key', 'surrogate_key': 'customer_id'},
         >>> #     'part': {'natural_key': 'part_key', 'surrogate_key': 'part_id'},
@@ -46,7 +134,6 @@ def build_dimension_mappings(df: DataFrame) -> Dict[str, Dict[str, str]]:
         }
     
     return mappings
-
 
 
 def enrich_with_surrogate_keys(

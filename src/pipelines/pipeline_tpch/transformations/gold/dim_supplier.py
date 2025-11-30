@@ -5,7 +5,7 @@ import dlt
 from pyspark.sql import SparkSession
 from framework.config import Config
 from framework.utils import add_metadata_columns
-from framework.dimension_utils import add_dummy_row, add_surrogate_id
+from framework.dw import add_dummy_row, add_surrogate_id
 
 # Configuration
 config = Config.from_spark_config()

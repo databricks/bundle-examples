@@ -1,5 +1,5 @@
 """Test validate_table_metadata with example config files"""
-from framework.utils import validate_table_metadata
+from framework.metadata import validate_table_metadata
 import json
 from pathlib import Path
 

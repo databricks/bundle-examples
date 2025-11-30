@@ -7,8 +7,7 @@ This module contains unit tests for the lakehouse framework package.
 import pytest
 from framework.utils import get_catalog_schema, get_table_path, add_metadata_columns, get_or_create_spark_session
 from framework.config import Config
-from framework.dimension_utils import add_dummy_row, add_surrogate_id
-from framework.fact_utils import build_dimension_mappings, enrich_with_surrogate_keys
+from framework.dw import add_dummy_row, add_surrogate_id, build_dimension_mappings, enrich_with_surrogate_keys
 
 # Try to create Spark session, skip Spark tests if not available
 try:

@@ -13,9 +13,9 @@ resources:
         - glob:
             include: 
               ../../src/pipelines/pipeline_tpch/transformations/**
+              ../../src/pipelines/pipeline_tpch/tests/**
 
       configuration:
-        workspace_path: ${workspace.file_path}
         bronze_catalog: ${var.bronze_catalog}
         bronze_schema: ${resources.schemas.schema_tpch_bronze.name}
         silver_catalog: ${var.silver_catalog}

@@ -1,4 +1,5 @@
-from framework.utils import add_metadata_columns, load_table_configs
+from framework.utils import add_metadata_columns
+from framework.metadata import load_table_configs
 from framework.config import Config
 from framework.write import create_dlt_table
 

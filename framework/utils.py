@@ -5,6 +5,30 @@ This module provides common utility functions used across the lakeflow pipelines
 """
 
 from typing import Optional
+from pathlib import Path
+import os
+
+
+def get_metadata_path(pipeline_name: str, layer: str) -> Path:
+    """Get metadata path from Spark config or use relative path for local development.
+    
+    Args:
+        pipeline_name: Name of the pipeline (e.g., 'pipeline_tpch')
+        layer: Data layer (e.g., 'bronze', 'silver', 'gold')
+        
+    Returns:
+        Path to the metadata directory
+    """
+    try:
+        from pyspark.sql import SparkSession
+        spark = SparkSession.getActiveSession()
+        if spark:
+            workspace_path = spark.conf.get("workspace_path")
+            return Path(workspace_path) / "pipelines" / pipeline_name / "metadata" / layer
+    except Exception:
+        pass
+    # Fallback for local development
+    return Path(os.getcwd()) / "pipelines" / pipeline_name / "metadata" / layer
 
 
 def get_catalog_schema(catalog: str, schema: str) -> str:

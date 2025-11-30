@@ -1,15 +1,11 @@
-from pathlib import Path
 from framework.config import Config
-from framework.utils import add_metadata_columns
+from framework.utils import add_metadata_columns, get_metadata_path
 from framework.metadata import load_table_configs
 from framework.dlt import create_dlt_table
 
 
 # Configuration
 config = Config.from_spark_config()
-
-# Metadata path (relative to project root)
-METADATA_PATH = Path(__file__).resolve().parents[4] / "pipelines" / "pipeline_tpch" / "metadata" / "silver"
 
 def create_silver_table(table_config: dict):
     """
@@ -53,7 +49,7 @@ def create_silver_table(table_config: dict):
 if __name__ == "__main__":
 
     # Load table configuration from metadata directory
-    tables_config = load_table_configs(METADATA_PATH)
+    tables_config = load_table_configs(get_metadata_path("pipeline_tpch", "silver"))
 
     # Create table for each configuration
     for table_config in tables_config:

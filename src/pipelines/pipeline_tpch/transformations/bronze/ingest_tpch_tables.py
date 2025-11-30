@@ -1,3 +1,4 @@
+from pathlib import Path
 from framework.utils import add_metadata_columns
 from framework.metadata import load_table_configs
 from framework.config import Config
@@ -5,6 +6,9 @@ from framework.dlt import create_dlt_table
 
 # Configuration
 config = Config.from_spark_config()
+
+# Metadata path (relative to project root)
+METADATA_PATH = Path(__file__).resolve().parents[4] / "pipelines" / "pipeline_tpch" / "metadata" / "bronze"
 
 # Table definitions
 def create_bronze_table(table_config: dict):
@@ -48,8 +52,8 @@ def create_bronze_table(table_config: dict):
 
 if __name__ == "__main__":
     
-    # Load table configuration from all JSON files in the metadata directory 
-    tables_config = load_table_configs("../metadata/bronze")
+    # Load table configuration from metadata directory
+    tables_config = load_table_configs(METADATA_PATH)
 
     # Create table for each configuration
     for table_config in tables_config:

@@ -19,16 +19,23 @@ def get_metadata_path(pipeline_name: str, layer: str) -> Path:
     Returns:
         Path to the metadata directory
     """
-    try:
-        from pyspark.sql import SparkSession
-        spark = SparkSession.getActiveSession()
-        if spark:
-            workspace_path = spark.conf.get("workspace_path")
-            return Path(workspace_path) / "pipelines" / pipeline_name / "metadata" / layer
-    except Exception:
-        pass
-    # Fallback for local development
-    return Path(os.getcwd()) / "pipelines" / pipeline_name / "metadata" / layer
+    # Try to get workspace path from Spark config
+    workspace_path = get_spark_config("workspace_path")
+    
+    if workspace_path:
+        base_path = Path(workspace_path)
+    else:
+        # Fallback: try to find project root by looking for pyproject.toml or databricks.yml
+        current = Path(os.getcwd())
+        for parent in [current] + list(current.parents):
+            if (parent / "databricks.yml").exists() or (parent / "pyproject.toml").exists():
+                base_path = parent
+                break
+        else:
+            # Last resort: use current working directory
+            base_path = current
+    
+    return base_path / "pipelines" / pipeline_name / "metadata" / layer
 
 
 def get_catalog_schema(catalog: str, schema: str) -> str:

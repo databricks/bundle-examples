@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/table-metadata.schema.json",
+  "title": "Table Metadata Configuration",
+  "description": "Schema for DLT table metadata configuration files",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/tableConfig"
+  },
+  "definitions": {
+    "tableConfig": {
+      "type": "object",
+      "description": "Configuration for a single DLT table",
+      "required": ["source", "destination", "primary_keys"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Source table name or fully qualified path (e.g., 'samples.tpch.customer' for bronze, or 'customer' for silver)"
+        },
+        "destination": {
+          "type": "string",
+          "description": "Destination table name (without catalog/schema prefix)"
+        },
+        "primary_keys": {
+          "type": "array",
+          "description": "List of column names that form the primary key",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the table"
+        },
+        "table_properties": {
+          "type": "object",
+          "description": "Delta table properties to set",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "expectations_warn": {
+          "$ref": "#/definitions/expectations",
+          "description": "Data quality expectations that log warnings but allow all data through"
+        },
+        "expectations_fail_update": {
+          "$ref": "#/definitions/expectations",
+          "description": "Data quality expectations that fail the pipeline update if violated"
+        },
+        "expectations_drop_row": {
+          "$ref": "#/definitions/expectations",
+          "description": "Data quality expectations that drop rows that don't meet the criteria"
+        }
+      }
+    },
+    "expectations": {
+      "type": "object",
+      "description": "Map of expectation name to SQL boolean expression",
+      "additionalProperties": {
+        "type": "string",
+        "description": "SQL boolean expression (e.g., 'column_name IS NOT NULL', 'COUNT(*) > 0')"
+      },
+      "examples": [
+        {
+          "has_rows": "COUNT(*) > 0",
+          "valid_status": "status IN ('active', 'inactive')"
+        }
+      ]
+    }
+  }
+}

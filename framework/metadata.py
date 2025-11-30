@@ -8,6 +8,12 @@ import json
 from pathlib import Path
 from typing import List, Set
 
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
+
 
 # Expected keys in table configuration
 REQUIRED_KEYS: Set[str] = {
@@ -19,7 +25,6 @@ REQUIRED_KEYS: Set[str] = {
 # Optional keys in table configuration
 OPTIONAL_KEYS: Set[str] = {
     "description",
-    "tags",
     "expectations_warn",
     "expectations_fail_update",
     "expectations_drop_row",
@@ -93,25 +98,18 @@ def validate_table_metadata(config: dict, filename: str = "") -> bool:
     if "description" in config and not isinstance(config["description"], str):
         raise ValueError(f"'description'{file_info} must be a string")
     
-    if "tags" in config:
-        if not isinstance(config["tags"], list):
-            raise ValueError(f"'tags'{file_info} must be a list")
-        # Validate tags list contains strings
-        for idx, tag in enumerate(config["tags"]):
-            if not isinstance(tag, str):
-                raise ValueError(f"tags[{idx}]{file_info} must be a string")
-    
     return True
 
 
 def load_table_configs(config_dir: str, validate: bool = True) -> list:
     """
-    Load and merge all JSON configuration files from a directory.
-    Each JSON file should contain either a list of table configuration dictionaries or a single dictionary.
+    Load and merge all YAML or JSON configuration files from a directory.
+    Each file should contain a 'tables' key with a list of table configurations,
+    or a list/single dictionary for backwards compatibility.
     Optionally validates the schema of each configuration entry.
     
     Args:
-        config_dir: Path to the directory containing JSON configuration files
+        config_dir: Path to the directory containing configuration files (.yml, .yaml, or .json)
         validate: If True, validate schema of each config entry (default: True)
         
     Returns:
@@ -130,36 +128,50 @@ def load_table_configs(config_dir: str, validate: bool = True) -> list:
         raise ValueError(f"Path is not a directory: {config_dir}")
     
     all_configs = []
-    json_files = sorted(config_dir.glob("*.json"))
     
-    if not json_files:
-        print(f"Warning: No JSON files found in {config_dir}")
+    # Find all config files (YAML and JSON)
+    yaml_files = sorted(list(config_dir.glob("*.yml")) + list(config_dir.glob("*.yaml")))
+    json_files = sorted(config_dir.glob("*.json"))
+    config_files = yaml_files + json_files
+    
+    if not config_files:
+        print(f"Warning: No configuration files found in {config_dir}")
         return all_configs
     
-    for json_file in json_files:
+    for config_file in config_files:
         try:
-            with open(json_file, "r") as f:
-                file_configs = json.load(f)
+            with open(config_file, "r") as f:
+                if config_file.suffix in [".yml", ".yaml"]:
+                    if not YAML_AVAILABLE:
+                        raise ImportError("PyYAML is required to load YAML files. Install it with: pip install pyyaml")
+                    file_data = yaml.safe_load(f)
+                else:
+                    file_data = json.load(f)
             
+            # Handle YAML structure with 'tables' key
+            if isinstance(file_data, dict) and "tables" in file_data:
+                file_configs = file_data["tables"]
             # Convert single dict to list for uniform processing
-            if isinstance(file_configs, dict):
-                file_configs = [file_configs]
-            elif not isinstance(file_configs, list):
-                raise ValueError(f"File '{json_file.name}' must contain either a dictionary or a list of dictionaries")
+            elif isinstance(file_data, dict):
+                file_configs = [file_data]
+            elif isinstance(file_data, list):
+                file_configs = file_data
+            else:
+                raise ValueError(f"File '{config_file.name}' must contain a 'tables' key, a dictionary, or a list of dictionaries")
             
             # Validate each config entry if requested
             if validate:
                 for idx, config in enumerate(file_configs):
-                    validate_table_metadata(config, f"{json_file.name}[{idx}]")
+                    validate_table_metadata(config, f"{config_file.name}[{idx}]")
             
             # Add all configs from this file
             all_configs.extend(file_configs)
                 
-        except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON in file '{json_file.name}': {str(e)}")
+        except (json.JSONDecodeError, yaml.YAMLError) as e:
+            raise ValueError(f"Invalid format in file '{config_file.name}': {str(e)}")
         except Exception as e:
-            raise RuntimeError(f"Error loading config file '{json_file.name}': {str(e)}")
+            raise RuntimeError(f"Error loading config file '{config_file.name}': {str(e)}")
     
-    print(f"Loaded {len(json_files)} configuration file(s) with {len(all_configs)} table(s)")
+    print(f"Loaded {len(config_files)} configuration file(s) with {len(all_configs)} table(s)")
     
     return all_configs

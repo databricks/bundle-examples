@@ -2,9 +2,10 @@
   {
     "source": "customer",
     "destination": "customer",
-    "primary_keys": ["c_custkey"],
+    "primary_keys": [
+      "c_custkey"
+    ],
     "description": "Cleaned customer dimension table",
-    "tags": ["dimension", "tpch", "cleaned"],
     "expectations_drop_row": {
       "valid_phone": "c_phone IS NOT NULL AND LENGTH(c_phone) > 0",
       "valid_acctbal": "c_acctbal IS NOT NULL"
@@ -19,9 +20,11 @@
   {
     "source": "lineitem",
     "destination": "lineitem",
-    "primary_keys": ["l_orderkey", "l_linenumber"],
+    "primary_keys": [
+      "l_orderkey",
+      "l_linenumber"
+    ],
     "description": "Cleaned line item fact table",
-    "tags": ["fact", "tpch", "cleaned"],
     "expectations_drop_row": {
       "positive_quantity": "l_quantity > 0",
       "positive_extendedprice": "l_extendedprice > 0"
@@ -38,9 +41,10 @@
   {
     "source": "orders",
     "destination": "orders",
-    "primary_keys": ["o_orderkey"],
+    "primary_keys": [
+      "o_orderkey"
+    ],
     "description": "Cleaned orders fact table",
-    "tags": ["fact", "tpch", "cleaned"],
     "expectations_drop_row": {
       "positive_totalprice": "o_totalprice > 0"
     },
@@ -55,9 +59,10 @@
   {
     "source": "nation",
     "destination": "nation",
-    "primary_keys": ["n_nationkey"],
+    "primary_keys": [
+      "n_nationkey"
+    ],
     "description": "Cleaned nation dimension table",
-    "tags": ["dimension", "tpch", "cleaned"],
     "expectations_drop_row": {
       "valid_name": "n_name IS NOT NULL AND LENGTH(n_name) > 0",
       "valid_regionkey": "n_regionkey IS NOT NULL"
@@ -69,9 +74,10 @@
   {
     "source": "part",
     "destination": "part",
-    "primary_keys": ["p_partkey"],
+    "primary_keys": [
+      "p_partkey"
+    ],
     "description": "Cleaned part dimension table",
-    "tags": ["dimension", "tpch", "cleaned"],
     "expectations_drop_row": {
       "valid_name": "p_name IS NOT NULL",
       "positive_size": "p_size > 0"
@@ -86,9 +92,11 @@
   {
     "source": "partsupp",
     "destination": "partsupp",
-    "primary_keys": ["ps_partkey", "ps_suppkey"],
+    "primary_keys": [
+      "ps_partkey",
+      "ps_suppkey"
+    ],
     "description": "Cleaned part supplier associative table",
-    "tags": ["associative", "tpch", "cleaned"],
     "expectations_fail_update": {
       "positive_availqty": "ps_availqty >= 0",
       "positive_supplycost": "ps_supplycost > 0",
@@ -98,9 +106,10 @@
   {
     "source": "region",
     "destination": "region",
-    "primary_keys": ["r_regionkey"],
+    "primary_keys": [
+      "r_regionkey"
+    ],
     "description": "Cleaned region dimension table",
-    "tags": ["dimension", "tpch", "cleaned"],
     "expectations_drop_row": {
       "valid_name": "r_name IS NOT NULL AND LENGTH(r_name) > 0"
     },
@@ -112,9 +121,10 @@
   {
     "source": "supplier",
     "destination": "supplier",
-    "primary_keys": ["s_suppkey"],
+    "primary_keys": [
+      "s_suppkey"
+    ],
     "description": "Cleaned supplier dimension table",
-    "tags": ["dimension", "tpch", "cleaned"],
     "expectations_drop_row": {
       "valid_name": "s_name IS NOT NULL",
       "valid_phone": "s_phone IS NOT NULL AND LENGTH(s_phone) > 0"

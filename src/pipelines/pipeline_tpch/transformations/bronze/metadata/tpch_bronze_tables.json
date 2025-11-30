@@ -2,9 +2,10 @@
   {
     "source": "samples.tpch.customer",
     "destination": "customer",
-    "primary_keys": ["c_custkey"],
+    "primary_keys": [
+      "c_custkey"
+    ],
     "description": "Customer dimension table",
-    "tags": ["dimension", "tpch"],
     "expectations_fail_update": {
       "has_rows": "COUNT(*) > 0"
     }
@@ -12,9 +13,11 @@
   {
     "source": "samples.tpch.lineitem",
     "destination": "lineitem",
-    "primary_keys": ["l_orderkey", "l_linenumber"],
+    "primary_keys": [
+      "l_orderkey",
+      "l_linenumber"
+    ],
     "description": "Line item fact table",
-    "tags": ["fact", "tpch"],
     "expectations_fail_update": {
       "has_rows": "COUNT(*) > 0"
     }
@@ -22,9 +25,10 @@
   {
     "source": "samples.tpch.orders",
     "destination": "orders",
-    "primary_keys": ["o_orderkey"],
+    "primary_keys": [
+      "o_orderkey"
+    ],
     "description": "Orders fact table",
-    "tags": ["fact", "tpch"],
     "expectations_fail_update": {
       "has_rows": "COUNT(*) > 0"
     }
@@ -32,9 +36,10 @@
   {
     "source": "samples.tpch.nation",
     "destination": "nation",
-    "primary_keys": ["n_nationkey"],
+    "primary_keys": [
+      "n_nationkey"
+    ],
     "description": "Nation dimension table",
-    "tags": ["dimension", "tpch"],
     "expectations_fail_update": {
       "has_rows": "COUNT(*) > 0"
     }
@@ -42,9 +47,10 @@
   {
     "source": "samples.tpch.part",
     "destination": "part",
-    "primary_keys": ["p_partkey"],
+    "primary_keys": [
+      "p_partkey"
+    ],
     "description": "Part dimension table",
-    "tags": ["dimension", "tpch"],
     "expectations_fail_update": {
       "has_rows": "COUNT(*) > 0"
     }
@@ -52,9 +58,11 @@
   {
     "source": "samples.tpch.partsupp",
     "destination": "partsupp",
-    "primary_keys": ["ps_partkey", "ps_suppkey"],
+    "primary_keys": [
+      "ps_partkey",
+      "ps_suppkey"
+    ],
     "description": "Part supplier associative table",
-    "tags": ["associative", "tpch"],
     "expectations_fail_update": {
       "has_rows": "COUNT(*) > 0"
     }
@@ -62,9 +70,10 @@
   {
     "source": "samples.tpch.region",
     "destination": "region",
-    "primary_keys": ["r_regionkey"],
+    "primary_keys": [
+      "r_regionkey"
+    ],
     "description": "Region dimension table",
-    "tags": ["dimension", "tpch"],
     "expectations_fail_update": {
       "has_rows": "COUNT(*) > 0"
     }

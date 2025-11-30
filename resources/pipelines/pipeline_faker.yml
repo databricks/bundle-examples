@@ -12,7 +12,7 @@ resources:
       libraries:
         - glob:
             include: 
-              ../../src/pipelines/pipeline_faker/**/*.py
+              ../../src/pipelines/pipeline_faker/transformations/*.py
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

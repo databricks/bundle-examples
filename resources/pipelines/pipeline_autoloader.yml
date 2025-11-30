@@ -11,7 +11,8 @@ resources:
 
       libraries:
         - glob:
-            include: ../../src/pipelines/pipeline_autoloader/**/*.py
+            include: 
+              ../../src/pipelines/pipeline_autoloader/transformations/*.py
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

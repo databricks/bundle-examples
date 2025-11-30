@@ -12,8 +12,7 @@ resources:
       libraries:
         - glob:
             include: 
-              ../../src/pipelines/pipeline_tpch/transformations/*.py
-              ../../src/pipelines/pipeline_tpch/tests/*.py
+              ../../src/pipelines/pipeline_tpch/transformations/**
 
       configuration:
         bronze_catalog: ${var.bronze_catalog}

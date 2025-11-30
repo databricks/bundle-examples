@@ -49,7 +49,7 @@ def create_silver_table(table_config: dict):
 if __name__ == "__main__":
 
     # Load table configuration from all JSON files in the metadata directory
-    tables_config = load_table_configs("./metadata")
+    tables_config = load_table_configs("../metadata/silver")
 
     # Create table for each configuration
     for table_config in tables_config:

@@ -1,0 +1,33 @@
+  # Shared configuration variables
+
+variables:
+
+  monitoring_catalog:
+    description: The catalog where the monitoring tables are to be created
+    default: main
+
+  monitoring_schema:
+    description: The schema where the monitoring tables are to be created
+    default: databricks_ingestion_monitoring
+
+  monitoring_schema_grants:
+    description: Controls who has access to the monitoring schema (see https://docs.databricks.com/aws/en/dev-tools/bundles/resources#grants)
+    type: complex
+    default: []
+
+  warehouse_id:
+    description: >
+        (Optional) The ID of the warehouse to use for dashboards, alerts, etc. If not specified,
+        an attempt will be made to find a suitable one.
+    default: ""
+
+  dab_type:
+    description: >
+        A string that gets incorporated in names of shared resources to distinguish between 
+        usage in different DABs.
+    default: SDP
+    
+  jobs_and_pipelines_permissions:
+    description: The permission assignments (https://docs.databricks.com/aws/en/dev-tools/bundles/reference#permissions) for all jobs and pipelines in this DAB
+    type: complex
+    default: []

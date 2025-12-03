@@ -1,6 +1,0 @@
-resources:
-  schemas:
-    monitoring_schema:
-      name: ${var.monitoring_schema}
-      catalog_name: ${var.monitoring_catalog}
-      comment: A schema used for aggregation of monitoring information for CDC Connector pipelines

@@ -63,7 +63,7 @@ except ValueError as e:
 # Check for default storage (recommended setting)
 logger.info(f"Checking default storage configuration for catalog {catalog_name}")
 try:
-    if not envmanager.has_default_storage(ws, catalog_name):
+    if not envmanager.has_default_storage(catalog_name, ws):
         logger.warning(
             f"Default storage is NOT enabled for catalog '{catalog_name}'. "
             "It is recommended to enable default storage for the catalog to ensure "

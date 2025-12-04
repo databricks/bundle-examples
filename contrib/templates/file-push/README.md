@@ -15,6 +15,6 @@ During initialization, you'll be prompted to configure:
   - Schema evolution settings
   - Optional schema hints
 
-The template supports configuring up to 4 tables during initialization. Additional tables can be added later by editing `./src/configs/tables.json`.
+The template configures a single table during initialization. Additional tables can be added later by editing `./src/configs/tables.json`.
 
 After initialization, follow the generated README.md to deploy and start ingesting data.

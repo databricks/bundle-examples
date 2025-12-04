@@ -25,10 +25,10 @@ Common use case: Monitor data quality, send notifications, or trigger remediatio
 
 3. Initialize this template in your environment
 
-``` 
-databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/sql-alert-trigger
-```
-You will be prompted to provide the following details to tailor the template to your preferences:
+   ``` 
+   databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/sql-alert-trigger
+   ```
+You will be prompted to provide the following details to tailor the template to your preference:
 - Project name
 - SQL warehouse ID
 - SQL alert ID

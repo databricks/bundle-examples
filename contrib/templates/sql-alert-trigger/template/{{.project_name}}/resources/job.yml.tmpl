@@ -8,11 +8,11 @@ resources:
         - task_key: sql_alert_check
           email_notifications: {}
           sql_task:
-            warehouse_id: {{.warehouse_id}}
+            warehouse_id: ${var.warehouse_id}
             alert:
               subscriptions:
                 - user_name: {{user_name}} # dynamically retrieved
-              alert_id: {{.alert_id}}
+              alert_id: ${var.alert_id}
           webhook_notifications: {}
           run_if: ALL_SUCCESS
         

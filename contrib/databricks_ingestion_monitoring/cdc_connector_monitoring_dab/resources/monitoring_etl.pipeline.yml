@@ -1,0 +1,59 @@
+# This pipeline is responsible for the ETL of the data from the monitored sources and 
+# generating the observability tables
+
+resources:
+  pipelines:
+    cdc_connector_monitoring_etl:
+      name: "Monitoring ETL for ${var.dab_type} Pipelines"
+      libraries:
+        - glob:
+            include: ../monitoring_etl/**
+        - glob:
+            include: ../../common/third_party_sinks/**
+      serverless: ${var.serverless_monitoring_pipeline_enabled}
+      catalog: ${var.monitoring_catalog}
+      schema: ${resources.schemas.monitoring_schema.name}
+      root_path: ${workspace.file_path}/cdc_connector_monitoring_dab/monitoring_etl
+      permissions: ${var.jobs_and_pipelines_permissions}
+      event_log:
+        catalog: ${var.monitoring_catalog}
+        schema: ${resources.schemas.monitoring_schema.name}
+        name: cdc_connector_monitoring_etl_event_log
+      configuration:
+        monitoring_catalog: ${var.monitoring_catalog}
+        monitoring_schema: ${resources.schemas.monitoring_schema.name}
+        directly_monitored_pipeline_ids: ${var.directly_monitored_pipeline_ids}
+        directly_monitored_pipeline_tags: ${var.directly_monitored_pipeline_tags}
+        imported_event_log_tables: ${var.imported_event_log_tables}
+        pipeline_tags_index_table_name: ${var.pipeline_tags_index_table_name}
+        pipeline_tags_index_enabled: ${var.pipeline_tags_index_enabled}
+        pipeline_tags_index_max_age_hours: ${var.pipeline_tags_index_max_age_hours}
+        pipeline_tags_index_api_fallback_enabled: ${var.pipeline_tags_index_api_fallback_enabled}
+
+        # Third-party monitoring configuration
+        destination: ${var.third_party_destination}
+        host_name: ${var.third_party_host_name}
+        secrets_scope: ${var.third_party_secrets_scope}
+        endpoints.metrics: ${var.third_party_endpoints_metrics}
+        endpoints.logs: ${var.third_party_endpoints_logs}
+        endpoints.events: ${var.third_party_endpoints_events}
+        num_rows_per_batch: ${var.third_party_batch_size}
+        max_retry_duration_sec: ${var.third_party_max_retry_duration_sec}
+        request_timeout_sec: ${var.third_party_request_timeout_sec}
+
+        # Datadog/New Relic API key (stored in secrets)
+        api_key: ${var.third_party_api_key}
+
+        # Azure Monitor specific configuration
+        azure_client_id: ${var.azure_client_id}
+        azure_client_secret: ${var.azure_client_secret}
+        azure_tenant_id: ${var.azure_tenant_id}
+        azure_dcr_immutable_id: ${var.azure_dcr_immutable_id}
+        azure_authorization_endpoint: ${var.azure_authorization_endpoint}
+        azure_max_access_token_staleness: ${var.azure_max_access_token_staleness}
+
+        # Splunk Observability specific configuration
+        splunk_access_token: ${var.splunk_access_token}
+
+        # New Relic specific configuration
+        account_id: ${var.third_party_account_id}

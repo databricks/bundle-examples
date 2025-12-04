@@ -1,0 +1,15 @@
+# Configuration variables for the `post_deploy` job
+
+variables:
+  main_dashboard_name:
+    description: >
+        (Optional) The name of the monitoring dashboard. Override this when using multiple deployment targets to avoid name conflicts.
+        If not set, the name of the dashboard template will be used.
+    default: Example Spark Declarative Pipelines Dashboard
+  main_dashboard_id:
+    description: >
+        (Optional) The dashboard id to publish the main dashboard to. If not specified, the name of the dashboards will be used to 
+        find an existing dashboard with that name. If none is found, a new one will be created.
+    default: ""
+  main_dashboard_template_path:
+    description: (Required) The path to the main dashboard template.

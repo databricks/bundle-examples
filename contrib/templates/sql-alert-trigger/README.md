@@ -4,9 +4,9 @@ The 'sql-alert-trigger' project contains a databricks job and a Python notebook 
 
 ![Worklow UI example](images/sql-alert-workflow.png)
 
-### Databricks Asset Bundle Template: Alert-Triggered Workflow
+### Databricks Asset Bundle Template: Alert-Triggered Job
  
- This template creates a workflow that:
+ This template creates a job that:
  1. Runs a SQL alert query
  2. Checks if the alert was triggered
  3. Executes a notebook if the condition is met

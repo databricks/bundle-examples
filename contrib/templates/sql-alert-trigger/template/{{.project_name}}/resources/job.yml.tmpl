@@ -1,0 +1,43 @@
+
+resources:
+  jobs:
+    alert_workflow_job:
+      name: Alert-Workflow
+      tasks:
+        # Task 1: SQL Alert Query
+        - task_key: sql_alert_check
+          email_notifications: {}
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            alert:
+              subscriptions:
+                - user_name: {{user_name}} # dynamically retrieved
+              alert_id: ${var.alert_id}
+          webhook_notifications: {}
+          run_if: ALL_SUCCESS
+        
+        # Task 2: Conditional Check
+        - task_key: condition
+          depends_on:
+            - task_key: sql_alert_check
+          webhook_notifications: {}
+          condition_task:
+            left:  '{{ "{{" }}tasks.`sql_alert_check`.output.alert_state{{ "}}" }}'
+            op: EQUAL_TO
+            right: TRIGGERED
+          run_if: ALL_SUCCESS
+        
+        # Task 3: Action Notebook
+        - task_key: trigger-action-notebook
+          depends_on:
+            - outcome: "true"
+              task_key: condition
+          notebook_task:
+            notebook_path: "../src/create_jira_issue.ipynb"
+            source: WORKSPACE
+          webhook_notifications: {}
+          run_if: ALL_SUCCESS
+      
+      queue:
+        enabled: true
+      webhook_notifications: {}

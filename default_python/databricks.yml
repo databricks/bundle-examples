@@ -4,14 +4,21 @@ bundle:
   name: default_python
   uuid: 87d5a23e-7bc7-4f52-98ee-e374b67d5681
 
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
 artifacts:
   python_artifact:
     type: whl
     build: uv build --wheel
 
-include:
-  - resources/*.yml
-  - resources/*/*.yml
+# Variable declarations. These variables are assigned in the dev/prod targets below.
+variables:
+  catalog:
+    description: The catalog to use
+  schema:
+    description: The schema to use
 
 targets:
   dev:
@@ -23,13 +30,18 @@ targets:
     default: true
     workspace:
       host: https://company.databricks.com
-
+    variables:
+      catalog: catalog
+      schema: ${workspace.current_user.short_name}
   prod:
     mode: production
     workspace:
       host: https://company.databricks.com
       # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
       root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: catalog
+      schema: prod
     permissions:
       - user_name: user@company.com
         level: CAN_MANAGE

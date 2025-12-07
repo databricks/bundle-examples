@@ -1,17 +1,17 @@
-# The main pipeline for lakeflow_pipelines_sql
+# The main pipeline for lakeflow_pipelines_python
 
 resources:
   pipelines:
-    pipelines_sql_etl:
-      name: pipelines_sql_etl
+    lakeflow_pipelines_python_etl:
+      name: lakeflow_pipelines_python_etl
       catalog: ${var.catalog}
       schema: ${var.schema}
       serverless: true
-      root_path: "../src/pipelines_sql_etl"
+      root_path: "../src/lakeflow_pipelines_python_etl"
 
       libraries:
         - glob:
-            include: ../src/pipelines_sql_etl/transformations/**
+            include: ../src/lakeflow_pipelines_python_etl/transformations/**
 
       environment:
         dependencies:

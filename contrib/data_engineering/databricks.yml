@@ -29,6 +29,7 @@ targets:
       catalog: catalog
       schema: ${workspace.current_user.short_name}
       notifications: []
+      
   prod:
     mode: production
     workspace:

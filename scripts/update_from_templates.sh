@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 set -euo pipefail
@@ -19,22 +20,19 @@ function init_bundle() {
     local TEMPLATE_NAME="$1"
     local BUNDLE_UUID="${2:-}"
     local CONFIG_JSON="$3"
-    
+
     # Extract project_name from JSON
     local PROJECT_NAME=$(echo "$CONFIG_JSON" | grep -o '"project_name"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
-    
-    # Use 'cli' if available, otherwise fall back to 'databricks'
-    local CLI_CMD="databricks"
-    if command -v cli >/dev/null 2>&1; then
-        CLI_CMD="cli"
-    fi
-    
+
+    # Use CLI_COMMAND if set, otherwise default to 'databricks'
+    local CLI_COMMAND="${CLI_COMMAND:-databricks}"
+
     echo
     echo "# $PROJECT_NAME"
-    
+
     rm -rf "$PROJECT_NAME"
     echo "$CONFIG_JSON" > /tmp/config.json
-    $CLI_CMD bundle init "$TEMPLATE_NAME" --config-file /tmp/config.json
+    $CLI_COMMAND bundle init "$TEMPLATE_NAME" --config-file /tmp/config.json
     cleanup "$PROJECT_NAME" "$BUNDLE_UUID"
 }
 
@@ -63,12 +61,20 @@ fi
 
 cd $(dirname $0)/..
 
+# Use the 'databricks' CLI by default
+# To use a custom CLI, set: export CLI_COMMAND=/path/to/cli
+echo "Using Databricks CLI: ${CLI_COMMAND:-databricks}"
+${CLI_COMMAND:-databricks} --version
+echo
+
 init_bundle "default-python" "87d5a23e-7bc7-4f52-98ee-e374b67d5681" '{
     "project_name":     "default_python",
-    "include_notebook": "yes",
-    "include_dlt":      "yes",
+    "include_job":      "yes",
+    "include_pipeline": "yes",
     "include_python":   "yes",
-    "serverless":       "yes"
+    "serverless":       "yes",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes"
 }'
 
 init_bundle "default-sql" "853cd9bc-631c-4d4f-bca0-3195c7540854" '{
@@ -81,6 +87,7 @@ init_bundle "default-sql" "853cd9bc-631c-4d4f-bca0-3195c7540854" '{
 init_bundle "dbt-sql" "5e5ca8d5-0388-473e-84a1-1414ed89c5df" '{
     "project_name":     "dbt_sql",
     "http_path":        "/sql/1.0/warehouses/abcdef1234567890",
+    "serverless":       "yes",
     "default_catalog":  "catalog",
     "personal_schemas": "yes, use a schema based on the current user name during development"
 }'
@@ -100,12 +107,23 @@ init_bundle "lakeflow-pipelines" "87a174ba-60e4-4867-a140-1936bc9b00de" '{
     "language":         "python"
 }'
 
-cd contrib
-(
-    init_bundle "templates/data-engineering" "e5f6g7h8-i9j0-1234-efgh-567890123456" '{
-        "project_name":     "data_engineering",
-        "default_catalog":  "catalog",
-        "personal_schemas": "yes, use a schema based on the current user name during development"
-    }'
-)
-cd ..
+init_bundle "default-minimal" "8127e9c1-adac-4c9c-b006-d3450874f663" '{
+    "project_name":     "default_minimal",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes",
+    "language_choice":  "sql"
+}'
+
+# Add .gitkeep files to empty directories in default_minimal
+echo > default_minimal/src/.gitkeep
+echo > default_minimal/resources/.gitkeep
+
+init_bundle "pydabs" "4062028b-2184-4acd-9c62-f2ec572f7843" '{
+    "project_name":     "pydabs",
+    "include_job":      "yes",
+    "include_pipeline": "yes",
+    "include_python":   "yes",
+    "serverless":       "yes",
+    "default_catalog":  "catalog",
+    "personal_schemas": "yes"
+}'

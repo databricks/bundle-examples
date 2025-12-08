@@ -1,23 +1,12 @@
-# This is a Databricks asset bundle definition for pydabs.
+# This is a Databricks asset bundle definition for default_minimal.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: pydabs
-  uuid: 4062028b-2184-4acd-9c62-f2ec572f7843
-
-python:
-  venv_path: .venv
-  # Functions called to load resources defined in Python. See resources/__init__.py
-  resources:
-    - "resources:load_resources"
+  name: default_minimal
+  uuid: 8127e9c1-adac-4c9c-b006-d3450874f663
 
 include:
   - resources/*.yml
   - resources/*/*.yml
-
-artifacts:
-  python_artifact:
-    type: whl
-    build: uv build --wheel
 
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:

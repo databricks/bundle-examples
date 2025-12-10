@@ -24,9 +24,9 @@ resources:
       tasks:
         - task_key: refresh_pipeline
           pipeline_task:
-            pipeline_id: ${resources.pipelines.pipelines_python_etl.id}
+            pipeline_id: ${resources.pipelines.lakeflow_pipelines_python_etl.id}
 
       environments:
         - environment_key: default
           spec:
-            environment_version: "2"
+            environment_version: "4"

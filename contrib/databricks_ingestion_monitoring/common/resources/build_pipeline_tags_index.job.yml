@@ -18,7 +18,7 @@ resources:
       tasks:
         - task_key: build_index
           notebook_task:
-            notebook_path: ../jobs/build_pipeline_tags_index.ipynb
+            notebook_path: ../src/build_pipeline_tags_index.ipynb
             base_parameters:
               monitoring_catalog: ${var.monitoring_catalog}
               monitoring_schema: ${resources.schemas.monitoring_schema.name}

@@ -4,23 +4,22 @@
 resources:
   pipelines:
     cdc_connector_monitoring_etl:
-      name: "Monitoring ETL for SDP Pipelines"
+      name: "Monitoring ETL for ${var.dab_type}"
       libraries:
         - glob:
             include: ../monitoring_etl/**
         - glob:
             include: ../../common/third_party_sinks/**
       serverless: ${var.serverless_monitoring_pipeline_enabled}
-      #photon: true
-      #channel: PREVIEW
-      development: true
       catalog: ${var.monitoring_catalog}
       schema: ${resources.schemas.monitoring_schema.name}
       root_path: ${workspace.file_path}/generic_sdp_monitoring_dab/monitoring_etl
+      permissions: ${var.jobs_and_pipelines_permissions}
       event_log:
         catalog: ${var.monitoring_catalog}
         schema: ${resources.schemas.monitoring_schema.name}
         name: generic_sdp_monitoring_etl_event_log
+      tags: ${var.monitoring_etl_pipeline_tags}
       configuration:
         monitoring_catalog: ${var.monitoring_catalog}
         monitoring_schema: ${resources.schemas.monitoring_schema.name}

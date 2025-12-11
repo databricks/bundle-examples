@@ -1,6 +1,34 @@
 {
   "datasets": [
     {
+      "name": "5e3eb18f",
+      "displayName": "Event Times",
+      "queryLines": [
+        "SELECT event_timestamp\n",
+        "FROM event_logs_bronze\n",
+        "WHERE (:pipeline_id = 'All' OR pipeline_id = :pipeline_id)\n"
+      ],
+      "parameters": [
+        {
+          "displayName": "pipeline_id",
+          "keyword": "pipeline_id",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "catalog": "main",
+      "schema": "databricks_ingestion_monitoring"
+    },
+    {
       "name": "82c4e3b5",
       "displayName": "Pipelines Runs Errors",
       "queryLines": [
@@ -132,31 +160,120 @@
       "schema": "databricks_ingestion_monitoring"
     },
     {
-      "name": "2660d018",
-      "displayName": "Table Changes",
+      "name": "a189e440",
+      "displayName": "Pipelines Metrics Freshness Summary",
       "queryLines": [
-        "SELECT pipeline_name as `Pipeline Name`,\n",
-        "       pipeline_link as `Pipeline Link`,\n",
-        "       pipeline_run_id as `Pipeline Run Id`,\n",
-        "       ee.pipeline_run_link as `Pipeline Run`,\n",
-        "       table_name as `Target Table`,\n",
-        "       event_timestamp as `Event Time`,\n",
-        "       ifnull(num_output_rows, 0) as `Appended Rows`,\n",
-        "       ifnull(num_upserted_rows, 0) as `Upserted Rows`,\n",
-        "       ifnull(num_deleted_rows, 0) as `Deleted Rows`,\n",
-        "       ifnull(num_output_bytes, 0) as `Appended Bytes`,\n",
-        "       ifnull(num_written_rows, 0) as `Total Changes`\n",
-        "FROM events_table_metrics AS ee\n",
-        "     LEFT JOIN monitored_pipelines USING (pipeline_id)\n",
-        "WHERE  \n",
-        "    (:pipeline_id = 'All' or pipeline_id = :pipeline_id)\n",
-        "    AND (event_timestamp >= :event_range.min AND event_timestamp <= :event_range.max)\n",
-        "    AND (:table_name = 'All' OR table_name = :table_name)\n",
-        "    AND table_name is NOT NULL\n",
-        "    AND (num_written_rows IS NOT NULL)\n",
-        "     AND ((:pipeline_tag_value = '<All>')\n",
-        "          OR (:pipeline_tag_value = '<None>' and (tags_array IS NULL or array_size(tags_array) = 0))\n",
-        "          OR (array_contains(tags_array, :pipeline_tag_value)))\n"
+        "SELECT current_timestamp() as `Observability data check time`,\n",
+        "       min_latest_event_timestamp as `Oldest observability data freshness`,\n",
+        "       max_latest_event_timestamp as `Latest observability data freshness`,\n",
+        "       timestampdiff(MINUTE, min_latest_event_timestamp, current_timestamp()) as `Largest latency (minutes)`,\n",
+        "       timestampdiff(MINUTE, max_latest_event_timestamp, current_timestamp()) as `Smallest latency (minutes)`\n",
+        "FROM (SELECT min(latest_event_timestamp) as min_latest_event_timestamp,\n",
+        "             max(latest_event_timestamp) as max_latest_event_timestamp\n",
+        "      FROM (SELECT pipeline_id,\n",
+        "                   pipeline_link,\n",
+        "                   max(event_timestamp) AS latest_event_timestamp\n",
+        "            FROM event_logs_bronze LEFT JOIN monitored_pipelines USING (pipeline_id)\n",
+        "            WHERE (:pipeline_id = 'All' OR pipeline_id = :pipeline_id)\n",
+        "                  AND ((:pipeline_tag_value = '<All>')\n",
+        "                       OR (:pipeline_tag_value = '<None>' and (tags_array IS NULL or array_size(tags_array) = 0))\n",
+        "                       OR (array_contains(tags_array, :pipeline_tag_value)))\n",
+        "            GROUP BY 1,2\n",
+        "            )\n",
+        "       )\n"
+      ],
+      "parameters": [
+        {
+          "displayName": "pipeline_id",
+          "keyword": "pipeline_id",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "pipeline_tag_value",
+          "keyword": "pipeline_tag_value",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "<All>"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "catalog": "main",
+      "schema": "databricks_ingestion_monitoring"
+    },
+    {
+      "name": "6740610b",
+      "displayName": "Pipeline Ids",
+      "queryLines": [
+        "SELECT pipeline_id\n",
+        "FROM monitored_pipelines\n",
+        "WHERE (:tag_value = '<All>')\n",
+        "      OR (:tag_value = '<None>' and (tags_array IS NULL or array_size(tags_array) = 0))\n",
+        "      OR (array_contains(tags_array, :tag_value))"
+      ],
+      "parameters": [
+        {
+          "displayName": "tag_value",
+          "keyword": "tag_value",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "<All>"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "catalog": "main",
+      "schema": "databricks_ingestion_monitoring"
+    },
+    {
+      "name": "19d796af",
+      "displayName": "Pipelines Runs Status",
+      "queryLines": [
+        "SELECT pipeline_link as `Pipeline`,\n",
+        "       pipeline_name as `Pipeline Name`,\n",
+        "       pipeline_run_link as `Pipeline run`,\n",
+        "       create_time as `Create time`,\n",
+        "       end_time as `End time`,\n",
+        "       latest_state as `Status String`,\n",
+        "       latest_state_with_color as `Status`,\n",
+        "       ifnull(latest_error_log_message, '') as `Latest error log message`,\n",
+        "       ifnull(latest_error_message,'') as `Latest error message`,\n",
+        "       ifnull(latest_error_code,'<NONE>') as `Latest error code`,\n",
+        "       latest_error_full as `Latest full error`,\n",
+        "       timestampdiff(second, create_time, ifnull(end_time, current_timestamp())) AS `Total seconds`,\n",
+        "       timestampdiff(second, create_time, initialization_start_time) AS `Starting seconds`,\n",
+        "       timestampdiff(second, initialization_start_time, running_start_time) AS `Initialization seconds`,\n",
+        "       timestampdiff(second, running_start_time, ifnull(end_time, current_timestamp())) AS `Running seconds`\n",
+        "FROM pipeline_runs_status LEFT JOIN monitored_pipelines USING (pipeline_id)\n",
+        "WHERE (:pipeline_id = 'All' OR pipeline_id = :pipeline_id)\n",
+        "      AND ((create_time >= :event_range.min AND create_time <= :event_range.max )\n",
+        "           OR (end_time >= :event_range.min AND end_time <= :event_range.max))\n",
+        "      AND ((:pipeline_tag_value = '<All>')\n",
+        "           OR (:pipeline_tag_value = '<None>' and (tags_array IS NULL or array_size(tags_array) = 0))\n",
+        "           OR (array_contains(tags_array, :pipeline_tag_value)))\n",
+        "ORDER BY create_time DESC"
       ],
       "parameters": [
         {
@@ -192,21 +309,6 @@
           }
         },
         {
-          "displayName": "table_name",
-          "keyword": "table_name",
-          "dataType": "STRING",
-          "defaultSelection": {
-            "values": {
-              "dataType": "STRING",
-              "values": [
-                {
-                  "value": "All"
-                }
-              ]
-            }
-          }
-        },
-        {
           "displayName": "pipeline_tag_value",
           "keyword": "pipeline_tag_value",
           "dataType": "STRING",
@@ -234,36 +336,6 @@
         "SELECT DISTINCT tag_value\n",
         "FROM (SELECT explode(tags_array) as tag_value\n",
         "      FROM monitored_pipelines)"
-      ],
-      "catalog": "main",
-      "schema": "databricks_ingestion_monitoring"
-    },
-    {
-      "name": "6740610b",
-      "displayName": "Pipeline Ids",
-      "queryLines": [
-        "SELECT pipeline_id\n",
-        "FROM monitored_pipelines\n",
-        "WHERE (:tag_value = '<All>')\n",
-        "      OR (:tag_value = '<None>' and (tags_array IS NULL or array_size(tags_array) = 0))\n",
-        "      OR (array_contains(tags_array, :tag_value))"
-      ],
-      "parameters": [
-        {
-          "displayName": "tag_value",
-          "keyword": "tag_value",
-          "dataType": "STRING",
-          "defaultSelection": {
-            "values": {
-              "dataType": "STRING",
-              "values": [
-                {
-                  "value": "<All>"
-                }
-              ]
-            }
-          }
-        }
       ],
       "catalog": "main",
       "schema": "databricks_ingestion_monitoring"
@@ -430,12 +502,31 @@
       "schema": "databricks_ingestion_monitoring"
     },
     {
-      "name": "5e3eb18f",
-      "displayName": "Event Times",
+      "name": "2660d018",
+      "displayName": "Table Changes",
       "queryLines": [
-        "SELECT event_timestamp\n",
-        "FROM event_logs_bronze\n",
-        "WHERE (:pipeline_id = 'All' OR pipeline_id = :pipeline_id)\n"
+        "SELECT pipeline_name as `Pipeline Name`,\n",
+        "       pipeline_link as `Pipeline Link`,\n",
+        "       pipeline_run_id as `Pipeline Run Id`,\n",
+        "       ee.pipeline_run_link as `Pipeline Run`,\n",
+        "       table_name as `Target Table`,\n",
+        "       event_timestamp as `Event Time`,\n",
+        "       ifnull(num_output_rows, 0) as `Appended Rows`,\n",
+        "       ifnull(num_upserted_rows, 0) as `Upserted Rows`,\n",
+        "       ifnull(num_deleted_rows, 0) as `Deleted Rows`,\n",
+        "       ifnull(num_output_bytes, 0) as `Appended Bytes`,\n",
+        "       ifnull(num_written_rows, 0) as `Total Changes`\n",
+        "FROM events_table_metrics AS ee\n",
+        "     LEFT JOIN monitored_pipelines USING (pipeline_id)\n",
+        "WHERE  \n",
+        "    (:pipeline_id = 'All' or pipeline_id = :pipeline_id)\n",
+        "    AND (event_timestamp >= :event_range.min AND event_timestamp <= :event_range.max)\n",
+        "    AND (:table_name = 'All' OR table_name = :table_name)\n",
+        "    AND table_name is NOT NULL\n",
+        "    AND (num_written_rows IS NOT NULL)\n",
+        "     AND ((:pipeline_tag_value = '<All>')\n",
+        "          OR (:pipeline_tag_value = '<None>' and (tags_array IS NULL or array_size(tags_array) = 0))\n",
+        "          OR (array_contains(tags_array, :pipeline_tag_value)))\n"
       ],
       "parameters": [
         {
@@ -448,6 +539,53 @@
               "values": [
                 {
                   "value": "All"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "event_range",
+          "keyword": "event_range",
+          "dataType": "DATETIME",
+          "complexType": "RANGE",
+          "defaultSelection": {
+            "range": {
+              "dataType": "DATETIME",
+              "min": {
+                "value": "now-7d/d"
+              },
+              "max": {
+                "value": "now/d"
+              }
+            }
+          }
+        },
+        {
+          "displayName": "table_name",
+          "keyword": "table_name",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "pipeline_tag_value",
+          "keyword": "pipeline_tag_value",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "<All>"
                 }
               ]
             }
@@ -466,6 +604,7 @@
         "       table_name as `Target Table`,\n",
         "       latest_pipeline_run_link as `Latest Run`,\n",
         "       latest_state_with_color as `Latest State`,\n",
+        "       latest_state as `Latest State String`,\n",
         "       latest_table_schema as `Latest Schema`,\n",
         "       current_timestamp() as `Last Data Refresh Time`,\n",
         "       latest_changes_time as `Latest Changes Time`,\n",
@@ -867,86 +1006,6 @@
                   "value": "All"
                 }
               ]
-            }
-          }
-        },
-        {
-          "displayName": "pipeline_tag_value",
-          "keyword": "pipeline_tag_value",
-          "dataType": "STRING",
-          "defaultSelection": {
-            "values": {
-              "dataType": "STRING",
-              "values": [
-                {
-                  "value": "<All>"
-                }
-              ]
-            }
-          }
-        }
-      ],
-      "catalog": "main",
-      "schema": "databricks_ingestion_monitoring"
-    },
-    {
-      "name": "19d796af",
-      "displayName": "Pipelines Runs Status",
-      "queryLines": [
-        "SELECT pipeline_link as `Pipeline`,\n",
-        "       pipeline_name as `Pipeline Name`,\n",
-        "       pipeline_run_link as `Pipeline run`,\n",
-        "       create_time as `Create time`,\n",
-        "       end_time as `End time`,\n",
-        "       latest_state as `Status String`,\n",
-        "       latest_state_with_color as `Status`,\n",
-        "       ifnull(latest_error_log_message, '') as `Latest error log message`,\n",
-        "       ifnull(latest_error_message,'') as `Latest error message`,\n",
-        "       ifnull(latest_error_code,'<NONE>') as `Latest error code`,\n",
-        "       latest_error_full as `Latest full error`,\n",
-        "       timestampdiff(second, create_time, ifnull(end_time, current_timestamp())) AS `Total seconds`,\n",
-        "       timestampdiff(second, create_time, initialization_start_time) AS `Starting seconds`,\n",
-        "       timestampdiff(second, initialization_start_time, running_start_time) AS `Initialization seconds`,\n",
-        "       timestampdiff(second, running_start_time, ifnull(end_time, current_timestamp())) AS `Running seconds`\n",
-        "FROM pipeline_runs_status LEFT JOIN monitored_pipelines USING (pipeline_id)\n",
-        "WHERE (:pipeline_id = 'All' OR pipeline_id = :pipeline_id)\n",
-        "      AND ((create_time >= :event_range.min AND create_time <= :event_range.max )\n",
-        "           OR (end_time >= :event_range.min AND end_time <= :event_range.max))\n",
-        "      AND ((:pipeline_tag_value = '<All>')\n",
-        "           OR (:pipeline_tag_value = '<None>' and (tags_array IS NULL or array_size(tags_array) = 0))\n",
-        "           OR (array_contains(tags_array, :pipeline_tag_value)))\n",
-        "ORDER BY create_time DESC"
-      ],
-      "parameters": [
-        {
-          "displayName": "pipeline_id",
-          "keyword": "pipeline_id",
-          "dataType": "STRING",
-          "defaultSelection": {
-            "values": {
-              "dataType": "STRING",
-              "values": [
-                {
-                  "value": "All"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "displayName": "event_range",
-          "keyword": "event_range",
-          "dataType": "DATETIME",
-          "complexType": "RANGE",
-          "defaultSelection": {
-            "range": {
-              "dataType": "DATETIME",
-              "min": {
-                "value": "now-7d/d"
-              },
-              "max": {
-                "value": "now/d"
-              }
             }
           }
         },
@@ -1681,7 +1740,7 @@
           },
           "position": {
             "x": 0,
-            "y": 2,
+            "y": 6,
             "width": 6,
             "height": 5
           }
@@ -1784,7 +1843,7 @@
           },
           "position": {
             "x": 0,
-            "y": 7,
+            "y": 11,
             "width": 6,
             "height": 6
           }
@@ -1800,7 +1859,7 @@
           },
           "position": {
             "x": 0,
-            "y": 0,
+            "y": 4,
             "width": 6,
             "height": 2
           }
@@ -2287,9 +2346,259 @@
           },
           "position": {
             "x": 0,
-            "y": 13,
+            "y": 17,
             "width": 6,
             "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "observability-data-updated",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a189e440",
+                  "fields": [
+                    {
+                      "name": "minutely(Observability data check time)",
+                      "expression": "DATE_TRUNC(\"MINUTE\", `Observability data check time`)"
+                    }
+                  ],
+                  "disaggregated": true,
+                  "orders": [
+                    {
+                      "direction": "DESC",
+                      "expression": "DATE_TRUNC(\"MINUTE\", `Observability data check time`)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "period": {
+                  "fieldName": "minutely(Observability data check time)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Observability Data Last Updated At"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "oldest-observability-data-latency-minutes",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a189e440",
+                  "fields": [
+                    {
+                      "name": "Largest latency (minutes)",
+                      "expression": "`Largest latency (minutes)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Largest latency (minutes)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Oldest Observability Data Latency (in minutes)",
+                "showDescription": true,
+                "description": "See \"Observability Data Freshness\" in \"Pipelines Health\" tab for more info"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "newest-observability-data-latency-minutes",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a189e440",
+                  "fields": [
+                    {
+                      "name": "Smallest latency (minutes)",
+                      "expression": "`Smallest latency (minutes)`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "Smallest latency (minutes)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Newest Observability Data Latency (in minutes)",
+                "showDescription": true,
+                "description": "See \"Observability Data Freshness\" in \"Pipelines Health\" tab for more info"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "selected-pipelines",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "0ac0bb93",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(*)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Number of Selected Pipelines",
+                "showDescription": true,
+                "description": "See \"Selected Pipelines\" below"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "number-selected-tables",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "b18ee129",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(*)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Number of Selected Tables",
+                "description": "See \"Selected Tables\" below"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "number-selected-pipeline-runs",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "19d796af",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(*)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Number of Selected Pipeline Runs",
+                "description": "See \"Selected Pipeline Runs\" below"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 2,
+            "height": 2
           }
         }
       ],
@@ -2459,7 +2768,7 @@
           },
           "position": {
             "x": 0,
-            "y": 18,
+            "y": 24,
             "width": 6,
             "height": 6
           }
@@ -2814,14 +3123,14 @@
               "frame": {
                 "showTitle": true,
                 "showDescription": true,
-                "title": "Pipelines Errors",
+                "title": "Errors in Pipelines ",
                 "description": "Detected errors in the pipeline runs"
               }
             }
           },
           "position": {
             "x": 0,
-            "y": 6,
+            "y": 12,
             "width": 6,
             "height": 6
           }
@@ -3056,14 +3365,14 @@
               "frame": {
                 "showTitle": true,
                 "showDescription": true,
-                "title": "Pipelines Warnings",
+                "title": "Warnings in Pipelines",
                 "description": "Detected warnings in the pipeline runs"
               }
             }
           },
           "position": {
             "x": 0,
-            "y": 12,
+            "y": 18,
             "width": 6,
             "height": 6
           }
@@ -3520,9 +3829,179 @@
           },
           "position": {
             "x": 0,
-            "y": 0,
+            "y": 6,
             "width": 6,
             "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "pipeline-status-breakdown",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "62d03d54",
+                  "fields": [
+                    {
+                      "name": "count(Latest Status String)",
+                      "expression": "COUNT(`Latest Status String`)"
+                    },
+                    {
+                      "name": "Latest Status String",
+                      "expression": "`Latest Status String`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "count(Latest Status String)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Latest Status String",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Pipeline Status Breakdown",
+                "description": "See \"Latest Runs by Pipeline\" below"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "number-of-errors-in-pipelines",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "82c4e3b5",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(*)",
+                  "style": {
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "0"
+                          },
+                          "operator": ">"
+                        },
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 4
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Number of Errors in Pipelines",
+                "description": "See \"Errors in Pipelines\" below"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "number-of-warnings-in-pipelines",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c0688ffc",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(*)",
+                  "style": {
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "0"
+                          },
+                          "operator": ">"
+                        },
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 2
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Number of Warnings in Pipelines",
+                "description": "See \"Warnings in Pipelines\" below"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 3,
+            "width": 2,
+            "height": 3
           }
         }
       ],
@@ -4604,7 +5083,7 @@
           },
           "position": {
             "x": 0,
-            "y": 0,
+            "y": 6,
             "width": 6,
             "height": 10
           }
@@ -5071,7 +5550,7 @@
           },
           "position": {
             "x": 0,
-            "y": 40,
+            "y": 46,
             "width": 6,
             "height": 9
           }
@@ -5433,7 +5912,7 @@
           },
           "position": {
             "x": 0,
-            "y": 10,
+            "y": 16,
             "width": 6,
             "height": 6
           }
@@ -5705,7 +6184,7 @@
           },
           "position": {
             "x": 0,
-            "y": 34,
+            "y": 40,
             "width": 6,
             "height": 6
           }
@@ -5782,7 +6261,7 @@
           },
           "position": {
             "x": 0,
-            "y": 16,
+            "y": 22,
             "width": 6,
             "height": 6
           }
@@ -5845,7 +6324,7 @@
           },
           "position": {
             "x": 0,
-            "y": 22,
+            "y": 28,
             "width": 6,
             "height": 6
           }
@@ -5908,9 +6387,179 @@
           },
           "position": {
             "x": 0,
-            "y": 28,
+            "y": 34,
             "width": 6,
             "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "table-statuses-breakdown",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "248b74c6",
+                  "fields": [
+                    {
+                      "name": "count(Latest State String)",
+                      "expression": "COUNT(`Latest State String`)"
+                    },
+                    {
+                      "name": "Latest State String",
+                      "expression": "`Latest State String`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "count(Latest State String)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Latest State String",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Table Statuses Breakdown",
+                "description": "See \"Table Status\" below"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "table-errors",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3b8b7d86",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(*)",
+                  "style": {
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "0"
+                          },
+                          "operator": ">"
+                        },
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 4
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Number of Table Errors",
+                "description": "See \"Table Errors\" below"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "number-table-warnings",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "8897fc81",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(*)",
+                  "style": {
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "0"
+                          },
+                          "operator": ">"
+                        },
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 2
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "Number of Table Warnings",
+                "description": "See \"Table Warnings\" below"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 3,
+            "width": 1,
+            "height": 3
           }
         }
       ],
@@ -5925,7 +6574,7 @@
             "name": "5315d004",
             "queries": [
               {
-                "name": "dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c4fbf8dbce3c80c3104_pipeline_id",
+                "name": "dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b32acc049781d0cf011_pipeline_id",
                 "query": {
                   "datasetName": "6740610b",
                   "fields": [
@@ -5942,7 +6591,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c8abd83949a26602d02_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b74b28865962df14f44_pipeline_id",
                 "query": {
                   "datasetName": "0ac0bb93",
                   "parameters": [
@@ -5955,7 +6604,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cac982b741d5b37f100_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b9aa9c13d1f77991e37_pipeline_id",
                 "query": {
                   "datasetName": "8db826d7",
                   "parameters": [
@@ -5968,7 +6617,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cb78329052ef490c91c_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461ba4b22cc5d22af91321_pipeline_id",
                 "query": {
                   "datasetName": "b18ee129",
                   "parameters": [
@@ -5981,7 +6630,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c728a1aa93a52ea3ee5_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b54b96f2b00fb18b522_pipeline_id",
                 "query": {
                   "datasetName": "5e3eb18f",
                   "parameters": [
@@ -5994,7 +6643,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cc28199bd02a5cf014e_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bb2a2c9b3b4e6334bc3_pipeline_id",
                 "query": {
                   "datasetName": "19d796af",
                   "parameters": [
@@ -6007,7 +6656,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c31b162ca86027b2214_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b0aad0f649404f8cb25_pipeline_id",
                 "query": {
                   "datasetName": "c91619f8",
                   "parameters": [
@@ -6020,7 +6669,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1bbb9db33d0671b7e5c4_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461a9bbe5fbf4995bdc44f_pipeline_id",
                 "query": {
                   "datasetName": "82c4e3b5",
                   "parameters": [
@@ -6033,7 +6682,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1ca1afbff3b634a7e223_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b8d9e292d0d2dc67dd6_pipeline_id",
                 "query": {
                   "datasetName": "c0688ffc",
                   "parameters": [
@@ -6046,7 +6695,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cd2b93a998b3c7419d8_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bbdb4e1f9e9952a2684_pipeline_id",
                 "query": {
                   "datasetName": "3b8b7d86",
                   "parameters": [
@@ -6059,7 +6708,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c599c5f556138790884_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b3cb83f2bd346127021_pipeline_id",
                 "query": {
                   "datasetName": "8897fc81",
                   "parameters": [
@@ -6072,7 +6721,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c669e0bb96854f3e5b5_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b488f6ffac402178c47_pipeline_id",
                 "query": {
                   "datasetName": "2faba057",
                   "parameters": [
@@ -6085,7 +6734,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cdf9b2bfde5833021f0_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bd6911ce40b60eaf9a5_pipeline_id",
                 "query": {
                   "datasetName": "62d03d54",
                   "parameters": [
@@ -6098,7 +6747,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c418d770b5ee1faf6bc_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b1ab6fe6f2600b36759_pipeline_id",
                 "query": {
                   "datasetName": "2660d018",
                   "parameters": [
@@ -6111,7 +6760,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c7d8bf5c5e1b0b4198b_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b67bbebc173149c5e91_pipeline_id",
                 "query": {
                   "datasetName": "248b74c6",
                   "parameters": [
@@ -6124,7 +6773,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c94954d994de52a3bc2_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b7facb56e496d7acee2_pipeline_id",
                 "query": {
                   "datasetName": "7103e200",
                   "parameters": [
@@ -6137,7 +6786,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cec87c918c5462cfd91_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461be59b3be5a31cd1c7c2_pipeline_id",
                 "query": {
                   "datasetName": "b72dbc41",
                   "parameters": [
@@ -6150,7 +6799,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cf9ae98dbea28d3df14_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bf3ba5f4569c02f5f10_pipeline_id",
                 "query": {
                   "datasetName": "e9270b22",
                   "parameters": [
@@ -6163,7 +6812,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1d058384a13825d03ba9_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bff8c74816d8fb2d26d_pipeline_id",
                 "query": {
                   "datasetName": "f786fd7e",
                   "parameters": [
@@ -6176,9 +6825,22 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1d129699ed571ce2f3ea_pipeline_id",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461c0ca20f659ce33312ee_pipeline_id",
                 "query": {
                   "datasetName": "bc1ad993",
+                  "parameters": [
+                    {
+                      "name": "pipeline_id",
+                      "keyword": "pipeline_id"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6c03f63139e8465a3bb9d4b4785_pipeline_id",
+                "query": {
+                  "datasetName": "a189e440",
                   "parameters": [
                     {
                       "name": "pipeline_id",
@@ -6196,83 +6858,87 @@
                 "fields": [
                   {
                     "fieldName": "pipeline_id",
-                    "queryName": "dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c4fbf8dbce3c80c3104_pipeline_id"
+                    "queryName": "dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b32acc049781d0cf011_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c8abd83949a26602d02_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b74b28865962df14f44_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cac982b741d5b37f100_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b9aa9c13d1f77991e37_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cb78329052ef490c91c_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461ba4b22cc5d22af91321_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c728a1aa93a52ea3ee5_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b54b96f2b00fb18b522_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cc28199bd02a5cf014e_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bb2a2c9b3b4e6334bc3_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c31b162ca86027b2214_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b0aad0f649404f8cb25_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1bbb9db33d0671b7e5c4_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461a9bbe5fbf4995bdc44f_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1ca1afbff3b634a7e223_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b8d9e292d0d2dc67dd6_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cd2b93a998b3c7419d8_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bbdb4e1f9e9952a2684_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c599c5f556138790884_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b3cb83f2bd346127021_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c669e0bb96854f3e5b5_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b488f6ffac402178c47_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cdf9b2bfde5833021f0_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bd6911ce40b60eaf9a5_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c418d770b5ee1faf6bc_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b1ab6fe6f2600b36759_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c7d8bf5c5e1b0b4198b_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b67bbebc173149c5e91_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c94954d994de52a3bc2_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b7facb56e496d7acee2_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cec87c918c5462cfd91_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461be59b3be5a31cd1c7c2_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cf9ae98dbea28d3df14_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bf3ba5f4569c02f5f10_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1d058384a13825d03ba9_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bff8c74816d8fb2d26d_pipeline_id"
                   },
                   {
                     "parameterName": "pipeline_id",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1d129699ed571ce2f3ea_pipeline_id"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461c0ca20f659ce33312ee_pipeline_id"
+                  },
+                  {
+                    "parameterName": "pipeline_id",
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6c03f63139e8465a3bb9d4b4785_pipeline_id"
                   }
                 ]
               },
@@ -6813,7 +7479,7 @@
             "name": "pipeline-tags",
             "queries": [
               {
-                "name": "dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bff6d9d6134890a05e2f11e34007_tag_value",
+                "name": "dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b299faa569d93cdfe85_tag_value",
                 "query": {
                   "datasetName": "5ef35e45",
                   "fields": [
@@ -6830,7 +7496,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c4fbf8dbce3c80c3104_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b32acc049781d0cf011_tag_value",
                 "query": {
                   "datasetName": "6740610b",
                   "parameters": [
@@ -6843,7 +7509,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c8abd83949a26602d02_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b74b28865962df14f44_pipeline_tag_value",
                 "query": {
                   "datasetName": "0ac0bb93",
                   "parameters": [
@@ -6856,7 +7522,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cac982b741d5b37f100_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b9aa9c13d1f77991e37_pipeline_tag_value",
                 "query": {
                   "datasetName": "8db826d7",
                   "parameters": [
@@ -6869,7 +7535,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cb78329052ef490c91c_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461ba4b22cc5d22af91321_pipeline_tag_value",
                 "query": {
                   "datasetName": "b18ee129",
                   "parameters": [
@@ -6882,7 +7548,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1bbb9db33d0671b7e5c4_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461a9bbe5fbf4995bdc44f_pipeline_tag_value",
                 "query": {
                   "datasetName": "82c4e3b5",
                   "parameters": [
@@ -6895,7 +7561,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1ca1afbff3b634a7e223_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b8d9e292d0d2dc67dd6_pipeline_tag_value",
                 "query": {
                   "datasetName": "c0688ffc",
                   "parameters": [
@@ -6908,7 +7574,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cc28199bd02a5cf014e_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bb2a2c9b3b4e6334bc3_pipeline_tag_value",
                 "query": {
                   "datasetName": "19d796af",
                   "parameters": [
@@ -6921,7 +7587,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cdf9b2bfde5833021f0_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bd6911ce40b60eaf9a5_pipeline_tag_value",
                 "query": {
                   "datasetName": "62d03d54",
                   "parameters": [
@@ -6934,7 +7600,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c31b162ca86027b2214_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b0aad0f649404f8cb25_pipeline_tag_value",
                 "query": {
                   "datasetName": "c91619f8",
                   "parameters": [
@@ -6947,7 +7613,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c669e0bb96854f3e5b5_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b488f6ffac402178c47_pipeline_tag_value",
                 "query": {
                   "datasetName": "2faba057",
                   "parameters": [
@@ -6960,7 +7626,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c418d770b5ee1faf6bc_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b1ab6fe6f2600b36759_pipeline_tag_value",
                 "query": {
                   "datasetName": "2660d018",
                   "parameters": [
@@ -6973,7 +7639,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c599c5f556138790884_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b3cb83f2bd346127021_pipeline_tag_value",
                 "query": {
                   "datasetName": "8897fc81",
                   "parameters": [
@@ -6986,7 +7652,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c7d8bf5c5e1b0b4198b_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b67bbebc173149c5e91_pipeline_tag_value",
                 "query": {
                   "datasetName": "248b74c6",
                   "parameters": [
@@ -6999,7 +7665,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c94954d994de52a3bc2_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b7facb56e496d7acee2_pipeline_tag_value",
                 "query": {
                   "datasetName": "7103e200",
                   "parameters": [
@@ -7012,7 +7678,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cd2b93a998b3c7419d8_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bbdb4e1f9e9952a2684_pipeline_tag_value",
                 "query": {
                   "datasetName": "3b8b7d86",
                   "parameters": [
@@ -7025,7 +7691,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cec87c918c5462cfd91_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461be59b3be5a31cd1c7c2_pipeline_tag_value",
                 "query": {
                   "datasetName": "b72dbc41",
                   "parameters": [
@@ -7038,7 +7704,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cf9ae98dbea28d3df14_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bf3ba5f4569c02f5f10_pipeline_tag_value",
                 "query": {
                   "datasetName": "e9270b22",
                   "parameters": [
@@ -7051,7 +7717,7 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1d058384a13825d03ba9_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bff8c74816d8fb2d26d_pipeline_tag_value",
                 "query": {
                   "datasetName": "f786fd7e",
                   "parameters": [
@@ -7064,9 +7730,22 @@
                 }
               },
               {
-                "name": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1d129699ed571ce2f3ea_pipeline_tag_value",
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461c0ca20f659ce33312ee_pipeline_tag_value",
                 "query": {
                   "datasetName": "bc1ad993",
+                  "parameters": [
+                    {
+                      "name": "pipeline_tag_value",
+                      "keyword": "pipeline_tag_value"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6c03f63139e8465a3bb9d4b4785_pipeline_tag_value",
+                "query": {
+                  "datasetName": "a189e440",
                   "parameters": [
                     {
                       "name": "pipeline_tag_value",
@@ -7084,83 +7763,87 @@
                 "fields": [
                   {
                     "fieldName": "tag_value",
-                    "queryName": "dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bff6d9d6134890a05e2f11e34007_tag_value"
+                    "queryName": "dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b299faa569d93cdfe85_tag_value"
                   },
                   {
                     "parameterName": "tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c4fbf8dbce3c80c3104_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b32acc049781d0cf011_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c8abd83949a26602d02_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b74b28865962df14f44_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cac982b741d5b37f100_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b9aa9c13d1f77991e37_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cb78329052ef490c91c_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461ba4b22cc5d22af91321_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1bbb9db33d0671b7e5c4_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461a9bbe5fbf4995bdc44f_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1ca1afbff3b634a7e223_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b8d9e292d0d2dc67dd6_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cc28199bd02a5cf014e_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bb2a2c9b3b4e6334bc3_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cdf9b2bfde5833021f0_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bd6911ce40b60eaf9a5_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c31b162ca86027b2214_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b0aad0f649404f8cb25_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c669e0bb96854f3e5b5_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b488f6ffac402178c47_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c418d770b5ee1faf6bc_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b1ab6fe6f2600b36759_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c599c5f556138790884_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b3cb83f2bd346127021_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c7d8bf5c5e1b0b4198b_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b67bbebc173149c5e91_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1c94954d994de52a3bc2_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461b7facb56e496d7acee2_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cd2b93a998b3c7419d8_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bbdb4e1f9e9952a2684_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cec87c918c5462cfd91_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461be59b3be5a31cd1c7c2_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1cf9ae98dbea28d3df14_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bf3ba5f4569c02f5f10_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1d058384a13825d03ba9_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461bff8c74816d8fb2d26d_pipeline_tag_value"
                   },
                   {
                     "parameterName": "pipeline_tag_value",
-                    "queryName": "parameter_dashboards/01f0b68e549a192ea15560791af33ce6/datasets/01f0bc0f49ad1d129699ed571ce2f3ea_pipeline_tag_value"
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6bf6b461c0ca20f659ce33312ee_pipeline_tag_value"
+                  },
+                  {
+                    "parameterName": "pipeline_tag_value",
+                    "queryName": "parameter_dashboards/01f0d6bf6b46137ca4dacc873d919029/datasets/01f0d6c03f63139e8465a3bb9d4b4785_pipeline_tag_value"
                   }
                 ]
               },

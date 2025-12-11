@@ -19,6 +19,7 @@ resources:
         catalog: ${var.monitoring_catalog}
         schema: ${resources.schemas.monitoring_schema.name}
         name: cdc_connector_monitoring_etl_event_log
+      tags: ${var.monitoring_etl_pipeline_tags}
       configuration:
         monitoring_catalog: ${var.monitoring_catalog}
         monitoring_schema: ${resources.schemas.monitoring_schema.name}

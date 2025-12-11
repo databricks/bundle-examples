@@ -16,7 +16,7 @@ resources:
       tasks:
         - task_key: publish_main_dashboard
           notebook_task:
-            notebook_path: ../jobs/publish_dashboard.ipynb
+            notebook_path: ../src/publish_dashboard.ipynb
             base_parameters:
               dashboard_template_path: ${var.main_dashboard_template_path}
               dashboard_id: ${var.main_dashboard_id}
@@ -26,7 +26,7 @@ resources:
               warehouse_id: ${var.warehouse_id}
         - task_key: update_table_metadata
           notebook_task:
-            notebook_path: ../jobs/update_monitoring_tables_meta.ipynb
+            notebook_path: ../src/update_monitoring_tables_meta.ipynb
             base_parameters:
               monitoring_catalog: ${var.monitoring_catalog}
               monitoring_schema: ${resources.schemas.monitoring_schema.name}

@@ -7,9 +7,11 @@ bundle:
 sync:
   paths:
     - ../common/lib
-    - ../common/jobs
+    - ../common/src
     - ../common/vars
     - ../common/resources
+    - ../common/third_party_sinks
+    - .
 
 include:
   # Shared variables and resources
@@ -64,6 +66,10 @@ variables:
         tables. Note that you also have to set `monitoring_etl_schedule_state` to `UNPAUSED` for this to take effect. The default is to run the
         import hourly.
     default: "0 30 0/1 * * ?"
+  monitoring_etl_pipeline_tags:
+    description: A map of tag keys and values to annotate the monitoring ETL pipeline
+    type: complex
+    default: {}
 
 targets:
 #  dev:

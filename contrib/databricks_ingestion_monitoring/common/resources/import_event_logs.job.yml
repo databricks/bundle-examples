@@ -27,7 +27,7 @@ resources:
       tasks:
         - task_key: init_target_table
           notebook_task:
-            notebook_path: ../jobs/create_imported_event_logs_target_table.ipynb
+            notebook_path: ../src/create_imported_event_logs_target_table.ipynb
             base_parameters:
               monitoring_catalog: ${var.monitoring_catalog}
               monitoring_schema: ${resources.schemas.monitoring_schema.name}
@@ -36,7 +36,7 @@ resources:
           depends_on:
             - task_key: init_target_table
           notebook_task:
-            notebook_path: ../jobs/import_event_logs.ipynb
+            notebook_path: ../src/import_event_logs.ipynb
             base_parameters:
               monitoring_catalog: ${var.monitoring_catalog}
               monitoring_schema: ${resources.schemas.monitoring_schema.name}

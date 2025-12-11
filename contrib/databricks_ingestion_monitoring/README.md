@@ -38,7 +38,7 @@ Coming soon
 
 The following shared resources are located in the `common/` directory:
 
-- `common/jobs/` - Shared notebooks to be used in jobs in the individual monitoring DABs.
+- `common/src/` - Shared notebooks to be used in jobs in the individual monitoring DABs.
 - `common/lib/` - Shared python code.
 - `common/resources/` - Shared DAB resources definitions
 - `common/scripts/` - helper scripts

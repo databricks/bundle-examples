@@ -1,0 +1,50 @@
+resources:
+  alerts:
+    nyc_taxi_daily_revenue:
+      permissions:
+        - level: CAN_MANAGE
+          user_name: user@company.com
+
+      custom_summary: "Alert when NYC Taxi daily revenue exceeds threshold"
+      display_name: "NYC Taxi Daily Revenue Alert"
+
+      # The SQL query that the alert will evaluate
+      query_text: |
+        SELECT
+          to_date(tpep_pickup_datetime) as date,
+          SUM(fare_amount) as amount
+        FROM
+          `samples`.`nyctaxi`.`trips`
+        GROUP BY
+          ALL
+        ORDER BY
+          1 DESC
+
+      # The warehouse to use for running the query
+      warehouse_id: ${var.warehouse_id}
+
+      evaluation:
+        # Comparison operator for the threshold
+        comparison_operator: "GREATER_THAN"
+
+        # Notification settings
+        notification:
+          notify_on_ok: false
+          retrigger_seconds: 3600  # Re-trigger after 1 hour if condition persists
+
+        # Source defines which column and aggregation to evaluate
+        source:
+          aggregation: "MAX"
+          display: "amount"
+          name: "amount"
+
+        # Threshold to compare against
+        threshold:
+          value:
+            double_value: 1000000.0  # Alert if daily revenue exceeds $1M
+
+      # Schedule for running the alert
+      schedule:
+        pause_status: "UNPAUSED"
+        quartz_cron_schedule: "0 0 8 * * ?"  # Run daily at 8 AM UTC
+        timezone_id: "UTC"

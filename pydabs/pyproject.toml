@@ -1,14 +1,14 @@
 [project]
-name = "lakeflow_pipelines_sql"
+name = "pydabs"
 version = "0.0.1"
 authors = [{ name = "user@company.com" }]
-requires-python = ">=3.10,<=3.13"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     # Any dependencies for jobs and pipelines in this project can be added here
     # See also https://docs.databricks.com/dev-tools/bundles/library-dependencies
     #
     # LIMITATION: for pipelines, dependencies are cached during development;
-    # add dependencies to the 'environment' section of pipeline.yml file instead
+    # add dependencies to the 'environment' section of your pipeline.yml file instead
 ]
 
 [dependency-groups]
@@ -16,10 +16,11 @@ dev = [
     "pytest",
     "databricks-dlt",
     "databricks-connect>=15.4,<15.5",
+    "databricks-bundles==0.279.0",
 ]
 
 [project.scripts]
-main = "lakeflow_pipelines_sql.main:main"
+main = "pydabs.main:main"
 
 [build-system]
 requires = ["hatchling"]

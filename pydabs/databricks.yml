@@ -1,8 +1,14 @@
-# This is a Databricks asset bundle definition for default_python.
+# This is a Databricks asset bundle definition for pydabs.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: default_python
-  uuid: 87d5a23e-7bc7-4f52-98ee-e374b67d5681
+  name: pydabs
+  uuid: 4062028b-2184-4acd-9c62-f2ec572f7843
+
+python:
+  venv_path: .venv
+  # Functions called to load resources defined in Python. See resources/__init__.py
+  resources:
+    - "resources:load_resources"
 
 include:
   - resources/*.yml

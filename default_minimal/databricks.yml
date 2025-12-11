@@ -1,17 +1,12 @@
-# This is a Databricks asset bundle definition for default_python.
+# This is a Databricks asset bundle definition for default_minimal.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: default_python
-  uuid: 87d5a23e-7bc7-4f52-98ee-e374b67d5681
+  name: default_minimal
+  uuid: 8127e9c1-adac-4c9c-b006-d3450874f663
 
 include:
   - resources/*.yml
   - resources/*/*.yml
-
-artifacts:
-  python_artifact:
-    type: whl
-    build: uv build --wheel
 
 # Variable declarations. These variables are assigned in the dev/prod targets below.
 variables:

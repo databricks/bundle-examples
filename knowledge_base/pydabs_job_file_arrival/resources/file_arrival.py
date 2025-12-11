@@ -13,7 +13,9 @@ pydabs_job_file_arrival = Job(
             task_key="process_new_files",
             notebook_task=NotebookTask(
                 notebook_path="src/process_files.ipynb",
-                base_parameters={"file_arrival_location": "{{job.trigger.file_arrival.location}}"},
+                base_parameters={
+                    "file_arrival_location": "{{job.trigger.file_arrival.location}}"
+                },
             ),
         )
     ],

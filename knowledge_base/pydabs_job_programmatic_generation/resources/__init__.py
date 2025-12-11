@@ -22,20 +22,17 @@ def load_resources(bundle: Bundle) -> Resources:
     """
     resources = Resources()
 
-    target_schema_name = "target_prod_schema" # this is the schema name for prod - should be deployed with Terraform
+    target_schema_name = "target_prod_schema"  # this is the schema name for prod - should be deployed with Terraform
 
     if bundle.target == "dev":
         # create 1 schema per user in other environments
         # note databricks.yml: the target dev is mode "development"
         schema = Schema(
-                catalog_name="main",
-                name="prog_gen_target",
-                comment="Schema for output data"
-            )
-        resources.add_schema(
-            resource_name="project_schema",
-            schema=schema
+            catalog_name="main",
+            name="prog_gen_target",
+            comment="Schema for output data",
         )
+        resources.add_schema(resource_name="project_schema", schema=schema)
         target_schema_name = "${resources.schemas.project_schema.name}"
 
     for file in glob.glob("src/*.sql", recursive=True):
@@ -47,13 +44,11 @@ def load_resources(bundle: Bundle) -> Resources:
                     {
                         "task_key": "create_table",
                         "sql_task": {
-                            "parameters": {
-                                "target_schema": target_schema_name
-                            },
+                            "parameters": {"target_schema": target_schema_name},
                             "file": {
                                 "path": file,
                             },
-                            "warehouse_id": "${resources.sql_warehouses.twoxs_warehouse.id}"
+                            "warehouse_id": "${resources.sql_warehouses.twoxs_warehouse.id}",
                         },
                     }
                 ],

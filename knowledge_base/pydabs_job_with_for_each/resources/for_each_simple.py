@@ -10,17 +10,17 @@ process_item_iteration = Task(
         notebook_path="src/notebook_process_item.py",
         base_parameters={
             "index": "{{input}}",
-        },        
+        },
     ),
 )
 process_item = Task(
-    task_key='process_item',
+    task_key="process_item",
     depends_on=[TaskDependency(task_key="extract")],
     for_each_task=ForEachTask(
-        inputs='{{tasks.extract.values.indexes}}', 
+        inputs="{{tasks.extract.values.indexes}}",
         task=process_item_iteration,
-        concurrency=10
-    )
+        concurrency=10,
+    ),
 )
 
 for_each_example = Job(
@@ -30,9 +30,9 @@ for_each_example = Job(
         process_item,
     ],
     parameters=[
-            {
-                "name": "lookup_file_name",
-                "default": "/Volumes/main/for_each_example/hotchpotch/my_file.json",
-            },
+        {
+            "name": "lookup_file_name",
+            "default": "/Volumes/main/for_each_example/hotchpotch/my_file.json",
+        },
     ],
 )

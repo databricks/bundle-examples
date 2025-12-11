@@ -1,6 +1,6 @@
 # Databricks notebook source
-lookup_file_name = dbutils.widgets.get('lookup_file_name')
-index = int(dbutils.widgets.get('index'))
+lookup_file_name = dbutils.widgets.get("lookup_file_name")
+index = int(dbutils.widgets.get("index"))
 
 # COMMAND ----------
 
@@ -13,4 +13,3 @@ date = data[index].get("date")
 print(date)
 
 # COMMAND ----------
-

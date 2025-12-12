@@ -1,0 +1,26 @@
+[project]
+name = "pydabs_job_with_task_values"
+version = "0.0.1"
+authors = [{ name = "Databricks Field Engineering" }]
+requires-python = ">=3.10,<=3.13"
+dependencies = [
+    # Any dependencies for jobs and pipelines in this project can be added here
+    # See also https://docs.databricks.com/dev-tools/bundles/library-dependencies
+    #
+    # LIMITATION: for pipelines, dependencies are cached during development;
+    # add dependencies to the 'environment' section of pipeline.yml file instead
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "databricks-connect>=15.4,<15.5",
+    "databricks-bundles==0.275.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 125

@@ -1,0 +1,34 @@
+# This is a Databricks asset bundle definition for pydabs_airflow.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: pydabs_job_programmatic_generation
+  uuid: 3874a19c-7ea5-401d-bca2-9bd1f9d3efbf
+
+python:
+  venv_path: .venv
+  # Functions called to load resources defined in Python. See resources/__init__.py
+  resources:
+    - "resources:load_resources"
+  mutators:
+    - 'mutators:add_email_notifications'
+
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+resources:
+  sql_warehouses:
+    twoxs_warehouse:
+      name: Serverless Starter Warehouse
+      cluster_size: 2X-Small
+      auto_stop_mins: 10
+
+targets:
+  dev:
+    mode: development
+    default: true
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}

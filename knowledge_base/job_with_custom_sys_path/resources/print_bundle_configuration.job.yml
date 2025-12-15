@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    print_bundle_configuration:
+      name: Example to demonstrate job parameterization
+
+      parameters:
+        - # The bundle deployment's root file path in the workspace.
+          name: "bundle_file_path"
+          default: "${workspace.file_path}"
+
+        - # The bundle target name (e.g. "dev" or "prod").
+          name: "bundle_target"
+          default: "${bundle.target}"
+
+      tasks:
+        - task_key: print
+          notebook_task:
+            notebook_path: ../src/print.ipynb

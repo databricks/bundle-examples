@@ -20,7 +20,7 @@ def test_kmeans_udtf(spark, load_fixture):
         assert fn == "main.test.test_k_means"
 
         result = spark.sql(
-            f"""
+            """
             SELECT * FROM main.test.test_k_means(
                 input_data => TABLE(SELECT * FROM titanic_sample),
                 id_column => 'PassengerId',

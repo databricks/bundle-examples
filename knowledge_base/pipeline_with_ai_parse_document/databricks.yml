@@ -1,0 +1,40 @@
+# This is a Databricks asset bundle definition for ai_parse_document_pipeline.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: ai_parse_document_pipeline
+
+variables:
+  catalog:
+    description: The catalog name for the pipeline
+    default: main
+  schema:
+    description: The schema name for the pipeline
+    default: default
+  source_volume_path:
+    description: Source volume path for PDF files
+    default: /Volumes/main/default/source_documents
+  output_volume_path:
+    description: Output volume path for processed images
+    default: /Volumes/main/default/parsed_output
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://your-workspace.cloud.databricks.com
+
+  prod:
+    mode: production
+    workspace:
+      host: https://your-workspace.cloud.databricks.com
+    permissions:
+      - group_name: users
+        level: CAN_VIEW

@@ -1,0 +1,26 @@
+resources:
+  jobs:
+    register_udtf_job:
+      name: register_udtf_job
+      schedule:
+        quartz_cron_expression: '0 0 8 * * ?' # daily at 8am
+        timezone_id: "UTC"
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+      tasks:
+        - task_key: create_udtf
+          spark_python_task:
+            python_file: ../src/main.py
+            parameters:
+              - "--catalog"
+              - "{{job.parameters.catalog}}"
+              - "--schema"
+              - "{{job.parameters.schema}}"
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

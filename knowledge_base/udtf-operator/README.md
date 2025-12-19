@@ -49,7 +49,7 @@ The UDTF integrates seamlessly with:
 - Databricks SQL dashboards
 - Any tool that connects to your Databricks workspace via SQL
 
-See [`src/sample_notebook.ipynb`](src/sample_notebook.ipynb) for complete examples.
+See [`explorations/sample_notebook.ipynb`](explorations/sample_notebook.ipynb) for complete examples.
 
 ## Getting Started With This Project
 
@@ -91,7 +91,7 @@ The UDTF will be registered at `main.your_username.k_means` (dev) or `main.prod.
 
 **CI/CD Integration:**
 - Set up CI/CD for Databricks Asset Bundles following the [CI/CD documentation](https://docs.databricks.com/dev-tools/bundles/ci-cd.html)
-- To automatically register the UDTF on deployment, add `databricks bundle run -t prod register_udtf_job` to your deployment script after `databricks bundle deploy -t prod` (alternatively, the job in `resources/udtf_job.yml` can use a schedule for registration)
+- To automatically register the UDTF on deployment, add `databricks bundle run -t prod register_udtf_job` to your deployment script after `databricks bundle deploy -t prod` (alternatively, the job in `resources/register_udtf_job.yml` can use a schedule for registration)
 
 **Serverless compute vs. clusters:** The job uses serverless compute by default. Customize catalog/schema in `databricks.yml` or via job parameters.
 

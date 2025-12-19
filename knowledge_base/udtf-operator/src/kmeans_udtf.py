@@ -50,6 +50,7 @@ def register(catalog: str, schema: str, name: str = "k_means"):
     spark = SparkSession.builder.getOrCreate()
     source = inspect.getsource(SklearnKMeans)
 
+    # Use SQL CREATE FUNCTION since the Python API for registering UDTFs is still experimental
     spark.sql(f"""
         CREATE OR REPLACE FUNCTION {catalog}.{schema}.{name}(
             input_data TABLE,

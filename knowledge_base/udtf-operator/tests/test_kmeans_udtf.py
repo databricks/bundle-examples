@@ -6,7 +6,7 @@ from pathlib import Path
 src_path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
-from kmeans_udtf import register
+import kmeans_udtf
 
 
 def test_kmeans_udtf(spark, load_fixture):
@@ -16,7 +16,7 @@ def test_kmeans_udtf(spark, load_fixture):
 
     try:
         spark.sql("CREATE SCHEMA IF NOT EXISTS main.test")
-        fn = register("main", "test", "test_k_means")
+        fn = kmeans_udtf.register("main", "test", "test_k_means")
         assert fn == "main.test.test_k_means"
 
         result = spark.sql(

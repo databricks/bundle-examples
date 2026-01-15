@@ -1,6 +1,7 @@
 """K-Means UDTF for Unity Catalog"""
 
 import inspect
+
 from pyspark.sql import SparkSession
 
 
@@ -32,6 +33,7 @@ class SklearnKMeans:
         if not self.rows:
             return
 
+        # Imports must be inline: only this class's source is sent to Unity Catalog
         import numpy as np
         from sklearn.cluster import KMeans
 

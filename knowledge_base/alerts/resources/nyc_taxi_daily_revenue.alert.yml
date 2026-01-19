@@ -58,5 +58,3 @@ resources:
       display_name: "NYC Taxi Daily Revenue Alert as File"
       warehouse_id: ${var.warehouse_id}
       file_path: ./nyc_taxi_daily_revenue_as_file.dbalert.json
-
-

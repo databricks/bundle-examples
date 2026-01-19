@@ -15,7 +15,6 @@ workspace:
   host: https://myworkspace.databricks.com
 
 
-
 targets:
   dev:
     default: true

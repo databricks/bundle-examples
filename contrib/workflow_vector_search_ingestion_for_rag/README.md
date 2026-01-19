@@ -1,6 +1,7 @@
 # AI Document Processing Workflow for RAG with Structured Streaming
 
 A Databricks Asset Bundle demonstrating **incremental document processing** using `ai_parse_document`, chunking, and Databricks Workflows with Structured Streaming.
+This example is similar to [job_with_ai_parse_document](https://github.com/databricks/bundle-examples/tree/main/contrib/job_with_ai_parse_document), with the differnece it adds the chunking and vector search indexing.
 
 ## Overview
 

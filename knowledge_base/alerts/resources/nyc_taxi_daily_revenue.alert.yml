@@ -49,8 +49,8 @@ resources:
         quartz_cron_schedule: "0 0 8 * * ?"  # Run daily at 8 AM UTC
         timezone_id: "UTC"
 
-    # This is the same alert as above, but refers to a .dbalert.json file
-    # for the configuration.
+    # This alert is configured identically to the above alert, but it refers to a .dbalert.json file
+    # instead of inlining the configuration in YAML.
     nyc_taxi_daily_revenue_as_file:
       permissions:
         - level: CAN_MANAGE

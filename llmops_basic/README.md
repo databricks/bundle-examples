@@ -1,4 +1,4 @@
-# {{.project_name}}
+# llmops_basic
 
 End-to-end LLMOps project for sentiment analysis of reviews using Databricks.
 
@@ -7,9 +7,8 @@ End-to-end LLMOps project for sentiment analysis of reviews using Databricks.
 This example demonstrates a complete LLMOps pipeline for building, evaluating, and deploying a sentiment analysis model.
 
 **Pipeline stages:**
-- Data preprocessing
-- Model training with MLflow
-- Model evaluation
+- Data preparation
+- Model build and evaluation with MLflow
 - Model deployment to serving endpoint
 - Batch inference
 
@@ -38,8 +37,8 @@ databricks bundle run model_inference -t dev
 
 ## Configuration
 
-- **Dev Catalog**: `{{.catalog_name_dev}}`
-- **Prod Catalog**: `{{.catalog_name_prod}}`
+- **Dev Catalog**: `dev_catalog`
+- **Prod Catalog**: `prod_catalog`
 
 Edit `databricks.yml` to customize catalog names, schema name, model name, and experiment settings.
 

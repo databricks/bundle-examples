@@ -1,8 +1,5 @@
-# Databricks
 .databricks/
 .bundle/
-
-# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -11,25 +8,15 @@ __pycache__/
 venv/
 env/
 ENV/
-
-# Jupyter
 .ipynb_checkpoints/
 *.ipynb_checkpoints
-
-# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
 Thumbs.db
-
-# MLflow
 mlruns/
-
-# Logs
 *.log
 

@@ -6,5 +6,5 @@ using DABs, Unity Catalog and MLflow.
 Install it using
 
 ```
-databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/data-engineering
+databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/llmops-basic
 ```

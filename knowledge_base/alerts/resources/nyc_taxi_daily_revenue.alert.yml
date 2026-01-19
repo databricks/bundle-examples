@@ -48,3 +48,15 @@ resources:
         pause_status: "UNPAUSED"
         quartz_cron_schedule: "0 0 8 * * ?"  # Run daily at 8 AM UTC
         timezone_id: "UTC"
+
+    # This is the same alert as above, but refers to a .dbalert.json file
+    # for the configuration.
+    nyc_taxi_daily_revenue_as_file:
+      permissions:
+        - level: CAN_MANAGE
+          user_name: user@company.com
+      display_name: "NYC Taxi Daily Revenue Alert as File"
+      warehouse_id: ${var.warehouse_id}
+      file_path: ./nyc_taxi_daily_revenue_as_file.dbalert.json
+
+

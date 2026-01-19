@@ -52,7 +52,7 @@ resources:
     # This alert is configured identically to the above alert, but it refers to a .dbalert.json file
     # instead of inlining the configuration in YAML. We recommend inlining the configuration in YAML
     # when you need to productionize the alert across different target (dev, staging, prod) and
-    # use a .dbalert.json file when you have a single target alert that you author in the Databricks UI
+    # using a .dbalert.json file when you have a single target alert that you author in the Databricks UI
     # or using the databricks bundle generate alert command.
     nyc_taxi_daily_revenue_as_file:
       permissions:

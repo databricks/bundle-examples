@@ -7,13 +7,12 @@ include:
 variables:
   # The "warehouse_id" variable is used to reference the warehouse used by the alert.
   warehouse_id:
-    default: 49efc47d56d40c50
-    # lookup:
-    #   # Replace this with the name of your SQL warehouse.
-    #   warehouse: "Shared Unity Catalog Severless"
+    lookup:
+      # Replace this with the name of your SQL warehouse.
+      warehouse: "Shared Unity Catalog Severless"
 
-# workspace:
-  # host: https://myworkspace.databricks.com
+workspace:
+  host: https://myworkspace.databricks.com
 
 
 

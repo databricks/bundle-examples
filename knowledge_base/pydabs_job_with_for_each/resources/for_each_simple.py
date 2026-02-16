@@ -10,7 +10,7 @@ from databricks.bundles.jobs import (
 
 generate_items = Task(
     task_key="generate_items",
-    notebook_task=NotebookTask(notebook_path="src/foreach/generate_items.ipynb"),
+    notebook_task=NotebookTask(notebook_path="src/foreach/generate_items.py"),
 )
 
 process_item = Task(
@@ -20,7 +20,7 @@ process_item = Task(
         task=Task(
             task_key="process_item_iteration",
             notebook_task=NotebookTask(
-                notebook_path="src/foreach/process_item.ipynb",
+                notebook_path="src/foreach/process_item.py",
                 base_parameters={"item": "{{input}}"},
             ),
         ),
@@ -29,7 +29,7 @@ process_item = Task(
     depends_on=[TaskDependency(task_key="generate_items")],
 )
 
-for_each_task_example = Job(
+job = Job(
     name="for_each_task_example",
     tasks=[generate_items, process_item],
 )

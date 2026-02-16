@@ -10,7 +10,7 @@ from databricks.bundles.jobs import (
 # 1) Producer task: runs a notebook and emits a task value
 check_quality = Task(
     task_key="check_quality",
-    notebook_task=NotebookTask(notebook_path="src/branch/check_quality.ipynb"),
+    notebook_task=NotebookTask(notebook_path="src/branch/check_quality.py"),
 )
 
 # 2) Branch task: evaluates an expression using an upstream task value
@@ -27,13 +27,13 @@ branch = Task(
 # 3) Downstream tasks: gated on the condition outcome
 fix_path = Task(
     task_key="fix_path",
-    notebook_task=NotebookTask(notebook_path="src/branch/fix_path.ipynb"),
+    notebook_task=NotebookTask(notebook_path="src/branch/fix_path.py"),
     depends_on=[TaskDependency(task_key="branch", outcome="true")],
 )
 
 skip_path = Task(
     task_key="skip_path",
-    notebook_task=NotebookTask(notebook_path="src/branch/skip_path.ipynb"),
+    notebook_task=NotebookTask(notebook_path="src/branch/skip_path.py"),
     depends_on=[TaskDependency(task_key="branch", outcome="false")],
 )
 

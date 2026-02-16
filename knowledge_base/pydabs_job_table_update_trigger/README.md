@@ -11,7 +11,7 @@ The Lakeflow Job is configured with:
 - **Automatic processing**: When updates are detected, the job automatically runs and processes them
 
 * `src/`: Notebook source code for this project.
-  * `src/assets/consume_table.py`: 
+  * `src/assets/consume_table.ipynb`: 
 * `resources/`:  Resource configurations (jobs, pipelines, etc.)
   * `resources/table_update.py`: PyDABs job with table update trigger configuration.
 

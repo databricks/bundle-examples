@@ -3,8 +3,8 @@
 This example demonstrates a simple Databricks job that uses a foreach task.
 
 * `src/`: Python source code for this project.
-    * `foreach/generate_items.ipynb`: A notebook which returns a list of items to be used for task generation.
-    * `foreach/process_item.ipynb`: A notebook which will process an item.
+    * `foreach/generate_items.py`: A notebook which returns a list of items to be used for task generation.
+    * `foreach/process_item.py`: A notebook which will process an item.
 * `resources/`:  Resource configurations (jobs, pipelines, etc.)
 
 

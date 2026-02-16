@@ -2,7 +2,7 @@ from databricks.bundles.jobs import FileArrivalTriggerConfiguration, Job, Task, 
 
 process_files = Task(
     task_key="process_files",
-    notebook_task=NotebookTask(notebook_path="src/files/process_files.ipynb"),
+    notebook_task=NotebookTask(notebook_path="src/files/process_files.py"),
 )
 
 job = Job(

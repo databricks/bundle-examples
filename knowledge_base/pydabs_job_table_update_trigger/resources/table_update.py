@@ -2,7 +2,7 @@ from databricks.bundles.jobs import Job, NotebookTask, Task, TriggerSettings, Ta
 
 consume_table = Task(
     task_key="consume_table",
-    notebook_task=NotebookTask(notebook_path="src/assets/consume_table.ipynb"),
+    notebook_task=NotebookTask(notebook_path="src/assets/consume_table.py"),
 )
 
 job = Job(

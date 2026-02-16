@@ -48,3 +48,16 @@ resources:
         pause_status: "UNPAUSED"
         quartz_cron_schedule: "0 0 8 * * ?"  # Run daily at 8 AM UTC
         timezone_id: "UTC"
+
+    # This alert is configured identically to the above alert, but it refers to a .dbalert.json file
+    # instead of inlining the configuration in YAML. We recommend inlining the configuration in YAML
+    # when you need to productionize the alert across different target (dev, staging, prod) and
+    # using a .dbalert.json file when you have a single target alert that you author in the Databricks UI
+    # or using the databricks bundle generate alert command.
+    nyc_taxi_daily_revenue_as_file:
+      permissions:
+        - level: CAN_MANAGE
+          user_name: user@company.com
+      display_name: "NYC Taxi Daily Revenue Alert as File"
+      warehouse_id: ${var.warehouse_id}
+      file_path: ./nyc_taxi_daily_revenue_as_file.dbalert.json

@@ -39,26 +39,33 @@ class AutoLoaderFormat:
 
     def validate_user_options(self, options: dict[str, str]) -> None:
         allowed = set(self.get_userfacing_options())
-        illegal = set(options) - allowed
+        # Create lowercase version of allowed options for case-insensitive comparison
+        allowed_lower = {key.lower() for key in allowed}
+
+        # Check for illegal options (case-insensitive)
+        illegal = [key for key in options if key.lower() not in allowed_lower]
+
         if illegal:
             raise ValueError(
                 f"Unsupported or protected options: {sorted(illegal)}. "
                 f"Allowed user options: {sorted(allowed)}"
             )
 
-    def get_modified_options(self, options: dict[str, str]) -> dict[str, str]:
-        self.validate_user_options(options)
-        defaults = self.get_userfacing_options()
-        return {k: v for k, v in options.items() if k in defaults and v != defaults[k]}
-
     def get_merged_options(
         self, options: dict[str, str], table_name: str, is_placeholder: bool = False
     ) -> dict[str, str]:
         self.validate_user_options(options)
         defaults = {opt.key: opt.value for opt in self.options}
+        # Create case-insensitive mapping
+        defaults_lower = {key.lower(): key for key in defaults}
 
         merged = defaults.copy()
-        merged.update({k: v for k, v in options.items() if k in defaults})
+        # Merge user options using case-insensitive matching
+        for user_key, user_value in options.items():
+            lower_key = user_key.lower()
+            if lower_key in defaults_lower:
+                canonical_key = defaults_lower[lower_key]
+                merged[canonical_key] = user_value
 
         # Do not specify schema evolution mode in placeholder
         if is_placeholder:

@@ -10,7 +10,7 @@ The Lakeflow Job is configured with:
 - **Automatic processing**: When files are detected, the job automatically runs and processes them
 
 * `src/`: Notebook source code for this project.
-  * `src/process_files.py`: Processes newly arrived files from the volume path.
+  * `src/files/process_files.ipynb`: Processes newly arrived files from the volume path.
 * `resources/`:  Resource configurations (jobs, pipelines, etc.)
   * `resources/file_arrival.py`: PyDABs job with file arrival trigger configuration.
 

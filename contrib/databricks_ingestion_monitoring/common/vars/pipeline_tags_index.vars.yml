@@ -1,0 +1,35 @@
+# Configuration variables for the helper job that builds the pipeline tags index (see ../resources/build_pipeline_tags_index.job.yml)
+variables:
+  pipeline_tags_index_enabled:
+    description: >
+      Whether to use the pipeline tags index table for tag-based pipeline discovery. If disabled, the system will fall back to
+      API-based discovery (which is slower but always up-to-date).
+    default: false
+
+  pipeline_tags_index_schedule_state:
+    description: Enable (`UNPAUSED`) or disable (`PAUSED`) the periodic rebuild of the pipeline tags index.
+    default: PAUSED
+
+  pipeline_tags_index_cron_schedule:
+    description: >
+      The cron schedule (see http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html) to use for rebuilding
+      the pipeline tags index. The default is to run once daily at 9:31 AM UTC.
+    default: "0 31 9 * * ?"
+
+  pipeline_tags_index_max_age_hours:
+    description: >
+      Maximum age (in hours) of the pipeline tags index before it is considered stale. If the index is older than this,
+      the system will fall back to API-based discovery and log a warning.
+    default: 48
+
+  pipeline_tags_index_table_name:
+    description: >
+      The name of the table to use for the pipeline tags inverted index. This table maps tag:value pairs to lists of pipeline IDs.
+      The table is used to efficiently discover pipelines by tags without having to call the Databricks API for every pipeline.
+    default: pipeline_tags_index
+
+  pipeline_tags_index_api_fallback_enabled:
+    description: >
+      Whether to fall back to API-based pipeline discovery if the index table is unavailable or stale.
+      If false, an error will be raised when the index is unavailable.
+    default: true

@@ -1,0 +1,86 @@
+variables:
+  third_party_destination:
+    description: >
+      Third-party monitoring destination (datadog, newrelic, azuremonitor, splunk_observability). Leave empty to disable third-party monitoring.
+    default: ""
+  third_party_host_name:
+    description: >
+      Host name for the third-party monitoring service. Used to auto-generate API endpoints.
+      For Datadog: datadoghq.com, datadoghq.eu, us5.datadoghq.com, ap2.datadoghq.com
+      For New Relic: newrelic.com, eu.newrelic.com
+      For Azure Monitor: <dce-name>.<region>.ingest.monitor.azure.com
+      For Splunk Observability: ingest.<realm>.signalfx.com (e.g., ingest.us0.signalfx.com)
+    default: ""
+  third_party_account_id:
+    description: >
+      Account ID for New Relic (required for New Relic events endpoint auto-generation).
+      Not required for other destinations. Leave empty if using explicit endpoint configuration.
+    default: ""
+  third_party_api_key:
+    description: >
+      API key for the third-party monitoring service (required when destination is specified).
+    default: ""
+  third_party_endpoints_metrics:
+    description: >
+      Endpoint URL for sending metrics to the third-party monitoring service.
+    default: ""
+  third_party_endpoints_logs:
+    description: >
+      Endpoint URL for sending logs to the third-party monitoring service.
+    default: ""
+  third_party_endpoints_events:
+    description: >
+      Endpoint URL for sending events to the third-party monitoring service.
+    default: ""
+  third_party_batch_size:
+    description: >
+      Batch size for sending telemetry data to third-party monitoring service.
+    default: 100
+  third_party_max_retry_duration_sec:
+    description: >
+      Maximum retry duration in seconds for failed requests to third-party monitoring service.
+    default: 300
+  third_party_request_timeout_sec:
+    description: >
+      Request timeout in seconds for third-party monitoring service API calls.
+    default: 30
+  third_party_secrets_scope:
+    description: >
+      Databricks secret scope for storing sensitive information like API keys.
+      See: https://docs.databricks.com/aws/en/security/secrets/
+    default: "third-party-monitoring-secrets"
+  azure_client_id:
+    description: >
+      Azure service principal client ID for authentication (required when destination is azuremonitor).
+    default: ""
+  azure_client_secret:
+    description: >
+      Azure service principal client secret for authentication (required when destination is azuremonitor).
+    default: ""
+  azure_authorization_endpoint:
+    description: >
+      Azure AD token endpoint URL for obtaining access tokens (required when destination is azuremonitor).
+      Example: https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token
+    default: ""
+  azure_max_access_token_staleness:
+    description: >
+      Maximum time in seconds before refreshing the Azure access token.
+    default: 3300
+  splunk_access_token:
+    description: >
+      Splunk Observability Cloud organization access token for metrics, events, and logs (required when destination is splunk_observability).
+      Logs are sent as events to eliminate the need for HEC setup.
+      Refer: https://docs.splunk.com/observability/en/admin/authentication/authentication-tokens/org-tokens.html
+    default: ""
+  azure_tenant_id:
+    description: >
+      Azure AD tenant ID for authentication (required when destination is azuremonitor).
+      Used to construct the authorization endpoint: https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token
+      Example: 12345678-1234-1234-1234-123456789012
+    default: ""
+  azure_dcr_immutable_id:
+    description: >
+      Azure Data Collection Rule immutable ID (required when destination is azuremonitor).
+      Used to auto-generate data ingestion endpoints for metrics, logs, and events streams.
+      Example: dcr-1234567890abcdef1234567890abcdef
+    default: ""

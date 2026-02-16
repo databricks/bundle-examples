@@ -1,0 +1,25 @@
+DATABRICKS INGESTION MONITORING DABS
+====================================
+
+0.3.4
+
+- Add support for pipeline discovery using pipeline tags
+- Enhance AI/BI dashboards to support pipeline selection using tags
+
+0.3.3
+
+- Add support for monitoring expectation check results
+    - Extend `table_events_metrics` with a new column `num_expectation_dropped_records` that contains the number of rows dropped by expectations
+    - Add a table `table_events_expectation_checks` which contains the number of rows that passed or failed specific expectation checks
+- Update the generic SDP dashboard to expose metrics/visualizations about expectation failures.
+- Bugfixes in the Datadog sink
+
+0.3.2
+
+- All monitoring ETL pipelines are now configured to write their event logs to the monitoring schema so that the monitoring pipelines can also be monitored. For example, the CDC Monitoring ETL pipeline will write its event log into `{monitoring_catalog}.{monitoring_schema}.cdc_connector_monitoring_etl_event_log` and the Generic SDP monitoring ETL pipeline will write its event log into `{monitoring_catalog}.{monitoring_schema}.generic_sdp_monitoring_etl_event_log`.
+- Added a fix for an issue that would cause the Monitoring ETL pipelines to periodically get stuck on `flow_targets` update.
+
+
+0.3.1
+
+- Fix an issue with pipelines execution time graph across DABs

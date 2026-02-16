@@ -1,0 +1,49 @@
+# This job will import event logs from pipelines which are not configured to store those logs
+# in Delta tables. This is an expensive operation and it is recommended that you make that
+# configuration job instead.
+#
+# This job uses `event_log()` TVF which requires the reader to the owner of the pipeline.
+# If that is not the case, you'll need to enable the `run_as` setting. If the pipelines are 
+# owned by different principals, you'll need to create a different instance for this job
+# per owner principal.
+#
+# Note that you need to add the target table name to the `imported_event_log_tables` variable for
+# it to be loaded by the monitoring ETL pipeline.
+resources:
+  jobs:
+    import_event_logs:
+      name: Import ${var.dab_type} event logs
+      # Set this to the owner principal of all imported pipelines
+      # run_as:
+      #   service_principal_name: 
+      #   user_name:
+      schedule:
+        pause_status: ${var.import_event_log_schedule_state}
+        quartz_cron_expression: ${var.import_event_log_cron_schedule}
+        timezone_id: UTC
+      email_notifications:
+        on_failure: ${var.notification_emails}
+      permissions: ${var.jobs_and_pipelines_permissions}
+      tasks:
+        - task_key: init_target_table
+          notebook_task:
+            notebook_path: ../src/create_imported_event_logs_target_table.ipynb
+            base_parameters:
+              monitoring_catalog: ${var.monitoring_catalog}
+              monitoring_schema: ${resources.schemas.monitoring_schema.name}
+              imported_event_logs_table_name: ${var.imported_event_logs_table_name}
+        - task_key: merge_logs
+          depends_on:
+            - task_key: init_target_table
+          notebook_task:
+            notebook_path: ../src/import_event_logs.ipynb
+            base_parameters:
+              monitoring_catalog: ${var.monitoring_catalog}
+              monitoring_schema: ${resources.schemas.monitoring_schema.name}
+              imported_pipeline_ids: ${var.imported_pipeline_ids}
+              imported_pipeline_tags: ${var.imported_pipeline_tags}
+              imported_event_logs_table_name: ${var.imported_event_logs_table_name}
+              pipeline_tags_index_table_name: ${var.pipeline_tags_index_table_name}
+              pipeline_tags_index_enabled: ${var.pipeline_tags_index_enabled}
+              pipeline_tags_index_max_age_hours: ${var.pipeline_tags_index_max_age_hours}
+              pipeline_tags_index_api_fallback_enabled: ${var.pipeline_tags_index_api_fallback_enabled}

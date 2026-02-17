@@ -1,12 +1,4 @@
-from databricks.bundles.jobs import (
-    Job,
-    Task,
-    NotebookTask,
-    ForEachTask,
-    TaskDependency,
-    JobEnvironment,
-    Environment,
-)
+from databricks.bundles.jobs import Job, Task, NotebookTask, ForEachTask, TaskDependency
 
 generate_items = Task(
     task_key="generate_items",

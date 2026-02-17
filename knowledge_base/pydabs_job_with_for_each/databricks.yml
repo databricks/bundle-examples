@@ -2,7 +2,6 @@
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: pydabs_job_with_foreach
-  uuid: 3874a19c-7ea5-401d-bca2-9bd1f9d3efbf
 
 python:
   venv_path: .venv

@@ -1,7 +1,7 @@
 # This is a Databricks asset bundle definition for pydabs_airflow.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: pydabs_job_conditional_execution
+  name: pydabs_job_backfill_data
 
 python:
   venv_path: .venv

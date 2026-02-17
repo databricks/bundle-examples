@@ -15,7 +15,7 @@ run_daily_sql = Task(
     ),
 )
 
-sql_backfill_example = Job(
+job = Job(
     name="sql_backfill_example",
     tasks=[run_daily_sql],
     parameters=[

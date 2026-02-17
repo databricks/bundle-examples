@@ -10,9 +10,9 @@ The Lakeflow Job consists of following tasks:
    - If bad records ≤ 100: runs `skip_path` task
 
 * `src/`: Notebook source code for this project.
-  * `src/check_quality.ipynb`: Checks data quality and outputs bad record count
-  * `src/fix_path.ipynb`: Handles cases with high bad record count
-  * `src/skip_path.ipynb`: Continues normal pipeline for good data
+  * `src/check_quality.py`: Checks data quality and outputs bad record count
+  * `src/fix_path.py`: Handles cases with high bad record count
+  * `src/skip_path.py`: The skip path
 * `resources/`:  Resource configurations (jobs, pipelines, etc.)
   * `resources/conditional_execution.py`: PyDABs job definition with conditional tasks
 

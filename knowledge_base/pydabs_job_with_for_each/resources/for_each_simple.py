@@ -21,7 +21,7 @@ process_item = Task(
     depends_on=[TaskDependency(task_key="generate_items")],
 )
 
-for_each_task_example = Job(
+job = Job(
     name="for_each_task_example",
     tasks=[generate_items, process_item],
 )

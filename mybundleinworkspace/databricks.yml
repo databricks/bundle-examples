@@ -1,0 +1,31 @@
+# This is a Databricks asset bundle definition for mybundleinworkspace.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: mybundleinworkspace
+  uuid: 7ed79d03-4c14-4d27-a7a5-8cdb509d9fb4
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://e2-dogfood.staging.cloud.databricks.com
+
+  prod:
+    mode: production
+    workspace:
+      host: https://e2-dogfood.staging.cloud.databricks.com
+      # We explicitly specify /Workspace/Users/denis.bilenko@databricks.com to make sure we only have a single copy.
+      root_path: /Workspace/Users/denis.bilenko@databricks.com/.bundle/${bundle.name}/${bundle.target}
+    permissions:
+      - user_name: denis.bilenko@databricks.com
+        level: CAN_MANAGE
+    run_as:
+      user_name: denis.bilenko@databricks.com

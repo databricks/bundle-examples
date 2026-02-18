@@ -5,10 +5,10 @@ bundle:
 resources:
   jobs:
     job_with_sql_notebook:
-      name: Job to demonstrate using a SQL notebook with a SQL warehouse
+      name: Job to demonstrate using a SQL notebook with a SQL warehouse (deployed from /Workspace)
 
       tasks:
         - task_key: notebook
           notebook_task:
             notebook_path: ./select.sql
-            warehouse_id: 744f096837fddbb4
+            warehouse_id: 58aa1b363649e722

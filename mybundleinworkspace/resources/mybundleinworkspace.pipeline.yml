@@ -1,0 +1,13 @@
+# The main pipeline for mybundleinworkspace
+resources:
+  pipelines:
+    mybundleinworkspace_pipeline:
+      name: mybundleinworkspace_pipeline
+      catalog: main
+      target: mybundleinworkspace_${bundle.target}
+      libraries:
+        - notebook:
+            path: ../src/dlt_pipeline.ipynb
+
+      configuration:
+        bundle.sourcePath: ${workspace.file_path}/src

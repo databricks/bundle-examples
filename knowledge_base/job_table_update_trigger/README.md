@@ -1,19 +1,25 @@
-# pydabs_job_file_arrival
+# job_table_update_trigger
 
-This example demonstrates a Lakeflow Job that uses file arrival triggers to automatically process new files when they arrive in a Unity Catalog Volume.
+This example demonstrates a workflow when producers write to Unity Catalog tables, consumers can trigger on table updates instead of time‑based schedules.
+
 
 The Lakeflow Job is configured with:
-- **File arrival trigger**: Monitors a Unity Catalog Volume (root or subpath) for new files, recursively.
+- **Table update trigger**: To run a job when new data is ready without the need for a continuously running cluster or knowledge of the processes that update a table.
 - **Configurable wait times**: 
-  - Minimum time between triggers: 60 seconds
-  - Wait after last file change: 90 seconds (ensures file write is complete)
-- **Automatic processing**: When files are detected, the job automatically runs and processes them
+  - Minimum time between triggers: 0 seconds
+  - Wait after last file change: 3600 seconds
+- **Automatic processing**: When updates are detected, the job automatically runs and processes them
 
 * `src/`: Notebook source code for this project.
-  * `src/files/process_files.py`: Processes newly arrived files from the volume path.
+  * `src/assets/consume_table.py`: 
 * `resources/`:  Resource configurations (jobs, pipelines, etc.)
-  * `resources/file_arrival.py`: PyDABs job with file arrival trigger configuration.
+  * `resources/table_update.py`: job with table update trigger configuration.
 
+## Documentation
+
+For more information about table update triggers, see:
+- [Trigger jobs when source tables are updated](https://docs.databricks.com/aws/en/jobs/trigger-table-update)
+- [Automating jobs with schedules and triggers](https://docs.databricks.com/en/jobs/triggers.html)
 
 ## Getting started
 
@@ -53,7 +59,7 @@ with this project. It's also possible to interact with it directly using the CLI
 
     This deploys everything that's defined for this project.
     For example, this project will deploy a job called
-    `[dev yourname] file_arrival_example` to your workspace.
+    `[dev yourname] table_update_example` to your workspace.
     You can find that resource by opening your workspace and clicking on **Jobs & Pipelines**.
 
 3. Development vs. Production behavior
@@ -61,7 +67,7 @@ with this project. It's also possible to interact with it directly using the CLI
      You can also manually run it with:
 
      ```
-     $ databricks bundle run file_arrival_example
+     $ databricks bundle run table_update_example
      ```
-   - Prod target (mode: production): Automatic triggers are active. Uploading a file to the configured Unity Catalog Volume path will trigger the job run when the trigger evaluates.
+   - Prod target (mode: production): Automatic triggers are active. Updates to the configured Unity Catalog table will trigger the job run when the trigger evaluates.
    

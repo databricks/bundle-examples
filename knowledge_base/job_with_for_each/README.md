@@ -1,4 +1,4 @@
-# pydabs_job_with_for_each
+# job_with_for_each
 
 This example demonstrates a simple Databricks job that uses a foreach task.
 
@@ -7,6 +7,10 @@ This example demonstrates a simple Databricks job that uses a foreach task.
     * `foreach/process_item.py`: A notebook which will process an item.
 * `resources/`:  Resource configurations (jobs, pipelines, etc.)
 
+## Documentation
+
+For more information about for each tasks, see:
+- [Use a For each task to run another task in a loop](https://docs.databricks.com/aws/en/jobs/for-each)
 
 ## Getting started
 
@@ -47,7 +51,7 @@ with this project. It's also possible to interact with it directly using the CLI
     This deploys everything that's defined for this project.
     For example, the default template would deploy a job called
     `[dev yourname] for_each_task_example` to your workspace.
-    You can find that resource by opening your workpace and clicking on **Jobs & Pipelines**.
+    You can find that resource by opening your workspace and clicking on **Jobs & Pipelines**.
 
 3. Similarly, to deploy a production copy, type:
    ```

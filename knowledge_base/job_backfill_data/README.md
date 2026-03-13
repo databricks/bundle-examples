@@ -1,4 +1,4 @@
-# pydabs_job_backfill_data
+# job_backfill_data
 
 This example demonstrates a Databricks Asset Bundle (DABs) Job that runs a SQL task with a date parameter for backfilling data.
 
@@ -9,7 +9,7 @@ The Job consists of:
 * `src/`: SQL and notebook source code for this project.
   * `src/my_query.sql`: Daily insert query that uses the `:run_date` parameter to filter by event date.
 * `resources/`: Resource configurations (jobs, pipelines, etc.)
-  * `resources/backfill_data.py`: PyDABs job definition with a parameterized SQL task.
+  * `resources/backfill_data.py`: job definition with a parameterized SQL task.
 
 ## Job parameters
 
@@ -18,6 +18,12 @@ The Job consists of:
 | `run_date` | `2024-01-01` | Date used to filter data (e.g. `event_date`). |
 
 Before deploying, set `warehouse_id` in `resources/backfill_data.py` to your SQL warehouse ID, and adjust the catalog/schema/table names in `src/my_query.sql` to match your environment.
+
+## Documentation
+
+For more information about job backfills and parameters, see:
+- [Create and run jobs](https://docs.databricks.com/en/jobs/index.html)
+- [Backfill jobs](https://docs.databricks.com/aws/en/jobs/backfill-jobs)
 
 ## Getting started
 

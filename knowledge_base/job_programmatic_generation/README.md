@@ -19,6 +19,12 @@ This module customizes jobs after they are loaded. The `@job_mutator` decorator 
 
 For any target other than `dev`, the mutator adds email notifications on job failure.
 
+## Documentation
+
+For more information about programmatic resource generation and mutators, see:
+- [Bundle Configuration in Python](https://docs.databricks.com/aws/en/dev-tools/bundles/python/)
+- [Mutator functions in databricks.yml](https://docs.databricks.com/aws/en/dev-tools/bundles/python/#modify-resources-defined-in-yaml-or-python)
+
 ## Getting started
 
 Choose how you want to work on this project:
@@ -57,8 +63,8 @@ with this project. It's also possible to interact with it directly using the CLI
 
     This deploys everything that's defined for this project.
     For example, the default template would deploy a job called
-    `[dev yourname] pydabs_airflow_job` to your workspace.
-    You can find that resource by opening your workpace and clicking on **Jobs & Pipelines**.
+    `[dev yourname] airflow_job` to your workspace.
+    You can find that resource by opening your workspace and clicking on **Jobs & Pipelines**.
 
 3. Similarly, to deploy a production copy, type:
    ```

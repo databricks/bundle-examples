@@ -1,7 +1,7 @@
-# This is a Databricks asset bundle definition for pydabs_airflow.
+# This is a Databricks asset bundle definition for job with for each.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: pydabs_job_file_arrival
+  name: job_with_for_each
 
 python:
   venv_path: .venv
@@ -17,5 +17,3 @@ targets:
   dev:
     mode: development
     default: true
-    workspace:
-      host: https://myworkspace.databricks.com

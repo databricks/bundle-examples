@@ -1,4 +1,4 @@
-# pydabs_job_conditional_execution
+# job_conditional_execution
 
 This example demonstrates a Lakeflow Job that uses conditional task execution based on data quality checks.
 
@@ -14,8 +14,12 @@ The Lakeflow Job consists of following tasks:
   * `src/fix_path.py`: Handles cases with high bad record count
   * `src/skip_path.py`: The skip path
 * `resources/`:  Resource configurations (jobs, pipelines, etc.)
-  * `resources/conditional_execution.py`: PyDABs job definition with conditional tasks
+  * `resources/conditional_execution.py`: job definition with conditional tasks
 
+## Documentation
+
+For more information about conditional task execution, see:
+- [Add branching logic to a job with the If/else task](https://docs.databricks.com/aws/en/jobs/if-else)
 
 ## Getting started
 

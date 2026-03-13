@@ -1,4 +1,4 @@
-# This is a Databricks asset bundle definition for pydabs_airflow.
+# This is a Databricks asset bundle definition for job programmatic generation.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: job_programmatic_generation
@@ -27,8 +27,3 @@ targets:
   dev:
     mode: development
     default: true
-
-  prod:
-    mode: production
-    workspace:
-      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}

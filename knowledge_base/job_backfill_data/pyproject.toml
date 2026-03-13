@@ -1,5 +1,5 @@
 [project]
-name = "pydabs_job_file_arrival"
+name = "job_backfill_data"
 version = "0.0.1"
 authors = [{ name = "Databricks Field Engineering" }]
 requires-python = ">=3.10,<=3.13"
@@ -14,7 +14,6 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest",
-    "databricks-connect>=15.4,<15.5",
     "databricks-bundles==0.275.0",
 ]
 

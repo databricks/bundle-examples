@@ -1,11 +1,14 @@
-# pydabs_job_with_task_values
+# job_with_task_values
 
 This example demonstrates a simple Databricks job that uses tasks values to exchange info.
 
 * `src/`: Python source code for this project.
-  * `src/pydabs_job_with_task_values/`: Shared Python code that can be used by jobs and pipelines.
 * `resources/`:  Resource configurations, in this case a Lakeflow Job with two tasks exchanging information.
 
+## Documentation
+
+For more information about task values, see:
+- [Use task values to pass information between tasks](https://docs.databricks.com/gcp/en/jobs/task-values)
 
 ## Getting started
 
@@ -46,7 +49,7 @@ with this project. It's also possible to interact with it directly using the CLI
     This deploys everything that's defined for this project.
     For example, the default template would deploy a job called
     `[dev yourname] xcom_to_task_values_example` to your workspace.
-    You can find that resource by opening your workpace and clicking on **Jobs & Pipelines**.
+    You can find that resource by opening your workspace and clicking on **Jobs & Pipelines**.
 
 3. Similarly, to deploy a production copy, type:
    ```

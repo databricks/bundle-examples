@@ -1,7 +1,7 @@
 # This is a Databricks asset bundle definition for pydabs_airflow.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: pydabs_job_programmatic_generation
+  name: job_programmatic_generation
   uuid: 3874a19c-7ea5-401d-bca2-9bd1f9d3efbf
 
 python:

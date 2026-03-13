@@ -1,11 +1,23 @@
-# pydabs_job_programmatic_generation
+# job_programmatic_generation
 
 This example demonstrates a simple Databricks job with programmatic generation and customization.
 
-* `src/`: Python source code for this project.
-  * `src/pydabs_job_programmatic_generation/`: Shared Python code that can be used by jobs and pipelines.
-* `resources/`:  Resource configurations (jobs, pipelines, etc.)
+* `src/`: Source code for this project, i.e. SQL files that are turned into jobs programmatically.
+* `resources/`: Resource configurations loaded programmatically; see below.
 
+## Programmatic resources and mutators
+
+### `resources/__init__.py`
+
+This module implements _programmatic resource loading_ for the bundle. The `load_resources` function is referenced in `databricks.yml` and is invoked by the Databricks CLI during `databricks bundle deploy`. 
+
+It scans all `src/*.sql` files and creates one job per SQL file, each having a single SQL task.
+
+### `mutators.py`
+
+This module customizes jobs after they are loaded. The `@job_mutator` decorator registers a function that receives every `Job` in the bundle and can return a modified copy.
+
+For any target other than `dev`, the mutator adds email notifications on job failure.
 
 ## Getting started
 

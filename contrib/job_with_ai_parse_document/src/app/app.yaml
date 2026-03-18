@@ -1,0 +1,14 @@
+command:
+  - "/bin/sh"
+  - "-c"
+  - "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true --server.enableCORS=false --server.enableXsrfProtection=false --browser.gatherUsageStats=false"
+
+env:
+  - name: DATABRICKS_WAREHOUSE_ID
+    value: ""  # Set to your SQL warehouse ID
+  - name: CATALOG
+    value: "main"
+  - name: SCHEMA
+    value: "default"
+  - name: VOLUME
+    value: "source_documents"

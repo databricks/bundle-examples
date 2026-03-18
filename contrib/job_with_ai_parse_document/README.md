@@ -1,15 +1,26 @@
 # AI Document Processing Job with Structured Streaming
 
-A Databricks Asset Bundle demonstrating **incremental document processing** using `ai_parse_document`, `ai_query`, and Databricks Jobs with Structured Streaming.
+A Databricks Asset Bundle demonstrating **incremental document processing** using `ai_parse_document`, `ai_query`, and Databricks Jobs with Structured Streaming. Includes an interactive **Document Analyzer App** for on-demand PDF analysis.
 
 ## Overview
 
-This example shows how to build an incremental job that:
+This example shows how to build:
+1. An **incremental ETL job** that parses, extracts, and analyzes documents at scale
+2. An **interactive Streamlit app** for uploading and analyzing individual PDFs on demand
+
+### ETL Job
 1. **Parses** PDFs and images using [`ai_parse_document`](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_parse_document)
 2. **Extracts** clean text with incremental processing
 3. **Analyzes** content using [`ai_query`](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_query) with LLMs
 
 All stages run as Python notebook tasks in a Databricks Job using Structured Streaming with serverless compute.
+
+### Document Analyzer App
+A Streamlit-based Databricks App that lets users:
+- Upload a PDF document
+- Parse it with `ai_parse_document`
+- Classify it with [`ai_classify`](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_classify)
+- Extract structured information with `ai_query` (Claude)
 
 ## Architecture
 
@@ -40,7 +51,8 @@ Source Documents (UC Volume)
   - Source documents (PDFs/images)
   - Parsed output images
   - Streaming checkpoints
-- AI functions (`ai_parse_document`, `ai_query`)
+- AI functions (`ai_parse_document`, `ai_query`, `ai_classify`)
+- A SQL warehouse (for the Document Analyzer app)
 
 ## Quick Start
 
@@ -79,7 +91,10 @@ variables:
   raw_table_name: parsed_documents_raw                            # Table names
   text_table_name: parsed_documents_text
   structured_table_name: parsed_documents_structured
+  warehouse_id: your_warehouse_id                                  # For the app
 ```
+
+For the Document Analyzer app, also update `src/app/app.yaml` with your warehouse ID.
 
 ## Job Tasks
 
@@ -108,6 +123,35 @@ Applies LLM to extract structured insights:
 - Uses `ai_query` with Claude Sonnet 4
 - Customizable prompt for domain-specific extraction
 - Outputs structured JSON
+
+## Document Analyzer App
+
+**Directory**: `src/app/`
+
+An interactive Streamlit app deployed as a Databricks App. Users can upload a PDF and get instant analysis.
+
+**How it works:**
+1. Uploads the PDF to a Unity Catalog Volume
+2. Parses the document with `ai_parse_document` (extracts text, tables, layout)
+3. Classifies the document type with `ai_classify` (Invoice, Contract, Report, etc.)
+4. Extracts structured information with `ai_query` using Claude (entities, dates, amounts, summary)
+
+**Key implementation details:**
+- Uses the **Databricks SDK Statement Execution API** (REST-based) instead of `databricks-sql-connector` for reliable connectivity inside the Databricks App container
+- Polls async SQL statements with timeout handling
+- Strips markdown code fences from LLM output before JSON parsing
+- Service principal auto-authentication via `WorkspaceClient()`
+
+**Setup:**
+1. Set `warehouse_id` in `databricks.yml` to your SQL warehouse ID
+2. Update `src/app/app.yaml` with your warehouse ID
+3. Grant the app's service principal access to your catalog, schema, and volume:
+   ```sql
+   GRANT USE CATALOG ON CATALOG <catalog> TO `<app-service-principal-id>`;
+   GRANT USE SCHEMA, SELECT, MODIFY ON SCHEMA <catalog>.<schema> TO `<app-service-principal-id>`;
+   GRANT READ VOLUME, WRITE VOLUME ON VOLUME <catalog>.<schema>.<volume> TO `<app-service-principal-id>`;
+   ```
+4. Deploy and start the app via `databricks bundle deploy`
 
 ## Visual Debugger
 
@@ -158,9 +202,14 @@ The included notebook visualizes parsing results with interactive bounding boxes
 .
 ├── databricks.yml                      # Bundle configuration
 ├── resources/
-│   └── ai_parse_document_job.job.yml
+│   ├── ai_parse_document_job.job.yml   # ETL job definition
+│   └── document_analyzer_app.app.yml   # Databricks App definition
 ├── src/
-│   ├── transformations/
+│   ├── app/                            # Document Analyzer App
+│   │   ├── app.py                      # Streamlit application
+│   │   ├── app.yaml                    # App runtime config
+│   │   └── requirements.txt            # Python dependencies
+│   ├── transformations/                # ETL job notebooks
 │   │   ├── 01_parse_documents.py
 │   │   ├── 02_extract_text.py
 │   │   └── 03_extract_structured_data.py

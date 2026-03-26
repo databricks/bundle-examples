@@ -81,7 +81,7 @@ init_bundle "default-sql" "853cd9bc-631c-4d4f-bca0-3195c7540854" '{
     "project_name":     "default_sql",
     "http_path":        "/sql/1.0/warehouses/abcdef1234567890",
     "default_catalog":  "catalog",
-    "personal_schemas": "yes, automatically use a schema based on the current user name during development"
+    "personal_schemas": "yes"
 }'
 
 init_bundle "dbt-sql" "5e5ca8d5-0388-473e-84a1-1414ed89c5df" '{
@@ -89,7 +89,7 @@ init_bundle "dbt-sql" "5e5ca8d5-0388-473e-84a1-1414ed89c5df" '{
     "http_path":        "/sql/1.0/warehouses/abcdef1234567890",
     "serverless":       "yes",
     "default_catalog":  "catalog",
-    "personal_schemas": "yes, use a schema based on the current user name during development"
+    "personal_schemas": "yes"
 }'
 
 init_bundle "lakeflow-pipelines" "295000fc-1ea8-4f43-befe-d5fb9f7d4ad4" '{
@@ -98,7 +98,6 @@ init_bundle "lakeflow-pipelines" "295000fc-1ea8-4f43-befe-d5fb9f7d4ad4" '{
     "personal_schemas": "yes",
     "language":         "sql"
 }'
-
 
 init_bundle "lakeflow-pipelines" "87a174ba-60e4-4867-a140-1936bc9b00de" '{
     "project_name":     "lakeflow_pipelines_python",

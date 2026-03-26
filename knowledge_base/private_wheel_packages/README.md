@@ -1,6 +1,6 @@
 # Private wheel packages
 
-This example demonstrates how to use a private wheel package from a job in a Declarative Automation Bundle (DAB).
+This example demonstrates how to use a private wheel package from a job in a Declarative Automation Bundle.
 
 If you are using notebooks, you can use the approach documented in [Notebook-scoped Python libraries][doc] to install
 wheels from a private repository in a notebook. You can use the workaround documented here if you are not using notebooks.
@@ -15,7 +15,7 @@ wheels from a private repository in a notebook. You can use the workaround docum
 # Usage
 
 You can refer to private wheel files from job libraries or serverless environments by downloading the wheel
-and making it part of your Declarative Automation Bundle (DAB) deployment.
+and making it part of your Declarative Automation Bundle deployment.
 
 To emulate this for this example, we will download a wheel from PyPI, include it in deployment, and refer to it from job configuration.
 

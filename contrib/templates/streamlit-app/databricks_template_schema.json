@@ -1,5 +1,5 @@
 {
-    "welcome_message": "\nWelcome to the streamlit-app template for Declarative Automation Bundles (DABs)!",
+    "welcome_message": "\nWelcome to the streamlit-app template for Declarative Automation Bundles!",
     "properties": {
         "project_name": {
             "type": "string",

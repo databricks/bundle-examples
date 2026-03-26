@@ -1,6 +1,6 @@
-# SQL Alerts with Declarative Automation Bundles (DABs)
+# SQL Alerts with Declarative Automation Bundles
 
-This example shows how to define SQL alerts using Declarative Automation Bundles (DABs). The alert monitors daily NYC Taxi revenue and triggers when it exceeds a threshold.
+This example shows how to define SQL alerts using Declarative Automation Bundles. The alert monitors daily NYC Taxi revenue and triggers when it exceeds a threshold.
 
 For more information about SQL alerts, see the [Databricks documentation](https://docs.databricks.com/aws/en/sql/user/alerts/).
 

@@ -1,6 +1,6 @@
 # Target Includes Example
 
-This example demonstrates the concept of using `target_includes` (or similar include mechanisms) in Declarative Automation Bundles (DABs) to organize job configurations across different environments without duplication.
+This example demonstrates the concept of using `target_includes` (or similar include mechanisms) in Declarative Automation Bundles to organize job configurations across different environments without duplication.
 
 It addresses the use case described in [GitHub Issue #2878](https://github.com/databricks/cli/issues/2878), which requests the ability to include specific resource files based on target configurations.
 

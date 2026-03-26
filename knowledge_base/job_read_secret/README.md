@@ -1,6 +1,6 @@
 # Databricks job that reads a secret from a secret scope
 
-This example demonstrates how to define a secret scope and a job with a task that reads from it in a Declarative Automation Bundle (DAB).
+This example demonstrates how to define a secret scope and a job with a task that reads from it in a Declarative Automation Bundle.
 
 It includes and deploys an example secret scope, and a job with a task in a bundle that reads a secret from the secret scope to a Databricks workspace.
 

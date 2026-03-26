@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "python_wheel_poetry"
 version = "0.0.1"
-description = "Example package to demonstrate using Poetry with Declarative Automation Bundles (DABs)."
+description = "Example package to demonstrate using Poetry with Declarative Automation Bundles."
 authors = ["Pieter Noordhuis <pieter.noordhuis@databricks.com>"]
 readme = "README.md"
 packages = [{ include = "python_wheel_poetry", from = "src" }]

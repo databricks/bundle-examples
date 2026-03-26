@@ -1,6 +1,6 @@
 # Zerobus - File Mode
 
-This is an (experimental) template for creating a file push pipeline with Declarative Automation Bundles (DABs). 
+This is an (experimental) template for creating a file push pipeline with Declarative Automation Bundles. 
 
 Install it using
 ```

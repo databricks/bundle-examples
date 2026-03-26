@@ -1,6 +1,6 @@
 # Save job result to volume
 
-This example demonstrates how to define and use a Unity Catalog Volume in a Declarative Automation Bundle (DAB).
+This example demonstrates how to define and use a Unity Catalog Volume in a Declarative Automation Bundle.
 
 Specifically we'll define a `hello_world_job` job which writes "Hello, World!"
 to a file in a Unity Catalog Volume.

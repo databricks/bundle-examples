@@ -1,10 +1,10 @@
 # Contrib Directory
 
-The `contrib` directory contains additional community-contributed examples and resources for Declarative Automation Bundles (DABs). These examples may include:
+The `contrib` directory contains additional community-contributed examples and resources for Declarative Automation Bundles. These examples may include:
 
 - Custom configurations and extensions
 - Advanced usage patterns
-- Tools or utilities for enhancing Declarative Automation Bundles (DABs) workflows
+- Tools or utilities for enhancing Declarative Automation Bundles workflows
 
 ## Structure
 
@@ -38,6 +38,6 @@ If you would like to add your own examples or resources, please:
 2. Include a `README.md` file explaining the contribution.
 3. Ensure that any necessary configuration files, scripts, or dependencies are included.
 
-For more information on Declarative Automation Bundles (DABs), see:
+For more information on Declarative Automation Bundles, see:
 - The launch blog post at https://www.databricks.com/blog/announcing-general-availability-databricks-asset-bundles
 - The docs at https://docs.databricks.com/dev-tools/bundles/index.html

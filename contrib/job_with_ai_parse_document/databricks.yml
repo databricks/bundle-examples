@@ -1,4 +1,4 @@
-# This is a Databricks asset bundle definition for ai_parse_document_workflow.
+# This is a Declarative Automation Bundle definition for ai_parse_document_workflow.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: ai_parse_document_workflow

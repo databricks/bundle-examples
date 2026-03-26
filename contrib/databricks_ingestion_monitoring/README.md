@@ -10,7 +10,7 @@ In particular, the package provides:
  - Provide out-of-the-box AI/BI Dashboards based on the above observability tables
  - Code and examples to integrate the observability tables with third-party monitoring providers such as Datadog, New Relic, Azure Monitor, Splunk
 
-The package contains deployable [Databricks Asset Bundles (DABs)](https://docs.databricks.com/aws/en/dev-tools/bundles/) for easy distribution:
+The package contains deployable [Declarative Automation Bundles (DABs)](https://docs.databricks.com/aws/en/dev-tools/bundles/) for easy distribution:
 
 - Generic SDP pipelines
 - CDC Connector
@@ -22,7 +22,7 @@ Coming soon
 
 # Prerequisites
 
-- [Databricks Asset Bundles (DABs)](https://docs.databricks.com/aws/en/dev-tools/bundles/)
+- [Declarative Automation Bundles (DABs)](https://docs.databricks.com/aws/en/dev-tools/bundles/)
 - PrPr for forEachBatch sinks in SDP (if using the 3P observabitlity platforms integration)
 
 

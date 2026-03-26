@@ -1,6 +1,6 @@
 # Development cluster
 
-This example demonstrates how to define and use a development (all-purpose) cluster in a Databricks Asset Bundle.
+This example demonstrates how to define and use a development (all-purpose) cluster in a Declarative Automation Bundle (DAB).
 
 This bundle defines an `example_job` which is run on a job cluster in production mode.
 

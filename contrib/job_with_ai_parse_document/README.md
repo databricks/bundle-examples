@@ -1,6 +1,6 @@
 # AI Document Processing Job with Structured Streaming
 
-A Databricks Asset Bundle demonstrating **incremental document processing** using `ai_parse_document`, `ai_query`, and Databricks Jobs with Structured Streaming.
+A Declarative Automation Bundle (DAB) demonstrating **incremental document processing** using `ai_parse_document`, `ai_query`, and Databricks Jobs with Structured Streaming.
 
 ## Overview
 
@@ -171,7 +171,7 @@ The included notebook visualizes parsing results with interactive bounding boxes
 
 ## Resources
 
-- [Databricks Asset Bundles](https://docs.databricks.com/dev-tools/bundles/)
+- [Declarative Automation Bundles (DABs)](https://docs.databricks.com/dev-tools/bundles/)
 - [Databricks Workflows](https://docs.databricks.com/workflows/)
 - [Structured Streaming](https://docs.databricks.com/structured-streaming/)
 - [`ai_parse_document` Function](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_parse_document)

@@ -1,6 +1,6 @@
 # Dashboard for NYC Taxi Trip Analysis
 
-This example shows how to define a Databricks Asset Bundle with an AI/BI dashboard and a job that captures a snapshot of the dashboard and emails it to a subscriber.
+This example shows how to define a Declarative Automation Bundle (DAB) with an AI/BI dashboard and a job that captures a snapshot of the dashboard and emails it to a subscriber.
 
 It deploys the sample __NYC Taxi Trip Analysis__ dashboard to a Databricks workspace and configures a daily schedule to run the dashboard and send the snapshot in email to a specified email address.
 

@@ -1,4 +1,4 @@
-# This is a Databricks asset bundle definition for job conditional execution.
+# This is a Declarative Automation Bundle definition for job conditional execution.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: job_conditional_execution

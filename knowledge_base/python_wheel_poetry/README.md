@@ -1,6 +1,6 @@
 # Python wheel with Poetry
 
-This example demonstrates how to use Poetry with a Databricks Asset Bundle.
+This example demonstrates how to use Poetry with a Declarative Automation Bundle (DAB).
 
 ## Prerequisites
 

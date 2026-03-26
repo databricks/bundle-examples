@@ -1,7 +1,7 @@
 # Databricks app with OLTP database
 
 This example demonstrates how to define a Databricks app backed by 
-an OLTP Postgres   in a Databricks Asset Bundle.
+an OLTP Postgres   in a Declarative Automation Bundle (DAB).
 
 It includes and deploys an example application that uses Python and Dash and a database instance.
 When application is started it provisions its own schema and demonstration data in the OLTP database.

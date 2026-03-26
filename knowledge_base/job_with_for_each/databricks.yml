@@ -1,4 +1,4 @@
-# This is a Databricks asset bundle definition for job with for each.
+# This is a Declarative Automation Bundle definition for job with for each.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: job_with_for_each

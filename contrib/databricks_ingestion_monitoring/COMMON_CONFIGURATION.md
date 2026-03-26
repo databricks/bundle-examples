@@ -1,6 +1,6 @@
 # Common Configuration Guide
 
-This document describes common configuration parameters shared among monitoring DABs (Databricks Asset Bundles).
+This document describes common configuration parameters shared among monitoring DABs (Declarative Automation Bundles).
 
 Configuration is done through variables in a DAB deployment target.
 

@@ -1,6 +1,6 @@
 # OLTP database instance with a catalog
 
-This example demonstrates how to define an OLTP database instance and a database catalog in a Databricks Asset Bundle.
+This example demonstrates how to define an OLTP database instance and a database catalog in a Declarative Automation Bundle (DAB).
 
 It includes and deploys an example database instance and a catalog. When data changes in the database instance, they are reflected in Unity Catalog.
 

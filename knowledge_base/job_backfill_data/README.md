@@ -1,6 +1,6 @@
 # job_backfill_data
 
-This example demonstrates a Databricks Asset Bundle (DABs) Job that runs a SQL task with a date parameter for backfilling data.
+This example demonstrates a Declarative Automation Bundle (DAB) Job that runs a SQL task with a date parameter for backfilling data.
 
 The Job consists of:
 

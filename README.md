@@ -1,6 +1,6 @@
 # bundle-examples
 
-This repository provides Databricks Asset Bundles examples.
+This repository provides Declarative Automation Bundles (DABs) examples.
 
 To learn more, see:
 * The launch blog post at https://www.databricks.com/blog/announcing-general-availability-databricks-asset-bundles

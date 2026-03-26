@@ -1,6 +1,6 @@
 # Job with multiple wheels
 
-This example demonstrates how to define and use a job with multiple wheel dependencies in a Databricks Asset Bundle.
+This example demonstrates how to define and use a job with multiple wheel dependencies in a Declarative Automation Bundle (DAB).
 
 One of the wheel files depends on the other. It is important to specify the order of the wheels in the job such that
 the dependent wheel is installed first, since it won't be available in a public registry.

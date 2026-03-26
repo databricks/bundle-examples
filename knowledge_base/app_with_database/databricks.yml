@@ -1,4 +1,4 @@
-# This is a Databricks asset bundle definition for app_with_database.
+# This is a Declarative Automation Bundle definition for app_with_database.
 bundle:
   name: app_with_database_example
 

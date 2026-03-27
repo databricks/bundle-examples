@@ -1,6 +1,6 @@
 # Serverless job
 
-This example demonstrates how to define and use a serverless job in a Declarative Automation Bundle.
+This Declarative Automation Bundles example demonstrates how to define a job that runs on serverless compute.
 
 For more information, please refer to the [documentation](https://docs.databricks.com/en/workflows/jobs/how-to/use-bundles-with-jobs.html#configure-a-job-that-uses-serverless-compute).
 

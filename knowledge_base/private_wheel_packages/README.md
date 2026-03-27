@@ -1,6 +1,6 @@
 # Private wheel packages
 
-This example demonstrates how to use a private wheel package from a job in a Declarative Automation Bundle.
+This Declarative Automation Bundles example demonstrates how to use a private wheel package from a job.
 
 If you are using notebooks, you can use the approach documented in [Notebook-scoped Python libraries][doc] to install
 wheels from a private repository in a notebook. You can use the workaround documented here if you are not using notebooks.

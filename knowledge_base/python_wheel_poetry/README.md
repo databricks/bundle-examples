@@ -1,6 +1,6 @@
 # Python wheel with Poetry
 
-This example demonstrates how to use Poetry with a Declarative Automation Bundle.
+This Declarative Automation Bundles example demonstrates how to use Poetry to build a whl.
 
 ## Prerequisites
 

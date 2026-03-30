@@ -1,0 +1,14 @@
+resources:
+  apps:
+    document_analyzer_app:
+      name: "document-analyzer-${bundle.target}"
+      description: "Upload and analyze PDF documents using AI functions (ai_parse_document, ai_classify, ai_query)."
+      source_code_path: ../src/app
+      resources:
+        - name: sql-warehouse
+          sql_warehouse:
+            id: ${var.warehouse_id}
+            permission: CAN_USE
+      permissions:
+        - level: CAN_USE
+          group_name: users

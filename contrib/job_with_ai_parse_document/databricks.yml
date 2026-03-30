@@ -28,6 +28,9 @@ variables:
   structured_table_name:
     description: Table name for structured data
     default: parsed_documents_structured
+  warehouse_id:
+    description: SQL warehouse ID for the Document Analyzer app
+    default: ""
 
 include:
   - resources/*.yml

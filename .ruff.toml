@@ -1,3 +1,5 @@
+line-length = 120
+
 [format]
 exclude = [
     # Templates are responsible for formatting at the source.

@@ -1,0 +1,6 @@
+resources:
+  schemas:
+    product_search_schema:
+      catalog_name: ${var.catalog}
+      name: ${var.schema}
+      comment: "Schema for the vector search product discovery example"

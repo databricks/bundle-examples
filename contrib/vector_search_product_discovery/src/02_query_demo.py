@@ -8,19 +8,25 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("index_name", "main.product_search.product_index", "Index name (3-part UC name)")
+dbutils.widgets.text(
+    "index_name", "main.product_search.product_index", "Index name (3-part UC name)"
+)
 dbutils.widgets.text("endpoint_name", "product-search-endpoint", "Endpoint name")
-dbutils.widgets.text("embedding_model", "databricks-gte-large-en", "Embedding model endpoint")
+dbutils.widgets.text(
+    "embedding_model", "databricks-gte-large-en", "Embedding model endpoint"
+)
 dbutils.widgets.text("embedding_dimension", "1024", "Embedding dimension")
-dbutils.widgets.text("query", "warm insulated jacket for cold mountain weather", "Search query")
+dbutils.widgets.text(
+    "query", "warm insulated jacket for cold mountain weather", "Search query"
+)
 dbutils.widgets.text("num_results", "5", "Number of results")
 
-index_name        = dbutils.widgets.get("index_name")
-endpoint_name     = dbutils.widgets.get("endpoint_name")
-embedding_model   = dbutils.widgets.get("embedding_model")
-embedding_dim     = int(dbutils.widgets.get("embedding_dimension"))
-query             = dbutils.widgets.get("query")
-num_results       = int(dbutils.widgets.get("num_results"))
+index_name = dbutils.widgets.get("index_name")
+endpoint_name = dbutils.widgets.get("endpoint_name")
+embedding_model = dbutils.widgets.get("embedding_model")
+embedding_dim = int(dbutils.widgets.get("embedding_dimension"))
+query = dbutils.widgets.get("query")
+num_results = int(dbutils.widgets.get("num_results"))
 
 # COMMAND ----------
 
@@ -52,7 +58,15 @@ results = index.similarity_search(
     num_results=num_results,
 )
 
-result_columns = ["product_id", "name", "category", "brand", "price", "description", "score"]
+result_columns = [
+    "product_id",
+    "name",
+    "category",
+    "brand",
+    "price",
+    "description",
+    "score",
+]
 rows = results["result"]["data_array"]
 df = pd.DataFrame(rows, columns=result_columns)
 df.index += 1
@@ -100,8 +114,10 @@ for q in example_queries:
         endpoint=embedding_model,
         inputs={"input": [q], "dimensions": embedding_dim},
     )["data"][0]["embedding"]
-    r = index.similarity_search(query_vector=qv, columns=["name", "category"], num_results=1)
+    r = index.similarity_search(
+        query_vector=qv, columns=["name", "category"], num_results=1
+    )
     top = r["result"]["data_array"]
     top_name = top[0][0] if top else "—"
-    top_cat  = top[0][1] if top else ""
+    top_cat = top[0][1] if top else ""
     print(f"{q:<55} {top_name} ({top_cat})")

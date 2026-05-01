@@ -8,17 +8,21 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("index_name", "main.product_search.product_index", "Index name (3-part UC name)")
+dbutils.widgets.text(
+    "index_name", "main.product_search.product_index", "Index name (3-part UC name)"
+)
 dbutils.widgets.text("endpoint_name", "product-search-endpoint", "Endpoint name")
-dbutils.widgets.text("embedding_model", "databricks-gte-large-en", "Embedding model endpoint")
+dbutils.widgets.text(
+    "embedding_model", "databricks-gte-large-en", "Embedding model endpoint"
+)
 dbutils.widgets.text("embedding_dimension", "1024", "Embedding dimension")
 dbutils.widgets.text("data_path", "", "Path to products.json")
 
-index_name        = dbutils.widgets.get("index_name")
-endpoint_name     = dbutils.widgets.get("endpoint_name")
-embedding_model   = dbutils.widgets.get("embedding_model")
-embedding_dim     = int(dbutils.widgets.get("embedding_dimension"))
-data_path         = dbutils.widgets.get("data_path")
+index_name = dbutils.widgets.get("index_name")
+endpoint_name = dbutils.widgets.get("endpoint_name")
+embedding_model = dbutils.widgets.get("embedding_model")
+embedding_dim = int(dbutils.widgets.get("embedding_dimension"))
+data_path = dbutils.widgets.get("data_path")
 
 # COMMAND ----------
 

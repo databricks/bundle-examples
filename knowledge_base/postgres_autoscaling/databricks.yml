@@ -9,7 +9,7 @@ resources:
   # Creating a project automatically provisions:
   #   - A default branch named "production"
   #   - A primary READ_WRITE endpoint on the default branch
-  #   - A "databricks_postgres" database
+  #   - A database with the name "databricks_postgres"
   postgres_projects:
     my_project:
       project_id: my-autoscaling-project

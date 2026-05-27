@@ -1,9 +1,6 @@
 bundle:
   name: postgres-autoscaling-example
 
-# workspace:
-#   host: https://myworkspace.cloud.databricks.com
-
 resources:
   # Top-level project container for Lakebase Autoscaling.
   # Creating a project automatically provisions:
@@ -44,3 +41,8 @@ targets:
   dev:
     default: true
     mode: development
+    workspace:
+      host: https://my-dev-workspace.cloud.databricks.com
+  prod:
+    workspace:
+      host: https://my-prod-workspace.cloud.databricks.com

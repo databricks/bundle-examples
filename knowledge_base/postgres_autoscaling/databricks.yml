@@ -13,8 +13,9 @@ resources:
       display_name: "My Autoscaling Project"
       pg_version: 17
       default_endpoint_settings:
-        # All newly created endpoints will inherit these settings
-        #   Changing these will not affect existing endpoints
+        # Newly created endpoints inherit these settings unless overridden
+        #   at the endpoint level (see "prod_read_replica" below).
+        #   Changing these will not affect existing endpoints.
         autoscaling_limit_min_cu: 1
         autoscaling_limit_max_cu: 4
         suspend_timeout_duration: "300s" # Scale-to-zero after 5 minutes

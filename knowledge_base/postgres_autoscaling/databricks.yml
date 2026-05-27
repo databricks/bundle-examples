@@ -25,11 +25,14 @@ resources:
       parent: ${resources.postgres_projects.my_project.id}/branches/production
       endpoint_id: ep-production-read-replica
       endpoint_type: ENDPOINT_TYPE_READ_ONLY
+      # Note: The below two options override the ones set in
+      #   "default_endpoint_settings" above
       autoscaling_limit_min_cu: 0.5
       autoscaling_limit_max_cu: 2
 
   # (Optional) Non-default branch for development/testing.
-  # Note: READ_WRITE endpoints are currently created by default
+  # Note: A READ_WRITE endpoint is currently created by default
+  #   when provisioning a new branch
   postgres_branches:
     dev:
       parent: ${resources.postgres_projects.my_project.id}

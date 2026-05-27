@@ -19,11 +19,11 @@ For more information about Lakebase Autoscaling, see the [documentation](https:/
 ## Usage
 
 Modify `databricks.yml`:
-* Update the `host` field under `workspace` to the Databricks workspace to deploy to
+* Update the `host` field under each target's `workspace` block (`dev` and `prod`) to point at the Databricks workspace you want to deploy to
 * Adjust `autoscaling_limit_min_cu` and `autoscaling_limit_max_cu` to fit your workload (valid range: 0.5-32 CU, max minus min cannot exceed 16 CU)
 * Adjust `suspend_timeout_duration` to control scale-to-zero behavior (minimum: 60 seconds)
 
-Run `databricks bundle deploy` to deploy the bundle.
+The bundle defines two targets: `dev` (the default) and `prod`. Run `databricks bundle deploy` to deploy to `dev`, or `databricks bundle deploy --target prod` to deploy to `prod`.
 
 Please note that after this bundle gets deployed, the project and its compute endpoints start running, which incurs cost. Endpoints with scale-to-zero enabled will suspend after the configured `suspend_timeout_duration`.
 

@@ -20,7 +20,7 @@ ORDER BY check_in_month;
 
 The metric view exposes these dimensions and measures (see [`src/bookings_kpis.metric_view.sql`](src/bookings_kpis.metric_view.sql)):
 
-- Dimensions: `check_in_date`, `check_in_month`, `status`, `guests_count`
+- Dimensions: `check_in_date`, `check_in_month`, `guests_count`
 - Measures: `total_bookings`, `total_revenue`, `avg_booking_value`, `total_guests`
 
 ## Layout
@@ -36,12 +36,13 @@ The job runs the SQL file on the warehouse you point it at. `{{catalog}}` and `{
 
 ## Getting started
 
-1. Replace `<your-serverless-warehouse-id>` in `databricks.yml` with one of your warehouse IDs (`databricks warehouses list`).
-2. `databricks bundle deploy`.
-3. `databricks bundle run bookings_kpis_metric_view`.
-4. Query the view from any SQL editor.
+1. In `databricks.yml`, replace `https://company.databricks.com` with your workspace URL, and replace `<your-warehouse-id>` with one of your warehouse IDs (`databricks warehouses list`).
+2. If you don't have write access to `main`, change `catalog:` under `targets.dev.variables` to a catalog you can write to.
+3. `databricks bundle deploy`.
+4. `databricks bundle run bookings_kpis_metric_view`.
+5. Query the view from any SQL editor.
 
 ## Notes
 
-- Requires Databricks Runtime / SQL warehouse with Metric View support (DBR 16.4+; serverless SQL warehouses are fine).
+- Requires a SQL warehouse on a runtime that supports Unity Catalog Metric Views (Public Preview; any recent serverless or PRO warehouse).
 - For production, point `source:` at a curated table from your own pipeline rather than the public sample.

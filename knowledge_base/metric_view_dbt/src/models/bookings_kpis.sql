@@ -25,27 +25,30 @@
 #}
 {{ config(materialized='metric_view') }}
 
-version: 0.1
+version: 1.0
+comment: Booking KPIs (count, revenue, AOV, guests) over samples.wanderbricks.bookings.
 source: samples.wanderbricks.bookings
 
-filter: "status = 'confirmed'"
+filter: status = 'confirmed'
 
 dimensions:
   - name: check_in_date
     expr: check_in
   - name: check_in_month
     expr: date_trunc('MONTH', check_in)
-  - name: status
-    expr: status
   - name: guests_count
     expr: guests_count
 
 measures:
   - name: total_bookings
     expr: COUNT(1)
+    comment: Number of confirmed bookings.
   - name: total_revenue
     expr: SUM(total_amount)
+    comment: Total revenue across confirmed bookings.
   - name: avg_booking_value
     expr: AVG(total_amount)
+    comment: Average revenue per confirmed booking.
   - name: total_guests
     expr: SUM(guests_count)
+    comment: Total guests across confirmed bookings.

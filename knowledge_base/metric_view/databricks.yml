@@ -35,7 +35,7 @@ targets:
     variables:
       catalog: main
       schema: ${workspace.current_user.short_name}
-      warehouse_id: <your-serverless-warehouse-id>
+      warehouse_id: <your-warehouse-id>
   prod:
     mode: production
     workspace:
@@ -44,7 +44,7 @@ targets:
     variables:
       catalog: main
       schema: prod
-      warehouse_id: <your-serverless-warehouse-id>
+      warehouse_id: <your-warehouse-id>
     permissions:
       - user_name: user@company.com
         level: CAN_MANAGE

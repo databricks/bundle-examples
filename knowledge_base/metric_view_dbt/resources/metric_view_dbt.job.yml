@@ -4,6 +4,13 @@ resources:
       name: metric_view_dbt_job
       description: Materializes the `bookings_kpis` Unity Catalog metric view via dbt-databricks.
 
+      trigger:
+        # Re-apply the view definition daily. Dev-mode deploys pause this trigger;
+        # in prod the job runs once per day. See https://docs.databricks.com/api/workspace/jobs/create#trigger
+        periodic:
+          interval: 1
+          unit: DAYS
+
       tasks:
         - task_key: dbt
           environment_key: default

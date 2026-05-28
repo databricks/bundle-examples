@@ -1,10 +1,41 @@
 # Unity Catalog Metric View
 
-This example creates a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) using a Databricks job that runs `CREATE OR REPLACE VIEW … WITH METRICS LANGUAGE YAML` on a SQL warehouse. See [`../metric_view_dbt`](../metric_view_dbt) for a dbt-based variant.
+This project demonstrates how to create a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) using Databricks Asset Bundles. Once registered, the metric view becomes available to analysts and BI tools across your workspace, queryable via the `MEASURE()` SQL function.
 
-## What it does
+**Learn more:** [Unity Catalog Metric Views](https://docs.databricks.com/aws/en/metric-views/) · dbt-based variant: [`../metric_view_dbt`](../metric_view_dbt)
 
-Defines `bookings_kpis`, a metric view over the public sample dataset `samples.wanderbricks.bookings`. Once deployed and run, you can query it like:
+## Concrete example: Definition and Usage
+
+This project defines `bookings_kpis`, a metric view over the public sample dataset `samples.wanderbricks.bookings`.
+
+### Metric View Definition
+
+A SQL task in the job runs `CREATE OR REPLACE VIEW … WITH METRICS LANGUAGE YAML` from [`src/bookings_kpis.metric_view.sql`](src/bookings_kpis.metric_view.sql):
+
+```sql
+CREATE OR REPLACE VIEW bookings_kpis
+WITH METRICS
+LANGUAGE YAML
+AS $$
+version: 1.0
+source: samples.wanderbricks.bookings
+filter: status = 'confirmed'
+dimensions:
+  - name: check_in_month
+    expr: date_trunc('MONTH', check_in)
+measures:
+  - name: total_bookings
+    expr: COUNT(1)
+  - name: total_revenue
+    expr: SUM(total_amount)
+$$;
+```
+
+`{{catalog}}` and `{{schema}}` in the SQL file are substituted from job parameters at run time.
+
+### SQL Usage
+
+Once registered, query the metric view from any SQL editor:
 
 ```sql
 SELECT
@@ -18,31 +49,49 @@ GROUP BY check_in_month
 ORDER BY check_in_month;
 ```
 
-The metric view exposes these dimensions and measures (see [`src/bookings_kpis.metric_view.sql`](src/bookings_kpis.metric_view.sql)):
+The view integrates seamlessly with:
 
-- Dimensions: `check_in_date`, `check_in_month`, `guests_count`
-- Measures: `total_bookings`, `total_revenue`, `avg_booking_value`, `total_guests`
+- SQL editors and notebooks
+- Databricks SQL dashboards / AI/BI Genie
+- Any BI tool that connects to your workspace
 
-## Layout
+## Getting Started With This Project
 
-```
-metric_view/
-  databricks.yml                         # bundle config (catalog/schema/warehouse_id vars)
-  resources/bookings_kpis.job.yml        # job with one sql_task
-  src/bookings_kpis.metric_view.sql      # CREATE VIEW ... WITH METRICS LANGUAGE YAML
-```
+### Prerequisites
 
-The job runs the SQL file on the warehouse you point it at. `{{catalog}}` and `{{schema}}` in the SQL are substituted from job parameters at run time.
+* Databricks workspace with Unity Catalog enabled
+* A SQL warehouse on a runtime that supports Unity Catalog metric views (Public Preview; any recent serverless or PRO warehouse)
+* Databricks CLI installed and configured
 
-## Getting started
+### Setup
 
 1. In `databricks.yml`, replace `https://company.databricks.com` with your workspace URL, and replace `<your-warehouse-id>` with one of your warehouse IDs (`databricks warehouses list`).
 2. If you don't have write access to `main`, change `catalog:` under `targets.dev.variables` to a catalog you can write to.
-3. `databricks bundle deploy`.
-4. `databricks bundle run bookings_kpis_metric_view`.
-5. Query the view from any SQL editor.
 
-## Notes
+### Deployment
 
-- Requires a SQL warehouse on a runtime that supports Unity Catalog Metric Views (Public Preview; any recent serverless or PRO warehouse).
-- For production, point `source:` at a curated table from your own pipeline rather than the public sample.
+Deploy to dev:
+```bash
+databricks bundle deploy --target dev
+databricks bundle run bookings_kpis_metric_view --target dev
+```
+
+Deploy to production:
+```bash
+databricks bundle deploy --target prod
+databricks bundle run bookings_kpis_metric_view --target prod
+```
+
+The metric view will be created at `<catalog>.<your_username>.bookings_kpis` (dev) or `<catalog>.prod.bookings_kpis` (prod).
+
+## Advanced Topics
+
+**Scheduling:** The job has a daily `periodic` trigger so the view definition is re-applied in production. [Development-mode](https://docs.databricks.com/dev-tools/bundles/deployment-modes.html) deploys pause the trigger automatically, so it only fires after `bundle deploy --target prod`.
+
+**Custom source table:** Point `source:` in the YAML body at any UC table you read from. The sample `samples.wanderbricks.bookings` is convenient for getting started; for production, use a curated table from your own pipeline.
+
+## Learn More
+
+- [Unity Catalog Metric Views](https://docs.databricks.com/aws/en/metric-views/) — Official documentation
+- [Metric View YAML Reference](https://docs.databricks.com/aws/en/metric-views/yaml-ref)
+- [Databricks Asset Bundles](https://docs.databricks.com/dev-tools/bundles/index.html)

@@ -1,12 +1,38 @@
 # Unity Catalog Metric View using dbt
 
-This example creates a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) using the [`metric_view` materialization](https://github.com/databricks/dbt-databricks/pull/1285) added in **dbt-databricks 1.12.0**. The deploy runs a Databricks job whose `dbt_task` executes `dbt run`, which in turn issues `CREATE OR REPLACE VIEW ... WITH METRICS LANGUAGE YAML` against your warehouse.
+This project demonstrates how to materialize a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) via dbt-databricks using Databricks Asset Bundles. The metric view is defined as a dbt model with the [`metric_view` materialization](https://github.com/databricks/dbt-databricks/pull/1285) added in **dbt-databricks 1.12.0**.
 
-See [`../metric_view`](../metric_view) for a variant that does the same thing with a raw `sql_task` (no dbt).
+**Learn more:** [Unity Catalog Metric Views](https://docs.databricks.com/aws/en/metric-views/) · SQL-job variant: [`../metric_view`](../metric_view)
 
-## What it does
+## Concrete example: Definition and Usage
 
-Defines `bookings_kpis`, a metric view over the public sample dataset `samples.wanderbricks.bookings`. Once `dbt run` has materialized it, query it like:
+This project defines `bookings_kpis`, a metric view over the public sample dataset `samples.wanderbricks.bookings`.
+
+### Metric View Definition (dbt model)
+
+The model lives in [`src/models/bookings_kpis.sql`](src/models/bookings_kpis.sql):
+
+```sql
+{{ config(materialized='metric_view') }}
+
+version: 1.0
+source: samples.wanderbricks.bookings
+filter: status = 'confirmed'
+dimensions:
+  - name: check_in_month
+    expr: date_trunc('MONTH', check_in)
+measures:
+  - name: total_bookings
+    expr: COUNT(1)
+  - name: total_revenue
+    expr: SUM(total_amount)
+```
+
+The `{{ config(materialized='metric_view') }}` line is the only jinja; everything below it is the metric view YAML body. dbt-databricks issues the equivalent `CREATE OR REPLACE VIEW … WITH METRICS LANGUAGE YAML` against the warehouse at `dbt run` time.
+
+### SQL Usage
+
+Once materialized, query the metric view from any SQL editor:
 
 ```sql
 SELECT
@@ -20,35 +46,54 @@ GROUP BY check_in_month
 ORDER BY check_in_month;
 ```
 
-The metric view exposes these dimensions and measures (see [`src/models/bookings_kpis.sql`](src/models/bookings_kpis.sql)):
+The view integrates seamlessly with:
 
-- Dimensions: `check_in_date`, `check_in_month`, `guests_count`
-- Measures: `total_bookings`, `total_revenue`, `avg_booking_value`, `total_guests`
+- SQL editors and notebooks
+- Databricks SQL dashboards / AI/BI Genie
+- Any BI tool that connects to your workspace
 
-## Layout
+## Getting Started With This Project
 
-```
-metric_view_dbt/
-  databricks.yml                          # bundle config and targets
-  dbt_project.yml                         # dbt project; points at src/models
-  dbt_profiles/profiles.yml               # profile the deployed job uses
-  resources/metric_view_dbt.job.yml       # job with one dbt_task
-  src/models/
-    bookings_kpis.sql                     # the metric_view (jinja config + YAML body)
-    schema.yml                            # dbt model docs
-```
+### Prerequisites
 
-## Getting started
+* Databricks workspace with Unity Catalog enabled
+* A SQL warehouse on a runtime that supports Unity Catalog metric views (Public Preview; any recent serverless or PRO warehouse)
+* Databricks CLI installed and configured
+
+### Setup
 
 1. In `databricks.yml`, replace `https://company.databricks.com` with your workspace URL.
-2. In `dbt_profiles/profiles.yml`, set `http_path` to one of your warehouses (`databricks warehouses list`) and update `catalog`/`schema` to something you can write to (the default is `main`, which is not always writable).
-3. `databricks bundle deploy`.
-4. `databricks bundle run metric_view_dbt_job`.
-5. Query the view from any SQL editor.
+2. In `dbt_profiles/profiles.yml`, set `http_path` to one of your warehouses (`databricks warehouses list`) and update `catalog` to one you can write to (the default `main` is often not writable).
 
-## Notes
+### Deployment
 
-- **dbt-databricks 1.12.0+ is required** — that's the version that introduced the `metric_view` materialization. The job pins it in the task environment (`resources/metric_view_dbt.job.yml`).
-- Requires a SQL warehouse on a runtime that supports Unity Catalog Metric Views (Public Preview; any recent serverless or PRO warehouse).
-- The model file is `.sql` even though its body is YAML — dbt model files must use `.sql`, and the `metric_view` materialization issues the equivalent `CREATE OR REPLACE VIEW … WITH METRICS LANGUAGE YAML` against the warehouse.
-- For production, replace `samples.wanderbricks.bookings` with a table from your own pipeline.
+Deploy to dev:
+```bash
+databricks bundle deploy --target dev
+databricks bundle run metric_view_dbt_job --target dev
+```
+
+Deploy to production:
+```bash
+databricks bundle deploy --target prod
+databricks bundle run metric_view_dbt_job --target prod
+```
+
+The metric view will be created at `<catalog>.<your_username>.bookings_kpis` (dev) or `<catalog>.default.bookings_kpis` (prod).
+
+## Advanced Topics
+
+**Scheduling:** The job has a daily `periodic` trigger so `dbt run` re-applies the view definition in production. [Development-mode](https://docs.databricks.com/dev-tools/bundles/deployment-modes.html) deploys pause the trigger automatically, so it only fires after `bundle deploy --target prod`.
+
+**dbt-databricks version:** Requires `dbt-databricks >= 1.12.0` (the `metric_view` materialization). The job pins this in its task environment (`resources/metric_view_dbt.job.yml`).
+
+**File extension:** The model file is `.sql` even though its body is YAML — dbt model files must use `.sql`. dbt-databricks wraps the body in `CREATE OR REPLACE VIEW … LANGUAGE YAML AS $$ … $$` at run time.
+
+**Custom source table:** Point `source:` in the YAML body at any UC table you read from. For production, replace the public `samples.wanderbricks.bookings` with a curated table from your own pipeline.
+
+## Learn More
+
+- [Unity Catalog Metric Views](https://docs.databricks.com/aws/en/metric-views/) — Official documentation
+- [Metric View YAML Reference](https://docs.databricks.com/aws/en/metric-views/yaml-ref)
+- [`metric_view` materialization in dbt-databricks](https://github.com/databricks/dbt-databricks/pull/1285)
+- [Databricks Asset Bundles](https://docs.databricks.com/dev-tools/bundles/index.html)

@@ -1,0 +1,25 @@
+name: 'metric_view_dbt'
+version: '1.0.0'
+config-version: 2
+
+# Which 'profile' (in dbt_profiles/profiles.yml) dbt uses for this project.
+profile: 'metric_view_dbt'
+
+# Everything dbt needs lives under src/ so that non-dbt bundle resources
+# (such as the job in resources/) can sit alongside without confusing dbt.
+model-paths: ["src/models"]
+analysis-paths: ["src/analyses"]
+test-paths: ["src/tests"]
+seed-paths: ["src/seeds"]
+macro-paths: ["src/macros"]
+snapshot-paths: ["src/snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Default materialization is 'view'; the single metric_view model overrides
+# this with `{{ config(materialized='metric_view') }}`.
+models:
+  metric_view_dbt:
+    +materialized: view

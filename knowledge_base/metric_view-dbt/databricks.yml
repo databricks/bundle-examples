@@ -1,0 +1,42 @@
+# This bundle creates a Unity Catalog Metric View using dbt-databricks.
+#
+# Metric Views are a Unity Catalog feature (Public Preview, Databricks Runtime 16.4+)
+# that let you declare reusable dimensions and measures over a base table, queryable
+# via the MEASURE() SQL function. dbt-databricks added a first-class `metric_view`
+# materialization in v1.12.0 (https://github.com/databricks/dbt-databricks/pull/1285).
+#
+# See also the SQL-job variant at ../metric_view.
+#
+# Docs:
+#   https://docs.databricks.com/aws/en/metric-views/
+#   https://docs.databricks.com/aws/en/metric-views/yaml-ref
+#   https://docs.getdbt.com/reference/resource-configs/databricks-configs
+
+bundle:
+  name: metric_view_dbt
+
+include:
+  - resources/*.yml
+
+# Deployment targets.
+# The default schema/catalog for dbt are in dbt_profiles/profiles.yml.
+targets:
+  dev:
+    # 'mode: development' creates a development copy:
+    # - Deployed resources are prefixed with '[dev my_user_name]'.
+    # - Job schedules/triggers are paused by default.
+    # See https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://company.databricks.com
+
+  prod:
+    mode: production
+    workspace:
+      host: https://company.databricks.com
+      # Pin the deploy root so a single copy of the bundle lives in production.
+      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+    permissions:
+      - user_name: user@company.com
+        level: CAN_MANAGE

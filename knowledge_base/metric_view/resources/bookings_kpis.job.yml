@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    bookings_kpis_metric_view:
+      name: bookings_kpis_metric_view
+      description: Creates/refreshes the `bookings_kpis` Unity Catalog metric view.
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: create_metric_view
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/bookings_kpis.metric_view.sql

@@ -1,0 +1,50 @@
+# This bundle shows how to create a Unity Catalog Metric View via a DABs job.
+#
+# Metric Views are a Unity Catalog feature (Public Preview, Databricks Runtime 16.4+)
+# that let you declare reusable dimensions and measures over a base table, queryable
+# via the MEASURE() SQL function. DABs does not yet have a first-class resource type
+# for metric views, so this example uses a SQL task in a job to run
+# `CREATE OR REPLACE VIEW ... WITH METRICS LANGUAGE YAML`.
+#
+# See also the dbt-based variant at ../metric_view-dbt.
+#
+# Docs:
+#   https://docs.databricks.com/aws/en/metric-views/
+#   https://docs.databricks.com/aws/en/metric-views/yaml-ref
+
+bundle:
+  name: metric_view
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: The Unity Catalog catalog where the metric view will be created
+  schema:
+    description: The schema where the metric view will be created
+  warehouse_id:
+    description: SQL warehouse ID used to run the CREATE VIEW statement. Find one via `databricks warehouses list`.
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://company.databricks.com
+    variables:
+      catalog: main
+      schema: ${workspace.current_user.short_name}
+      warehouse_id: <your-serverless-warehouse-id>
+  prod:
+    mode: production
+    workspace:
+      host: https://company.databricks.com
+      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: main
+      schema: prod
+      warehouse_id: <your-serverless-warehouse-id>
+    permissions:
+      - user_name: user@company.com
+        level: CAN_MANAGE

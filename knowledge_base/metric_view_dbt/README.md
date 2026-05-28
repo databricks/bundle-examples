@@ -28,7 +28,7 @@ The metric view exposes these dimensions and measures (see [`src/models/bookings
 ## Layout
 
 ```
-metric_view-dbt/
+metric_view_dbt/
   databricks.yml                          # bundle config and targets
   dbt_project.yml                         # dbt project; points at src/models
   dbt_profiles/profiles.yml               # profile the deployed job uses

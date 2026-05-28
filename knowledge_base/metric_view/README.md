@@ -1,6 +1,6 @@
 # Unity Catalog Metric View (via a DABs job)
 
-This example creates a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) using a Databricks job that runs `CREATE OR REPLACE VIEW … WITH METRICS LANGUAGE YAML` on a SQL warehouse. See [`../metric_view-dbt`](../metric_view-dbt) for a dbt-based variant.
+This example creates a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) using a Databricks job that runs `CREATE OR REPLACE VIEW … WITH METRICS LANGUAGE YAML` on a SQL warehouse. See [`../metric_view_dbt`](../metric_view_dbt) for a dbt-based variant.
 
 ## What it does
 

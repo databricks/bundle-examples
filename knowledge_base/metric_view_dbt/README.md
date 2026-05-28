@@ -1,4 +1,4 @@
-# Unity Catalog Metric View (via dbt)
+# Unity Catalog Metric View using dbt
 
 This example creates a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) using the [`metric_view` materialization](https://github.com/databricks/dbt-databricks/pull/1285) added in **dbt-databricks 1.12.0**. The deploy runs a Databricks job whose `dbt_task` executes `dbt run`, which in turn issues `CREATE OR REPLACE VIEW ... WITH METRICS LANGUAGE YAML` against your warehouse.
 

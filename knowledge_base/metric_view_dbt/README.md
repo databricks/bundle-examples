@@ -1,6 +1,6 @@
 # Unity Catalog Metric View using dbt
 
-This project demonstrates how to materialize a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) via dbt-databricks using Databricks Asset Bundles. The metric view is defined as a dbt model with the [`metric_view` materialization](https://github.com/databricks/dbt-databricks/pull/1285) added in **dbt-databricks 1.12.0**.
+This project demonstrates how to materialize a [Unity Catalog Metric View](https://docs.databricks.com/metric-views/) via dbt-databricks using Declarative Automation Bundles. The metric view is defined as a dbt model with the [`metric_view` materialization](https://github.com/databricks/dbt-databricks/pull/1285) added in **dbt-databricks 1.12.0**.
 
 **Learn more:** [Unity Catalog Metric Views](https://docs.databricks.com/aws/en/metric-views/) · SQL-job variant: [`../metric_view`](../metric_view)
 
@@ -93,7 +93,7 @@ The metric view will be created at `<catalog>.<your_username>.bookings_kpis` (de
 
 ## Learn More
 
-- [Unity Catalog Metric Views](https://docs.databricks.com/aws/en/metric-views/) — Official documentation
-- [Metric View YAML Reference](https://docs.databricks.com/aws/en/metric-views/yaml-ref)
+- [Unity Catalog Metric Views](https://docs.databricks.com/metric-views/) — Official documentation
+- [Metric View YAML Reference](https://docs.databricks.com/metric-views/yaml-ref)
 - [`metric_view` materialization in dbt-databricks](https://github.com/databricks/dbt-databricks/pull/1285)
-- [Databricks Asset Bundles](https://docs.databricks.com/dev-tools/bundles/index.html)
+- [Declarative Automation Bundles](https://docs.databricks.com/dev-tools/bundles/index.html)

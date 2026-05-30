@@ -1,14 +1,13 @@
 # Unity Catalog Metric View
 
-This project demonstrates how to create a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) using Databricks Asset Bundles. Once registered, the metric view becomes available to analysts and BI tools across your workspace, queryable via the `MEASURE()` SQL function.
+This project demonstrates how to create a [Unity Catalog Metric View](https://docs.databricks.com/aws/en/metric-views/) using Declarative Automation Bundles. Once registered, the metric view becomes available to analysts and BI tools across your workspace, queryable via the `MEASURE()` SQL function.
 
-**Learn more:** [Unity Catalog Metric Views](https://docs.databricks.com/aws/en/metric-views/) · dbt-based variant: [`../metric_view_dbt`](../metric_view_dbt)
 
 ## Concrete example: Definition and Usage
 
-This project defines `bookings_kpis`, a metric view over the public sample dataset `samples.wanderbricks.bookings`.
+## `bookings_kpis` metric view
 
-### Metric View Definition
+This project defines `bookings_kpis`, a metric view over the public sample dataset `samples.wanderbricks.bookings`.
 
 A SQL task in the job runs `CREATE OR REPLACE VIEW … WITH METRICS LANGUAGE YAML` from [`src/bookings_kpis.metric_view.sql`](src/bookings_kpis.metric_view.sql):
 
@@ -60,7 +59,7 @@ The view integrates seamlessly with:
 ### Prerequisites
 
 * Databricks workspace with Unity Catalog enabled
-* A SQL warehouse on a runtime that supports Unity Catalog metric views (Public Preview; any recent serverless or PRO warehouse)
+* A SQL warehouse on a runtime that supports Unity Catalog metric views
 * Databricks CLI installed and configured
 
 ### Setup
@@ -84,14 +83,14 @@ databricks bundle run bookings_kpis_metric_view --target prod
 
 The metric view will be created at `<catalog>.<your_username>.bookings_kpis` (dev) or `<catalog>.prod.bookings_kpis` (prod).
 
-## Advanced Topics
+### Notes
 
-**Scheduling:** The job has a daily `periodic` trigger so the view definition is re-applied in production. [Development-mode](https://docs.databricks.com/dev-tools/bundles/deployment-modes.html) deploys pause the trigger automatically, so it only fires after `bundle deploy --target prod`.
+- The job has a daily `periodic` trigger so the view definition is re-applied in production. [Development-mode](https://docs.databricks.com/dev-tools/bundles/deployment-modes.html) pauses the trigger automatically, so it only fires after `bundle deploy --target prod`.
 
-**Custom source table:** Point `source:` in the YAML body at any UC table you read from. The sample `samples.wanderbricks.bookings` is convenient for getting started; for production, use a curated table from your own pipeline.
+- Set `source:` in the YAML body to any UC table you read from. The sample `samples.wanderbricks.bookings` is convenient for getting started. For production, use a table from your own pipeline.
 
 ## Learn More
 
-- [Unity Catalog Metric Views](https://docs.databricks.com/aws/en/metric-views/) — Official documentation
-- [Metric View YAML Reference](https://docs.databricks.com/aws/en/metric-views/yaml-ref)
-- [Databricks Asset Bundles](https://docs.databricks.com/dev-tools/bundles/index.html)
+- [Unity Catalog Metric Views](https://docs.databricks.com/metric-views/) — Official documentation
+- [Metric View YAML Reference](https://docs.databricks.com/metric-views/yaml-ref)
+- [Declarative Automation Bundles](https://docs.databricks.com/dev-tools/bundles/index.html)

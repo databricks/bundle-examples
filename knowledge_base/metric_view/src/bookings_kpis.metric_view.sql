@@ -1,5 +1,5 @@
 -- Create (or replace) a Unity Catalog Metric View over samples.wanderbricks.bookings.
--- See https://docs.databricks.com/aws/en/metric-views/yaml-ref for the YAML syntax.
+-- See https://docs.databricks.com/metric-views/yaml-ref for the YAML syntax.
 --
 -- Once deployed and run, query the metric view from any SQL editor with:
 --   SELECT MEASURE(total_bookings), MEASURE(total_revenue)

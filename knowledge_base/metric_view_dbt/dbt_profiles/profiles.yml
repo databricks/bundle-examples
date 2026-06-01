@@ -24,7 +24,7 @@ metric_view_dbt:
       type: databricks
       method: http
       catalog: main
-      schema: default
+      schema: prod
 
       http_path: /sql/1.0/warehouses/abcdef1234567890
 

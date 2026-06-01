@@ -2,7 +2,7 @@
   A Unity Catalog Metric View, materialized by dbt-databricks.
 
   Everything below the `config(...)` line is the metric-view YAML body (see
-  https://docs.databricks.com/aws/en/metric-views/yaml-ref). The metric_view
+  https://docs.databricks.com/metric-views/yaml-ref). The metric_view
   materialization wraps it in:
 
       CREATE OR REPLACE VIEW <relation> WITH METRICS LANGUAGE YAML AS <yaml>
@@ -18,7 +18,7 @@
         MEASURE(total_bookings)    AS bookings,
         MEASURE(total_revenue)     AS revenue,
         MEASURE(avg_booking_value) AS aov
-      FROM main.<your_schema>.bookings_kpis
+      FROM <catalog>.<your_schema>.bookings_kpis
       WHERE check_in_date >= '2024-01-01'
       GROUP BY check_in_month
       ORDER BY check_in_month;

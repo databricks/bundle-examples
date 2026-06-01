@@ -3,7 +3,7 @@
 --
 -- Once deployed and run, query the metric view from any SQL editor with:
 --   SELECT MEASURE(total_bookings), MEASURE(total_revenue)
---   FROM <catalog>.<schema>.bookings_kpis
+--   FROM <catalog>.<your_schema>.bookings_kpis
 --   WHERE check_in_month >= '2024-01-01'
 --   GROUP BY check_in_month;
 

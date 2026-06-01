@@ -1,7 +1,10 @@
 resources:
   vector_search_indexes:
     product_index:
-      name: ${var.catalog}.${var.schema}.product_index
+      # Reference the schema *resource* (not ${var.schema}) so the index lands in the
+      # actually-deployed schema. In development mode the schema name is prefixed,
+      # and this reference picks that up.
+      name: ${var.catalog}.${resources.schemas.product_search_schema.name}.product_index
       endpoint_name: ${resources.vector_search_endpoints.product_search_endpoint.name}
       primary_key: product_id
       index_type: DIRECT_ACCESS

@@ -143,8 +143,8 @@ table and it keeps itself up to date. Replace `index_type: DIRECT_ACCESS` and
 │   ├── schema.yml                  # Unity Catalog schema
 │   ├── endpoint.yml                # Vector Search endpoint
 │   ├── index.yml                   # Direct Access index
-│   ├── setup_job.job.yml           # Embed + upsert job
-│   └── query_demo.job.yml          # Query job (--params "query=...")
+│   ├── setup_job.yml               # Embed + upsert job
+│   └── query_demo.yml              # Query job (--params "query=...")
 └── src/
     ├── 01_upsert_products.py       # Reads products.json, embeds, calls upsert_data
     └── 02_query_demo.py            # Semantic search — runs as job or interactively

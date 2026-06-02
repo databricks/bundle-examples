@@ -6,7 +6,7 @@ bundle:
 
 variables:
   catalog:
-    description: Unity Catalog catalog name
+    description: Unity Catalog catalog name for an existing catalog
     default: main
   schema:
     description: Unity Catalog schema name for the product search use case
@@ -27,20 +27,14 @@ include:
   - resources/*.yml
 
 targets:
-  dev:
-    # The default target uses 'mode: development' to create a development copy.
-    # - Deployed resources get prefixed with '[dev my_user_name]'
-    # - Any job schedules and triggers are paused by default.
-    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
-    mode: development
+  prod:
+    mode: production
     default: true
     workspace:
       host: https://your-workspace.cloud.databricks.com
-
-  prod:
-    mode: production
-    workspace:
-      host: https://your-workspace.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
     permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE
       - group_name: users
         level: CAN_VIEW

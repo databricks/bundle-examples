@@ -50,7 +50,7 @@ ranked results
    databricks auth login --host https://your-workspace.cloud.databricks.com
    ```
 
-2. **Configure** `databricks.yml` — set the `dev` workspace host and any variable overrides
+2. **Configure** `databricks.yml` — set the workspace host and any variable overrides
 
 3. **Deploy** — creates the schema, endpoint, index, jobs, and syncs `data/products.json`
    ```bash

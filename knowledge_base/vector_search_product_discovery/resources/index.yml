@@ -8,9 +8,16 @@ resources:
       direct_access_index_spec:
         # schema_json is a flat {"column_name": "type"} map serialised as a JSON string.
         # description_vector stores the pre-computed embedding produced by 01_upsert_products.py.
-        schema_json: >-
-          {"product_id":"int","name":"string","category":"string","brand":"string",
-           "price":"float","description":"string","description_vector":"array<float>"}
+        schema_json: |-
+          {
+            "product_id": "int",
+            "name": "string",
+            "category": "string",
+            "brand": "string",
+            "price": "float",
+            "description": "string",
+            "description_vector": "array<float>"
+          }
         embedding_vector_columns:
           - name: description_vector
             embedding_dimension: 1024

@@ -1,0 +1,34 @@
+resources:
+  jobs:
+    metric_view_dbt_job:
+      name: metric_view_dbt_job
+      description: Materializes the `bookings_kpis` Unity Catalog metric view via dbt-databricks.
+
+      trigger:
+        # Re-apply the view definition daily. Dev-mode deploys pause this trigger;
+        # in prod the job runs once per day. See https://docs.databricks.com/api/workspace/jobs/create#trigger
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      tasks:
+        - task_key: dbt
+          environment_key: default
+          dbt_task:
+            project_directory: ../
+            # The default schema/catalog are defined in ../dbt_profiles/profiles.yml.
+            profiles_directory: dbt_profiles/
+            # `dev_schema` is consumed by the 'dev' target in profiles.yml so
+            # each developer gets their own schema (matches DABs dev-mode prefixing).
+            commands:
+              - 'dbt deps --target=${bundle.target}'
+              - 'dbt run --target=${bundle.target} --vars "{ dev_schema: ${workspace.current_user.short_name} }"'
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+            dependencies:
+              # The metric_view materialization landed in dbt-databricks 1.12.0
+              # (https://github.com/databricks/dbt-databricks/pull/1285).
+              - dbt-databricks>=1.12.0,<2.0.0

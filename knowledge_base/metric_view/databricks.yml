@@ -1,0 +1,38 @@
+# This example bundle defines a job that creates a Unity Catalog Metric View.
+#
+# Metric Views are a Unity Catalog feature that let you declare reusable
+# dimensions and measures over a base table, queryable via the MEASURE() SQL
+# function.
+#
+# Docs:
+#   https://docs.databricks.com/metric-views/
+#   https://docs.databricks.com/metric-views/yaml-ref
+
+bundle:
+  name: metric_view
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: The Unity Catalog where the metric view will be created.
+  schema:
+    description: The schema where the metric view will be created.
+  warehouse_id:
+    description: SQL warehouse ID used to run the CREATE VIEW statement. To list available warehouses, use `databricks warehouses list`.
+
+targets:
+  dev:
+    mode: development
+    default: true
+    variables:
+      catalog: main
+      schema: ${workspace.current_user.short_name}
+      warehouse_id: <your-warehouse-id>
+  prod:
+    mode: production
+    variables:
+      catalog: main
+      schema: prod
+      warehouse_id: <your-warehouse-id>

@@ -1,0 +1,27 @@
+# This example bundle materializes a Unity Catalog Metric View using dbt-databricks.
+#
+# Metric Views are a Unity Catalog feature that let you declare reusable
+# dimensions and measures over a base table, queryable via the MEASURE() SQL
+# function.
+#
+# See also the SQL-job variant at ../metric_view.
+#
+# Docs:
+#   https://docs.databricks.com/metric-views/
+#   https://docs.databricks.com/metric-views/yaml-ref
+#   https://docs.getdbt.com/reference/resource-configs/databricks-configs
+
+bundle:
+  name: metric_view_dbt
+
+include:
+  - resources/*.yml
+
+# Deployment targets.
+# The schema and catalog for dbt are configured in dbt_profiles/profiles.yml.
+targets:
+  dev:
+    mode: development
+    default: true
+  prod:
+    mode: production

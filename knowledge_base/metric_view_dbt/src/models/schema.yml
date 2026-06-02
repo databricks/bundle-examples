@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: bookings_kpis
+    description: |
+      Unity Catalog Metric View over the public sample `samples.wanderbricks.bookings`.
+      Exposes booking-count, revenue, and average-value measures sliceable by date,
+      status, and guest count. Query via `MEASURE(<measure>) ... GROUP BY <dimension>`.

@@ -1,0 +1,32 @@
+# dbt profiles used by the deployed dbt job in resources/metric_view_dbt.job.yml.
+#
+# For local development with the dbt CLI you should create your own profile in
+# ~/.dbt/profiles.yml using `dbt init`; this file is only read by the job.
+metric_view_dbt:
+  target: dev # default target
+  outputs:
+
+    # The 'dev' target uses the workspace's current_user.short_name as the
+    # schema (passed in as the `dev_schema` var from the job; see the job YAML).
+    dev:
+      type: databricks
+      method: http
+      catalog: main
+      schema: "{{ var('dev_schema') }}"
+
+      http_path: /sql/1.0/warehouses/abcdef1234567890
+
+      # DBT_HOST / DBT_ACCESS_TOKEN are injected by Databricks at run time.
+      host: "{{ env_var('DBT_HOST') }}"
+      token: "{{ env_var('DBT_ACCESS_TOKEN') }}"
+
+    prod:
+      type: databricks
+      method: http
+      catalog: main
+      schema: prod
+
+      http_path: /sql/1.0/warehouses/abcdef1234567890
+
+      host: "{{ env_var('DBT_HOST') }}"
+      token: "{{ env_var('DBT_ACCESS_TOKEN') }}"

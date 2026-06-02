@@ -1,0 +1,25 @@
+resources:
+  jobs:
+    bookings_kpis_metric_view:
+      name: bookings_kpis_metric_view
+      description: Creates/refreshes the `bookings_kpis` Unity Catalog metric view.
+
+      trigger:
+        # Re-apply the view definition daily. Dev deployment mode pauses this trigger;
+        # in prod the job runs once per day. See https://docs.databricks.com/api/workspace/jobs/create#trigger
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      tasks:
+        - task_key: create_metric_view
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ../src/bookings_kpis.metric_view.sql

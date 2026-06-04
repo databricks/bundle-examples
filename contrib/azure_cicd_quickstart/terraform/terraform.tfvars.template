@@ -1,0 +1,86 @@
+# Update with your actual values
+
+# ==============================================================================
+# AZURE DEVOPS ORGANIZATION CONFIGURATION
+# ==============================================================================
+# Your Azure DevOps organization name (from https://dev.azure.com/{org_name})
+organization_name = "YOUR_ORGANIZATION_NAME"
+
+# Your Azure DevOps organization GUID 
+# Get this from Azure DevOps organization settings -> Microsoft Entra -> Download
+organization_id = "YOUR_ORGANIZATION_GUID"
+
+# Azure DevOps Personal Access Token with required permissions:
+# - Project and Team: Read & Write
+# - Service Connections: Read & Write  
+# - Build: Read & Execute
+azdo_personal_access_token = "YOUR_AZDO_PAT_TOKEN"
+
+# ==============================================================================
+# PROJECT CONFIGURATION
+# ==============================================================================
+project_name        = "YOUR_PROJECT_NAME"
+project_description = "Description of your Azure DevOps project"
+project_visibility  = "private"  # or "public"
+
+pipeline_name     = "DAB-CI-Pipeline"
+pipeline_yml_path = "azure-pipelines.yml"
+
+# ==============================================================================
+# MANAGEMENT RESOURCE GROUP
+# ==============================================================================
+# Resource Group where managed identities will be created (can be in any subscription)
+resource_group_name = "YOUR_MANAGEMENT_RESOURCE_GROUP_NAME"
+
+# ==============================================================================
+# DEV ENVIRONMENT CONFIGURATION
+# ==============================================================================
+# Dev Azure subscription details
+azure_subscription_id_dev   = "YOUR_DEV_AZURE_SUBSCRIPTION_ID"
+azure_subscription_name_dev = "YOUR_DEV_AZURE_SUBSCRIPTION_NAME"
+service_connection_name_dev  = "YOUR_PROJECT_NAME-Dev-Connection"
+databricks_host_dev         = "https://<your-dev-workspace-id>.azuredatabricks.net/"
+
+# ==============================================================================
+# TEST ENVIRONMENT CONFIGURATION
+# ==============================================================================
+# Test Azure subscription details
+azure_subscription_id_test   = "YOUR_TEST_AZURE_SUBSCRIPTION_ID"
+azure_subscription_name_test = "YOUR_TEST_AZURE_SUBSCRIPTION_NAME"
+service_connection_name_test  = "YOUR_PROJECT_NAME-Test-Connection"
+databricks_host_test         = "https://<your-test-workspace-id>.azuredatabricks.net/"
+
+# ==============================================================================
+# PROD ENVIRONMENT CONFIGURATION
+# ==============================================================================
+# Prod Azure subscription details
+azure_subscription_id_prod   = "YOUR_PROD_AZURE_SUBSCRIPTION_ID"
+azure_subscription_name_prod = "YOUR_PROD_AZURE_SUBSCRIPTION_NAME" 
+service_connection_name_prod  = "YOUR_PROJECT_NAME-Prod-Connection"
+databricks_host_prod         = "https://<your-prod-workspace-id>.azuredatabricks.net/"
+
+# ==============================================================================
+# INSTRUCTIONS FOR CUSTOMERS
+# ==============================================================================
+# 1. Copy this file to terraform.tfvars
+# 2. Replace all YOUR_* placeholders with actual values
+# 3. Ensure the management resource group exists before running terraform
+# 4. Generate Azure DevOps PAT with required permissions
+# 5. Run: terraform init && terraform plan && terraform apply
+#
+# This single deployment will create:
+# - Azure DevOps project and pipeline
+# - 3 variable groups (Dev, Test, Prod)
+# - 3 managed identities (one per environment)
+# - 3 service connections (one per environment/subscription)
+#
+# Required Azure DevOps PAT Permissions:
+# - Project and Team (Read & Write)
+# - Service Connections (Read & Write)
+# - Build (Read & Execute)
+#
+# Prerequisites:
+# - Azure CLI installed and logged in (az login)
+# - Terraform installed
+# - Access to all target subscriptions as Owner or Contributor
+# - Azure DevOps organization with appropriate permissions

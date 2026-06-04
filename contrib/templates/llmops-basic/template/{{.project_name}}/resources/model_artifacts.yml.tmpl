@@ -1,0 +1,21 @@
+resources:
+  registered_models:
+    sentiment_model:
+      name: ${var.model_name}
+      catalog_name: ${var.catalog_name}
+      schema_name: ${resources.schemas.sentiment_schema.name}
+      comment: Registered model in Unity Catalog for ${bundle.target} deployment target
+      grants:
+        - privileges:
+            - EXECUTE
+          principal: account users
+
+  experiments:
+    experiment:
+      name: ${var.experiment_name}
+
+  schemas:
+    sentiment_schema:
+      name: ${var.schema_name}
+      catalog_name: ${var.catalog_name}
+

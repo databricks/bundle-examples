@@ -1,0 +1,26 @@
+# The main configuration for serverless task
+resources:
+  jobs:
+    my_serverless_workflow:
+      name: my_serverless_workflow_${var.env}
+
+      schedule:
+        # Run every day at 8:00 AM
+        quartz_cron_expression: '0 0 8 * * ?'
+        timezone_id: Europe/Amsterdam
+
+      email_notifications:
+        on_failure:
+          - {{ your_email_address }}
+
+      tasks:
+        - task_key: python_job_serverless
+          spark_python_task:
+            python_file: ../../src/python/serverless_job.py
+
+          # The key that references an environment spec in a job.
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec: ${var.default_serverless_env_spec}

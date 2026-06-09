@@ -22,3 +22,17 @@ targets:
     permissions:
       - group_name: users
         level: CAN_MANAGE
+    resources:
+      jobs:
+        freshness_check:
+          name: Source freshness SLA
+          tags: {domain: platform, team: platform}
+          trigger:
+            periodic: {interval: 12, unit: HOURS}
+          tasks:
+            - task_key: freshness
+              environment_key: default
+              spark_python_task:
+                python_file: src/freshness_check.py
+          environments:
+            - {environment_key: default, spec: {client: "1"}}

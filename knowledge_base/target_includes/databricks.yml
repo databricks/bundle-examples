@@ -1,5 +1,5 @@
 bundle:
-  name: target-includes-example
+  name: wanderbricks_multi_env
 
 include:
   - resources/set1/*.yml

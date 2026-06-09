@@ -1,5 +1,5 @@
 bundle:
-  name: databricks_app
+  name: wanderbricks_ops_app
 
 include:
   - resources/*.yml

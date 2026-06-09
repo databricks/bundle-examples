@@ -1,5 +1,5 @@
 bundle:
-  name: job-read-secret-example
+  name: wanderbricks_secrets
 
 # workspace:
 #   host: https://myworkspace.cloud.databricks.com
@@ -21,10 +21,16 @@ resources:
           default: ${resources.secret_scopes.my_secret_scope.name}
       tasks:
         - task_key: example_python_task
+          environment_key: default
           spark_python_task:
             python_file: "src/example_spark_python_task.py"
             parameters:
               - --scope_name={{job.parameters.scope_name}}
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
 
 # Defines the targets for this bundle.
 # Targets allow you to deploy the same bundle to different Databricks workspaces.

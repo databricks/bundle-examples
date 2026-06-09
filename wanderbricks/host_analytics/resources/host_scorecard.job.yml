@@ -1,0 +1,16 @@
+resources:
+  jobs:
+    host_scorecard:
+      name: Host scorecard
+      tags: {domain: host_analytics, team: supply}
+      tasks:
+        - task_key: scorecard
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/host_scorecard.py
+            parameters: ["--catalog={{job.parameters.catalog}}", "--schema={{job.parameters.schema}}"]
+      parameters:
+        - {name: catalog, default: "${var.catalog}"}
+        - {name: schema, default: "${var.schema}"}
+      environments:
+        - {environment_key: default, spec: {client: "1"}}

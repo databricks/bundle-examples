@@ -1,6 +1,15 @@
 # Demand forecasting ML project (Data Science).
 bundle:
-  name: demand_ml
+  name: demand_forecasting
+
+variables:
+  catalog:
+    description: Catalog for prediction outputs.
+    default: main
+  schema:
+    description: Schema for prediction outputs.
+    default: demand_ml
+
 
 include:
   - resources/*.yml

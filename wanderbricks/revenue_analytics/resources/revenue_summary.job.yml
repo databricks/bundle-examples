@@ -5,7 +5,7 @@ resources:
       description: Daily revenue aggregated by payment method.
       tags: {domain: revenue, team: analytics-eng}
       trigger:
-        periodic: {interval: 1, unit: DAYS}
+        periodic: {interval: 7, unit: DAYS}
       email_notifications:
         on_failure: ["data-eng@wanderbricks.example"]
       queue: {enabled: true}

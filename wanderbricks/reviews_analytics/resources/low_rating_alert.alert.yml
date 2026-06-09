@@ -1,0 +1,18 @@
+resources:
+  alerts:
+    low_rating:
+      display_name: "Low average rating alert"
+      warehouse_id: ${var.warehouse_id}
+      query_text: |
+        SELECT property_id, avg(rating) AS avg_rating
+        FROM samples.wanderbricks.reviews WHERE is_deleted = false
+        GROUP BY property_id ORDER BY avg_rating ASC
+      evaluation:
+        comparison_operator: "LESS_THAN"
+        source: {aggregation: "MIN", display: "avg_rating", name: "avg_rating"}
+        threshold: {value: {double_value: 2.0}}
+        notification: {notify_on_ok: false, retrigger_seconds: 86400}
+      schedule:
+        pause_status: "UNPAUSED"
+        quartz_cron_schedule: "0 0 9 ? * MON"
+        timezone_id: "UTC"

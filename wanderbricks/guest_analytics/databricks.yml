@@ -6,6 +6,8 @@ include:
   - resources/*.yml
 
 variables:
+  warehouse_id:
+    description: SQL warehouse for the cohorts job and alert.
   catalog:
     description: Catalog for outputs.
   schema:

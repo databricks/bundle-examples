@@ -1,0 +1,13 @@
+resources:
+  jobs:
+    guest_cohorts:
+      name: Guest cohorts
+      tags: {domain: guest_analytics, team: growth}
+      trigger:
+        periodic: {interval: 1, unit: DAYS}
+      parameters:
+        - {name: catalog, default: "${var.catalog}"}
+        - {name: schema, default: "${var.schema}"}
+      tasks:
+        - task_key: cohorts
+          sql_task: {warehouse_id: "${var.warehouse_id}", file: {path: ../src/guest_cohorts.sql}}

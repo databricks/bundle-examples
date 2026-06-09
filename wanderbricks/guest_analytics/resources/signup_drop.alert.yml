@@ -1,0 +1,14 @@
+resources:
+  alerts:
+    signup_drop:
+      display_name: "Guest signup drop alert"
+      warehouse_id: ${var.warehouse_id}
+      query_text: |
+        SELECT to_date(created_at) AS day, count(*) AS new_guests
+        FROM samples.wanderbricks.users GROUP BY ALL ORDER BY 1 DESC
+      evaluation:
+        comparison_operator: "LESS_THAN"
+        source: {aggregation: "MIN", display: "new_guests", name: "new_guests"}
+        threshold: {value: {double_value: 5.0}}
+        notification: {notify_on_ok: false, retrigger_seconds: 86400}
+      schedule: {pause_status: "UNPAUSED", quartz_cron_schedule: "0 30 8 * * ?", timezone_id: "UTC"}

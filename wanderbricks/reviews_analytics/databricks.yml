@@ -1,11 +1,13 @@
 # Reviews & quality data product (Trust & Quality).
 bundle:
-  name: reviews
+  name: reviews_analytics
 
 include:
   - resources/*.yml
 
 variables:
+  warehouse_id:
+    description: SQL warehouse for the alert.
   catalog:
     description: Catalog for outputs.
   schema:

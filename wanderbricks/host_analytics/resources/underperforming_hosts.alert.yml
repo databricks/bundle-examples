@@ -1,0 +1,17 @@
+resources:
+  alerts:
+    underperforming_hosts:
+      display_name: "Underperforming hosts alert"
+      warehouse_id: ${var.warehouse_id}
+      query_text: |
+        SELECT h.host_id, h.name, avg(r.rating) AS avg_rating
+        FROM samples.wanderbricks.hosts h
+        JOIN samples.wanderbricks.properties p ON h.host_id = p.host_id
+        JOIN samples.wanderbricks.reviews r ON p.property_id = r.property_id
+        GROUP BY h.host_id, h.name ORDER BY avg_rating ASC
+      evaluation:
+        comparison_operator: "LESS_THAN"
+        source: {aggregation: "MIN", display: "avg_rating", name: "avg_rating"}
+        threshold: {value: {double_value: 2.0}}
+        notification: {notify_on_ok: false, retrigger_seconds: 86400}
+      schedule: {pause_status: "UNPAUSED", quartz_cron_schedule: "0 0 7 * * ?", timezone_id: "UTC"}

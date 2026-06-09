@@ -5,6 +5,7 @@ resources:
   jobs:
     train_occupancy_model:
       name: Train occupancy model
+      tags: {domain: demand_ml, team: data_science}
       tasks:
         - task_key: train
           environment_key: default
@@ -15,5 +16,29 @@ resources:
         - environment_key: default
           spec:
             client: "1"
-            dependencies:
-              - mlflow
+            dependencies: [mlflow]
+    batch_inference:
+      name: Occupancy batch inference
+      tags: {domain: demand_ml, team: data_science}
+      parameters:
+        - {name: catalog, default: "${var.catalog}"}
+        - {name: schema, default: "${var.schema}"}
+      tasks:
+        - task_key: score
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/score.py
+            parameters: ["--catalog={{job.parameters.catalog}}", "--schema={{job.parameters.schema}}"]
+      environments:
+        - {environment_key: default, spec: {client: "1"}}
+    retrain_pipeline:
+      name: Occupancy retrain pipeline
+      tags: {domain: demand_ml, team: data_science}
+      trigger:
+        periodic: {interval: 1, unit: WEEKS}
+      tasks:
+        - task_key: train
+          run_job_task: {job_id: "${resources.jobs.train_occupancy_model.id}"}
+        - task_key: score
+          depends_on: [{task_key: train}]
+          run_job_task: {job_id: "${resources.jobs.batch_inference.id}"}

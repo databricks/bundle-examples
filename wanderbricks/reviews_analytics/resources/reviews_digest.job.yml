@@ -1,0 +1,11 @@
+resources:
+  jobs:
+    reviews_digest:
+      name: Weekly reviews digest
+      tags: {domain: reviews, team: trust-quality}
+      trigger:
+        periodic: {interval: 7, unit: DAYS}
+      tasks:
+        - task_key: refresh_ratings
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.reviews_etl.id}

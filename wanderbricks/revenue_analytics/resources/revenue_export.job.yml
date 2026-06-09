@@ -1,0 +1,12 @@
+resources:
+  jobs:
+    revenue_export:
+      name: Revenue CSV export
+      tags: {domain: revenue, team: analytics-eng}
+      tasks:
+        - task_key: export
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/export_revenue.py
+      environments:
+        - {environment_key: default, spec: {client: "1"}}

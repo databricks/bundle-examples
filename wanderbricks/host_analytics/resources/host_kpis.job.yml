@@ -13,7 +13,7 @@ resources:
         - {name: schema, default: "${var.schema}"}
       tasks:
         - task_key: host_kpis
-          sql_task: {warehouse_id: "d2c8a1f09b3e4567", file: {path: ../src/host_kpis.sql}}
+          sql_task: {warehouse_id: "${var.warehouse_id}", file: {path: ../src/host_kpis.sql}}
         - task_key: property_revenue
           depends_on: [{task_key: host_kpis}]
-          sql_task: {warehouse_id: "d2c8a1f09b3e4567", file: {path: ../src/property_revenue.sql}}
+          sql_task: {warehouse_id: "${var.warehouse_id}", file: {path: ../src/property_revenue.sql}}

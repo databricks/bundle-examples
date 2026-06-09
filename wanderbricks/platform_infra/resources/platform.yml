@@ -5,25 +5,13 @@ resources:
   jobs:
     platform_health:
       name: Platform health check
-      tags: {domain: platform, team: platform}
+      tags: {domain: platform, team: platform, tier: infra}
       trigger:
-        periodic: {interval: 6, unit: HOURS}
+        periodic: {interval: 12, unit: HOURS}
       tasks:
         - task_key: check
           environment_key: default
           spark_python_task:
             python_file: ../src/health_check.py
-      environments:
-        - {environment_key: default, spec: {client: "1"}}
-    freshness_check:
-      name: Source freshness SLA
-      tags: {domain: platform, team: platform}
-      trigger:
-        periodic: {interval: 12, unit: HOURS}
-      tasks:
-        - task_key: freshness
-          environment_key: default
-          spark_python_task:
-            python_file: ../src/freshness_check.py
       environments:
         - {environment_key: default, spec: {client: "1"}}

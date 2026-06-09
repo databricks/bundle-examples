@@ -1,0 +1,17 @@
+resources:
+  jobs:
+    refresh_revenue:
+      name: Refresh revenue (pipeline + summary)
+      tags: {domain: revenue, team: analytics-eng}
+      trigger:
+        periodic: {interval: 6, unit: HOURS}
+      email_notifications:
+        on_failure: ["data-eng@wanderbricks.example"]
+      tasks:
+        - task_key: run_etl
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.revenue_etl.id}
+        - task_key: run_summary
+          depends_on: [{task_key: run_etl}]
+          run_job_task:
+            job_id: ${resources.jobs.revenue_summary.id}

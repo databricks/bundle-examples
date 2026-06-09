@@ -1,6 +1,6 @@
 # Revenue & bookings data product (Analytics Engineering).
 bundle:
-  name: revenue
+  name: revenue_analytics
 
 include:
   - resources/*.yml

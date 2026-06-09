@@ -2,8 +2,14 @@ resources:
   jobs:
     revenue_summary:
       name: Revenue by payment method
+      description: Daily revenue aggregated by payment method.
+      tags: {domain: revenue, team: analytics-eng}
       trigger:
         periodic: {interval: 1, unit: DAYS}
+      email_notifications:
+        on_failure: ["data-eng@wanderbricks.example"]
+      queue: {enabled: true}
+      max_concurrent_runs: 1
       parameters:
         - {name: catalog, default: "${var.catalog}"}
         - {name: schema, default: "${var.schema}"}

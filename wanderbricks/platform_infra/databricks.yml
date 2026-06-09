@@ -1,6 +1,6 @@
 # Shared platform infrastructure (Platform team).
 bundle:
-  name: platform
+  name: platform_infra
 
 include:
   - resources/*.yml

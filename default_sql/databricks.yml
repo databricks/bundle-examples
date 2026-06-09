@@ -1,7 +1,7 @@
 # This is a Databricks asset bundle definition for default_sql.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: wanderbricks_bookings_sql
+  name: bookings_sql
   uuid: 853cd9bc-631c-4d4f-bca0-3195c7540854
 
 include:

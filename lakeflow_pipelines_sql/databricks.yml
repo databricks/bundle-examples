@@ -1,7 +1,7 @@
 # This is a Databricks asset bundle definition for lakeflow_pipelines_sql.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: wanderbricks_bookings_etl_sql
+  name: bookings_etl_sql
   uuid: 295000fc-1ea8-4f43-befe-d5fb9f7d4ad4
 
 include:

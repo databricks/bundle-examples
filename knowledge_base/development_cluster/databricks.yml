@@ -1,5 +1,5 @@
 bundle:
-  name: wanderbricks_dev_cluster
+  name: dev_cluster
 
 include:
   - resources/*.yml

@@ -1,5 +1,5 @@
 bundle:
-  name: wanderbricks_secrets
+  name: secrets
 
 # workspace:
 #   host: https://myworkspace.cloud.databricks.com

@@ -7,12 +7,12 @@ across resource types, targets, owners, and commits.
 
 | Bundle (`wanderbricks/…`) | Owner | Resources | Deploy vars |
 |---|---|---|---|
-| `revenue` | Analytics Eng | Lakeflow pipeline (medallion) + SQL summary job | `catalog`, `warehouse_id` |
-| `reviews` | Trust & Quality | Lakeflow Python pipeline | `catalog` |
-| `host_analytics` | Supply | SQL warehouse job (host KPIs) | `catalog`, `warehouse_id` |
-| `guest_analytics` | Growth | serverless Python job (segmentation) | `catalog` |
-| `demand_ml` | Data Science | MLflow experiment + training job | — |
-| `platform` | Platform | all-purpose cluster + secret scope | — |
+| `revenue_analytics` | Analytics Eng | Lakeflow medallion pipeline + SQL summary job + orchestration job + revenue alert | `catalog`, `warehouse_id` |
+| `reviews_analytics` | Trust & Quality | Lakeflow Python pipeline (w/ expectations) + digest job + low-rating alert | `catalog`, `warehouse_id` |
+| `host_analytics` | Supply | multi-task SQL KPI job + serverless scorecard job + underperforming-hosts alert | `catalog`, `warehouse_id` |
+| `guest_analytics` | Growth | serverless segmentation job + SQL cohorts job + signup-drop alert | `catalog`, `warehouse_id` |
+| `demand_forecasting` | Data Science | MLflow experiment + training job + batch-inference job + retrain pipeline | `catalog` |
+| `platform_infra` | Platform | secret scope + health-check job + freshness-SLA job | — |
 
 ## One-time setup (each person)
 1. Get the DMS-enabled CLI (built from `shreyas-goenka/deployment-metadata-service`).
@@ -31,4 +31,4 @@ DATABRICKS_BUNDLE_MANAGED_STATE=true DATABRICKS_BUNDLE_ENGINE=direct \
 - **Different users** — each person deploys with their own auth → `created_by` varies. `dev` mode namespaces per user (separate deployments); a shared `prod`/`staging` target (production mode, `/Workspace/Shared/...`) gives multiple owners on one deployment's version history.
 - **Different commits** — push the branch, then deploy → edit → push → deploy for a version timeline with distinct, resolvable commits.
 - **Different targets/modes** — `dev` (DEVELOPMENT) vs `staging`/`prod` (PRODUCTION).
-- **A failure to debug** — flip `platform`'s cluster `node_type_id` to an AWS type (`i3.xlarge`) on this Azure workspace: deploy fails with `Node type i3.xlarge is not supported. Supported: Standard_DS…`, a one-line fix the in-workspace AI assistant resolves.
+- **A failure to debug** — pin a wrong `warehouse_id` on `host_analytics`'s `host_kpis` job: deploy fails the **update** with `SQL warehouse <id> does not exist (404)`. Because it's an update to an existing job, DMS records it as a failed operation on a new version — a one-line config fix the in-workspace AI assistant resolves.

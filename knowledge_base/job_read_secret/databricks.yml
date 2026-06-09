@@ -8,11 +8,6 @@ resources:
   secret_scopes:
     my_secret_scope:
       name: prod-secrets-scope
-      permissions:
-        - level: VIEW
-          group_name: users
-        - level: MANAGE
-          group_name: admins
   jobs:
     example_python_job:
       name: "example-python-job"

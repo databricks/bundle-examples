@@ -16,5 +16,5 @@ resources:
       tasks:
         - task_key: revenue_by_method
           sql_task:
-            warehouse_id: ${var.warehouse_id}
+            warehouse_id: "4d9d8c7b6a5e4f30"
             file: {path: ../src/revenue_by_method.sql}

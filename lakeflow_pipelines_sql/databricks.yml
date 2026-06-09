@@ -30,10 +30,10 @@ targets:
     mode: production
     workspace:
       # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
-      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
     variables:
       catalog: catalog
       schema: prod
     permissions:
-      - user_name: user@company.com
+      - group_name: users
         level: CAN_MANAGE

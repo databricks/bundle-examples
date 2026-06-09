@@ -37,3 +37,14 @@ targets:
     permissions:
       - user_name: user@company.com
         level: CAN_MANAGE
+
+  staging:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
+    variables:
+      catalog: catalog
+      schema: staging
+    permissions:
+      - group_name: users
+        level: CAN_MANAGE

@@ -30,9 +30,13 @@ resources:
 # Defines the targets for this bundle.
 # Targets allow you to deploy the same bundle to different Databricks workspaces.
 targets:
-  prod: { 
-    # No overrides
-  }
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
+    permissions:
+      - group_name: users
+        level: CAN_MANAGE
   dev:
     # This target is for development purposes.
     # It defaults to the current Databricks workspace.

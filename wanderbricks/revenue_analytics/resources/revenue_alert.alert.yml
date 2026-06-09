@@ -10,7 +10,7 @@ resources:
       evaluation:
         comparison_operator: "LESS_THAN"
         source: {aggregation: "MIN", display: "revenue", name: "revenue"}
-        threshold: {value: {double_value: 50000.0}}
+        threshold: {value: {double_value: 75000.0}}
         notification: {notify_on_ok: true, retrigger_seconds: 3600}
       schedule:
         pause_status: "UNPAUSED"

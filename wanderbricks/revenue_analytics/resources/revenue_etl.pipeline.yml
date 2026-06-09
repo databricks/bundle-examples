@@ -2,7 +2,7 @@ resources:
   pipelines:
     revenue_etl:
       name: Revenue ETL (medallion)
-      catalog: ${var.catalog}
+      catalog: dais2026
       schema: ${var.schema}
       serverless: true
       root_path: ../src/revenue_etl

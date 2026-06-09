@@ -1,53 +1,34 @@
-# Wanderbricks DMS demo — deployment guide
+# Wanderbricks DMS demo
 
-These bundles are wired for the Deployment Metadata Service (DMS) demo. Goal:
-populate the **Deployments** page with deployments from **multiple users** and
-**multiple commits** (display_name, mode, git_info, versions, operations).
+Six **domain data products** built on the `samples.wanderbricks` dataset (a fictional
+vacation-rental marketplace). Each bundle is an owned, deployable unit — the realistic
+"one bundle per domain/team" shape — and together they populate the **Deployments** page
+across resource types, targets, owners, and commits.
+
+| Bundle (`wanderbricks/…`) | Owner | Resources | Deploy vars |
+|---|---|---|---|
+| `revenue` | Analytics Eng | Lakeflow pipeline (medallion) + SQL summary job | `catalog`, `warehouse_id` |
+| `reviews` | Trust & Quality | Lakeflow Python pipeline | `catalog` |
+| `host_analytics` | Supply | SQL warehouse job (host KPIs) | `catalog`, `warehouse_id` |
+| `guest_analytics` | Growth | serverless Python job (segmentation) | `catalog` |
+| `demand_ml` | Data Science | MLflow experiment + training job | — |
+| `platform` | Platform | all-purpose cluster + secret scope | — |
 
 ## One-time setup (each person)
-1. Get the DMS-enabled CLI (built from `shreyas-goenka/deployment-metadata-service`)
-   — grab the shared snapshot binary, put it on PATH (or call by path).
-2. `git clone https://github.com/databricks/bundle-examples && cd bundle-examples`
-   then `git checkout wanderbricks-demo` (use the **pushed** branch/fork).
-3. Authenticate to the demo workspace **as yourself**:
-   `databricks auth login --host <demo-workspace-url> -p demo`
-   (the bundles don't hardcode a host — it comes from your profile.)
-4. The pipelines/SQL job write outputs to `${catalog}.${schema}`; pass a **writable**
-   UC catalog: `--var catalog=<your_catalog>`. (`samples` is read-only; the serverless
-   reviews job needs no writable catalog.)
+1. Get the DMS-enabled CLI (built from `shreyas-goenka/deployment-metadata-service`).
+2. `git clone https://github.com/databricks/bundle-examples && cd bundle-examples && git checkout wanderbricks-demo`
+3. Authenticate **as yourself**: `databricks auth login --host <workspace> -p demo` (no host is committed).
+4. Have a **writable UC catalog** for outputs and a **SQL warehouse** id for the warehouse jobs.
 
-## Always deploy with the DMS flags
+## Deploy (run inside each `wanderbricks/<bundle>` folder)
 ```sh
 DATABRICKS_BUNDLE_MANAGED_STATE=true DATABRICKS_BUNDLE_ENGINE=direct \
-  databricks bundle deploy -p demo [--var catalog=<writable_catalog>]
+  databricks bundle deploy -t <dev|staging|prod> -p demo \
+  [--var catalog=<your_catalog>] [--var warehouse_id=<your_wh>]
 ```
 
-## Deploying from DIFFERENT USERS
-`created_by` / `completed_by` is always the authenticated identity — it can't be
-spoofed; switch who deploys.
-
-- **Many owners across the list:** each person deploys (with their own auth). In
-  `dev` mode every deploy is namespaced per user (`[dev <user>]`, root_path under
-  your home), so the *same* bundle deployed by N people becomes **N separate
-  deployments**, each owned by a different person.
-- **Many owners on ONE deployment's history:** deploy a **shared** target
-  (`mode: production` with a fixed `root_path`, no per-user prefix) so everyone
-  hits the **same `deployment_id`** — the version timeline then shows alternating
-  `created_by`/`completed_by`.
-
-## Deploying from DIFFERENT COMMITS
-`git_info` (origin/branch/commit) is recorded per version. The commit must be
-**pushed** to resolve as a link in the UI (local-only commits won't link).
-
-- Push `wanderbricks-demo` to a shared branch/fork.
-- Deploy → version 1 (commit A). Make a small change → commit → push → deploy
-  again → version 2 (commit B). Repeat for a timeline of distinct commits.
-- Or tag commits and deploy from each `git checkout <tag>`.
-
-## Suggested run-of-show
-1. Person A deploys all bundles from commit A (seeds the list, owned by A).
-2. Persons B & C each deploy a couple bundles (multiple owners appear).
-3. Someone pushes a change and redeploys one bundle → second version with a new
-   commit (and a different `created_by` if a different person).
-4. Open **Deployments** (`?conf_enable=databricks.fe.dabs.deploymentsUi`) and walk
-   through display_name, mode, git_info, versions, and per-resource operations.
+## Making the deployments page rich
+- **Different users** — each person deploys with their own auth → `created_by` varies. `dev` mode namespaces per user (separate deployments); a shared `prod`/`staging` target (production mode, `/Workspace/Shared/...`) gives multiple owners on one deployment's version history.
+- **Different commits** — push the branch, then deploy → edit → push → deploy for a version timeline with distinct, resolvable commits.
+- **Different targets/modes** — `dev` (DEVELOPMENT) vs `staging`/`prod` (PRODUCTION).
+- **A failure to debug** — flip `platform`'s cluster `node_type_id` to an AWS type (`i3.xlarge`) on this Azure workspace: deploy fails with `Node type i3.xlarge is not supported. Supported: Standard_DS…`, a one-line fix the in-workspace AI assistant resolves.

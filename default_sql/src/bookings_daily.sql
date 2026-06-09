@@ -1,4 +1,4 @@
--- This query is executed using Databricks Workflows (see resources/default_sql_sql.job.yml)
+-- Daily Wanderbricks booking metrics (see resources/bookings.job.yml).
 
 USE CATALOG {{catalog}};
 USE IDENTIFIER({{schema}});
@@ -6,16 +6,10 @@ USE IDENTIFIER({{schema}});
 CREATE OR REPLACE MATERIALIZED VIEW
   bookings_daily
 AS SELECT
-  order_date, count(*) AS number_of_orders
-FROM
-  bookings_raw
-
-WHERE if(
-  {{bundle_target}} = "prod",
-  true,
-
-  -- During development, only process a smaller range of data
-  order_date >= '2019-08-01' AND order_date < '2019-09-01'
-)
-
-GROUP BY order_date
+  check_in AS booking_date,
+  count(*) AS number_of_bookings,
+  round(sum(total_amount), 2) AS total_revenue
+FROM bookings_raw
+-- In dev only look at recent bookings; in prod aggregate everything.
+WHERE {{bundle_target}} = "prod" OR check_in >= '2024-06-01'
+GROUP BY check_in;

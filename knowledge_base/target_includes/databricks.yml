@@ -1,5 +1,5 @@
 bundle:
-  name: multi_env
+  name: target-includes-example
 
 include:
   - resources/set1/*.yml

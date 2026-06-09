@@ -1,5 +1,5 @@
 bundle:
-  name: ops_app
+  name: databricks_app
 
 include:
   - resources/*.yml

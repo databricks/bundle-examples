@@ -1,0 +1,41 @@
+# Host & supply analytics data product (Supply team).
+bundle:
+  name: host_analytics
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Catalog for outputs.
+  schema:
+    description: Schema for outputs.
+  warehouse_id:
+    description: SQL warehouse to run the job.
+targets:
+  dev:
+    mode: development
+    default: true
+    variables:
+      catalog: catalog
+      schema: ${workspace.current_user.short_name}
+  staging:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
+    permissions:
+      - group_name: users
+        level: CAN_MANAGE
+    variables:
+      catalog: catalog
+      schema: staging
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
+    permissions:
+      - group_name: users
+        level: CAN_MANAGE
+    variables:
+      catalog: catalog
+      schema: prod

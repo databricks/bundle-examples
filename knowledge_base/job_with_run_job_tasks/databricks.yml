@@ -1,7 +1,8 @@
 bundle:
-  name: ingestion
+  name: job_with_run_job_tasks
 
 workspace:
+  host: https://myworkspace.cloud.databricks.com
 
 permissions:
   - level: CAN_VIEW
@@ -9,28 +10,28 @@ permissions:
 
 resources:
   jobs:
-    bookings_orchestration:
-      name: Wanderbricks bookings orchestration
+    primary:
+      name: primary job
 
       tasks:
-        - task_key: run_ingest_reviews
+        - task_key: run_leaf1
           run_job_task:
-            job_id: ${resources.jobs.ingest_reviews.id}
+            job_id: ${resources.jobs.leaf1.id}
 
-        - task_key: run_ingest_clickstream
+        - task_key: run_leaf2
           depends_on:
-            - task_key: run_ingest_reviews
+            - task_key: run_leaf1
 
           run_job_task:
-            job_id: ${resources.jobs.ingest_clickstream.id}
+            job_id: ${resources.jobs.leaf2.id}
 
       parameters:
         - name: input
           default: test_propagation
 
 
-    ingest_reviews:
-      name: Ingest reviews
+    leaf1:
+      name: leaf job 1
 
       tasks:
         - task_key: leaf
@@ -51,8 +52,8 @@ resources:
             client: "1"
 
 
-    ingest_clickstream:
-      name: Ingest clickstream
+    leaf2:
+      name: leaf job 2
 
       tasks:
         - task_key: leaf

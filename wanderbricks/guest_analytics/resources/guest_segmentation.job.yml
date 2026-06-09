@@ -1,0 +1,19 @@
+resources:
+  jobs:
+    guest_segmentation:
+      name: Guest segmentation
+      trigger:
+        periodic: {interval: 1, unit: DAYS}
+      parameters:
+        - {name: catalog, default: "${var.catalog}"}
+        - {name: schema, default: "${var.schema}"}
+      tasks:
+        - task_key: segment
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/guest_segmentation.py
+            parameters: ["--catalog={{job.parameters.catalog}}", "--schema={{job.parameters.schema}}"]
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"

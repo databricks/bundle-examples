@@ -1,0 +1,14 @@
+resources:
+  jobs:
+    revenue_summary:
+      name: Revenue by payment method
+      trigger:
+        periodic: {interval: 1, unit: DAYS}
+      parameters:
+        - {name: catalog, default: "${var.catalog}"}
+        - {name: schema, default: "${var.schema}"}
+      tasks:
+        - task_key: revenue_by_method
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file: {path: ../src/revenue_by_method.sql}

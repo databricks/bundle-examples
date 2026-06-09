@@ -1,0 +1,24 @@
+# Demand forecasting ML project (Data Science).
+bundle:
+  name: demand_ml
+
+include:
+  - resources/*.yml
+targets:
+  dev:
+    mode: development
+    default: true
+  staging:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
+    permissions:
+      - group_name: users
+        level: CAN_MANAGE
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
+    permissions:
+      - group_name: users
+        level: CAN_MANAGE

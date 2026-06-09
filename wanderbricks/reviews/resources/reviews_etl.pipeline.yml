@@ -1,0 +1,11 @@
+resources:
+  pipelines:
+    reviews_etl:
+      name: Reviews intelligence
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: ../src/reviews_etl
+      libraries:
+        - glob:
+            include: ../src/reviews_etl/transformations/**

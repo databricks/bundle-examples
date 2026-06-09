@@ -1,0 +1,14 @@
+resources:
+  jobs:
+    host_kpis:
+      name: Host KPIs
+      trigger:
+        periodic: {interval: 1, unit: DAYS}
+      parameters:
+        - {name: catalog, default: "${var.catalog}"}
+        - {name: schema, default: "${var.schema}"}
+      tasks:
+        - task_key: host_kpis
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file: {path: ../src/host_kpis.sql}

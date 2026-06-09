@@ -1,0 +1,19 @@
+resources:
+  experiments:
+    occupancy_experiment:
+      name: /Users/${workspace.current_user.userName}/${bundle.target}-occupancy-forecast
+  jobs:
+    train_occupancy_model:
+      name: Train occupancy model
+      tasks:
+        - task_key: train
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/train.py
+            parameters: ["--experiment=${resources.experiments.occupancy_experiment.name}"]
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
+            dependencies:
+              - mlflow

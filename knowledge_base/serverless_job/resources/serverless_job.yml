@@ -1,7 +1,7 @@
 resources:
   jobs:
-    aggregate_reviews:
-      name: Wanderbricks aggregate reviews
+    serverless_job:
+      name: Example serverless job
 
       # Run this job once an hour.
       trigger:
@@ -25,3 +25,5 @@ resources:
           # https://docs.databricks.com/api/workspace/jobs/create#environments-spec
           spec:
             client: "1"
+            dependencies:
+              - cowsay

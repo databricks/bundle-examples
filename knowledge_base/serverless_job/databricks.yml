@@ -1,20 +1,13 @@
 bundle:
-  name: reviews_job
+  name: serverless_job
 
 include:
   - resources/*.yml
 
 workspace:
+  host: https://myworkspace.databricks.com
 
 targets:
   dev:
     default: true
     mode: development
-
-  staging:
-    mode: production
-    workspace:
-      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
-    permissions:
-      - group_name: users
-        level: CAN_MANAGE

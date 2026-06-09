@@ -1,7 +1,7 @@
 # This is a Databricks asset bundle definition for lakeflow_pipelines_python.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: bookings_etl_py
+  name: lakeflow_pipelines_python
   uuid: 87a174ba-60e4-4867-a140-1936bc9b00de
 
 include:
@@ -23,12 +23,14 @@ targets:
     mode: development
     default: true
     workspace:
+      host: https://company.databricks.com
     variables:
       catalog: catalog
       schema: ${workspace.current_user.short_name}
   prod:
     mode: production
     workspace:
+      host: https://company.databricks.com
       # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
       root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
     variables:
@@ -36,15 +38,4 @@ targets:
       schema: prod
     permissions:
       - user_name: user@company.com
-        level: CAN_MANAGE
-
-  staging:
-    mode: production
-    workspace:
-      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
-    variables:
-      catalog: catalog
-      schema: staging
-    permissions:
-      - group_name: users
         level: CAN_MANAGE

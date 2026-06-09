@@ -1,7 +1,7 @@
 resources:
   apps:
     job_manager:
-      name: "job-manager"
+      name: "job_manager"
       description: "App which manages job created by this bundle"
 
       # The location of the source code for the app.

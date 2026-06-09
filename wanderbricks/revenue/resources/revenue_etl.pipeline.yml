@@ -1,0 +1,11 @@
+resources:
+  pipelines:
+    revenue_etl:
+      name: Revenue ETL (medallion)
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: ../src/revenue_etl
+      libraries:
+        - glob:
+            include: ../src/revenue_etl/transformations/**

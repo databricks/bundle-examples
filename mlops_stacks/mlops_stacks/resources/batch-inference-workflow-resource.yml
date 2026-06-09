@@ -14,7 +14,7 @@ permissions: &permissions
 resources:
   jobs:
     batch_inference_job:
-      name: ${bundle.target}-wanderbricks-review-batch-inference-job
+      name: ${bundle.target}-mlops_stacks-batch-inference-job
       tasks:
         - task_key: batch_inference_job
           <<: *new_cluster
@@ -23,8 +23,8 @@ resources:
             base_parameters:
               env: ${bundle.target}
               input_table_name: taxi_scoring_sample  # TODO: create input table for inference
-              output_table_name: ${bundle.target}.wanderbricks.predictions
-              model_name: ${bundle.target}.wanderbricks.${var.model_name}
+              output_table_name: ${bundle.target}.my-mlops-project.predictions
+              model_name: ${bundle.target}.my-mlops-project.${var.model_name}
               # git source information of current ML resource deployment. It will be persisted as part of the workflow run
               git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
 

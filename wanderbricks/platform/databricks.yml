@@ -1,0 +1,24 @@
+# Shared platform infrastructure (Platform team).
+bundle:
+  name: platform
+
+include:
+  - resources/*.yml
+targets:
+  dev:
+    mode: development
+    default: true
+  staging:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
+    permissions:
+      - group_name: users
+        level: CAN_MANAGE
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/wanderbricks/${bundle.name}/${bundle.target}
+    permissions:
+      - group_name: users
+        level: CAN_MANAGE

@@ -2,6 +2,7 @@ resources:
   jobs:
     host_kpis:
       name: Host KPIs
+      description: Daily host KPI rollups for the Supply team.
       tags: {domain: host_analytics, team: supply}
       trigger:
         periodic: {interval: 1, unit: DAYS}

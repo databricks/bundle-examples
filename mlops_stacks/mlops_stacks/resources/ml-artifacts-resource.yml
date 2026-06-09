@@ -49,7 +49,7 @@ resources:
       model:
         name: ${var.model_name}
         catalog_name: ${bundle.target}
-        schema_name: my-mlops-project     
+        schema_name: wanderbricks     
         <<: *grants
         depends_on:
           - resources.jobs.model_training_job.id

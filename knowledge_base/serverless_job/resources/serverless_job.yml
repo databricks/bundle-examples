@@ -1,7 +1,7 @@
 resources:
   jobs:
-    serverless_job:
-      name: Example serverless job
+    aggregate_reviews:
+      name: Wanderbricks aggregate reviews
 
       # Run this job once an hour.
       trigger:

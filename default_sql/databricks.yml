@@ -1,7 +1,7 @@
 # This is a Databricks asset bundle definition for default_sql.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: default_sql
+  name: wanderbricks_bookings_sql
   uuid: 853cd9bc-631c-4d4f-bca0-3195c7540854
 
 include:
@@ -25,20 +25,18 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://company.databricks.com
     variables:
-      warehouse_id: abcdef1234567890
+      warehouse_id: 613ba1d4d7e592f2
       catalog: catalog
       schema: ${workspace.current_user.short_name}
 
   prod:
     mode: production
     workspace:
-      host: https://company.databricks.com
       # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
       root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
     variables:
-      warehouse_id: abcdef1234567890
+      warehouse_id: 613ba1d4d7e592f2
       catalog: catalog
       schema: default
     permissions:

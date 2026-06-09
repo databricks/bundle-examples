@@ -2,8 +2,8 @@
 
 resources:
   pipelines:
-    lakeflow_pipelines_python_etl:
-      name: lakeflow_pipelines_python_etl
+    ingest_bookings:
+      name: Wanderbricks ingest bookings (Python)
       catalog: ${var.catalog}
       schema: ${var.schema}
       serverless: true

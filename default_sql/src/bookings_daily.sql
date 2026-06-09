@@ -4,11 +4,11 @@ USE CATALOG {{catalog}};
 USE IDENTIFIER({{schema}});
 
 CREATE OR REPLACE MATERIALIZED VIEW
-  orders_daily
+  bookings_daily
 AS SELECT
   order_date, count(*) AS number_of_orders
 FROM
-  orders_raw
+  bookings_raw
 
 WHERE if(
   {{bundle_target}} = "prod",

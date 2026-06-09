@@ -1,11 +1,10 @@
 bundle:
-  name: serverless_job
+  name: wanderbricks_reviews_job
 
 include:
   - resources/*.yml
 
 workspace:
-  host: https://myworkspace.databricks.com
 
 targets:
   dev:

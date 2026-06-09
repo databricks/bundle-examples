@@ -1,7 +1,7 @@
 # This is a Databricks asset bundle definition for lakeflow_pipelines_sql.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
-  name: lakeflow_pipelines_sql
+  name: wanderbricks_bookings_etl_sql
   uuid: 295000fc-1ea8-4f43-befe-d5fb9f7d4ad4
 
 include:
@@ -23,14 +23,12 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://company.databricks.com
     variables:
       catalog: catalog
       schema: ${workspace.current_user.short_name}
   prod:
     mode: production
     workspace:
-      host: https://company.databricks.com
       # We explicitly deploy to /Workspace/Users/user@company.com to make sure we only have a single copy.
       root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
     variables:

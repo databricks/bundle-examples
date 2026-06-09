@@ -14,7 +14,7 @@ permissions: &permissions
 resources:
   jobs:
     model_training_job:
-      name: ${bundle.target}-mlops_stacks-model-training-job
+      name: ${bundle.target}-review-quality-model-training-job
       job_clusters:
         - job_cluster_key: model_training_job_cluster
           <<: *new_cluster
@@ -28,7 +28,7 @@ resources:
               # TODO: Update training_data_path
               training_data_path: /databricks-datasets/nyctaxi-with-zipcodes/subsampled
               experiment_name: ${var.experiment_name}
-              model_name: ${bundle.target}.my-mlops-project.${var.model_name}
+              model_name: ${bundle.target}.wanderbricks.${var.model_name}
               # git source information of current ML resource deployment. It will be persisted as part of the workflow run
               git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
           

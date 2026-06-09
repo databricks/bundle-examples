@@ -19,7 +19,7 @@ resources:
       name: Source freshness SLA
       tags: {domain: platform, team: platform}
       trigger:
-        periodic: {interval: 1, unit: DAYS}
+        periodic: {interval: 12, unit: HOURS}
       tasks:
         - task_key: freshness
           environment_key: default

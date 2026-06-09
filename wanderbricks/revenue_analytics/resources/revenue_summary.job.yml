@@ -3,7 +3,7 @@ resources:
     revenue_summary:
       name: Revenue by payment method
       description: Daily revenue aggregated by payment method.
-      tags: {domain: revenue, team: analytics-eng}
+      tags: {domain: revenue, team: analytics-eng, tier: gold}
       trigger:
         periodic: {interval: 7, unit: DAYS}
       email_notifications:

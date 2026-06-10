@@ -46,7 +46,7 @@ For more information about Genie, see the [documentation](https://docs.databrick
         space_id: ${resources.genie_spaces.nyc_taxi_genie.space_id}
         permission: CAN_RUN
   ```
-* `app/app.yml` injects the space ID into the app as the `GENIE_SPACE_ID` environment variable using `valueFrom: "genie-space"`.
+* The `config` block in `resources/genie_assistant.app.yml` injects the space ID into the app as the `GENIE_SPACE_ID` environment variable using `value_from: "genie-space"`.
 * `app/app.py` sends each question to the space with `w.genie.start_conversation_and_wait(...)` and renders the text answer or the generated SQL and its results.
 
 Note that the app queries Genie with its own service principal identity: in addition to the `CAN_RUN` permission on the space granted by the bundle, the service principal must be able to use the SQL warehouse and read the tables that back the space. If access to the `samples` catalog is restricted for service principals in your workspace, point the space at a table the app can read.

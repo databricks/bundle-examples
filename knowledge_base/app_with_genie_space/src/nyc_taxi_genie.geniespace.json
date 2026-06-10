@@ -17,12 +17,12 @@
       {
         "identifier": "samples.nyctaxi.trips",
         "column_configs": [
-          { "column_name": "tpep_pickup_datetime" },
-          { "column_name": "tpep_dropoff_datetime" },
-          { "column_name": "trip_distance" },
+          { "column_name": "dropoff_zip" },
           { "column_name": "fare_amount" },
           { "column_name": "pickup_zip" },
-          { "column_name": "dropoff_zip" }
+          { "column_name": "tpep_dropoff_datetime" },
+          { "column_name": "tpep_pickup_datetime" },
+          { "column_name": "trip_distance" }
         ]
       }
     ]

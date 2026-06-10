@@ -1,11 +1,6 @@
 bundle:
   name: dashboard_nyc_taxi
 
-  # The Genie space in this bundle can only be deployed with the direct deployment
-  # engine. The direct engine is the default for new deployments since Databricks
-  # CLI v1.3.0.
-  engine: direct
-
 include:
   - resources/*.yml
 

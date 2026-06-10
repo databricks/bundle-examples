@@ -1,0 +1,24 @@
+bundle:
+  name: app_with_genie_space
+
+  # Genie spaces can only be deployed with the direct deployment engine.
+  # The direct engine is the default for new deployments since Databricks CLI v1.3.0.
+  engine: direct
+
+include:
+  - resources/*.yml
+
+variables:
+  # The "warehouse_id" variable is used to reference the warehouse used by the Genie space.
+  warehouse_id:
+    lookup:
+      # Replace this with the name of your SQL warehouse.
+      warehouse: "Shared Unity Catalog Serverless"
+
+workspace:
+  host: https://myworkspace.databricks.com
+
+targets:
+  dev:
+    default: true
+    mode: development

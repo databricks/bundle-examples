@@ -1,0 +1,34 @@
+<html>
+<head>
+    <title>Genie space app managed by DABs</title>
+</head>
+<body>
+    <h1>Ask Genie about NYC taxi trips</h1>
+    <form method="post">
+        <input type="text" name="question" placeholder="e.g. What is the average fare per trip?" size="60" required>
+        <button type="submit">Ask</button>
+    </form>
+
+    {% if question %}
+        <h2>{{ question }}</h2>
+        {% if answer %}
+            <p>{{ answer }}</p>
+        {% endif %}
+        {% if sql %}
+            <pre>{{ sql }}</pre>
+        {% endif %}
+        {% if columns %}
+            <table border="1" cellpadding="4">
+                <tr>
+                    {% for column in columns %}<th>{{ column }}</th>{% endfor %}
+                </tr>
+                {% for row in rows %}
+                    <tr>
+                        {% for value in row %}<td>{{ value }}</td>{% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endif %}
+</body>
+</html>

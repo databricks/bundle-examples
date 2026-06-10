@@ -1,0 +1,11 @@
+command:
+  - flask
+  - --app
+  - app
+  - run
+
+env:
+  # The value is injected by the Databricks Apps runtime from the app resource
+  # named "genie-space" (see resources/genie_assistant.app.yml).
+  - name: GENIE_SPACE_ID
+    valueFrom: "genie-space"

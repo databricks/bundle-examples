@@ -2,7 +2,7 @@
 
 This example demonstrates how to define a Databricks app that uses a Genie space in a Declarative Automation Bundle.
 
-It deploys a Genie space for the `samples.nyctaxi.trips` table and a Flask app that lets users ask the space questions in natural language through the [Genie Conversation API](https://docs.databricks.com/genie/conversation-api.html).
+It deploys a Genie space for the `samples.nyctaxi.trips` [table](https://docs.databricks.com/aws/en/discover/databricks-datasets#nyctaxi) and a Flask app that lets users ask the space questions in natural language through the [Genie Conversation API](https://docs.databricks.com/genie/conversation-api.html).
 
 For more information about Databricks Apps, see the [documentation](https://docs.databricks.com/aws/en/dev-tools/databricks-apps).
 For more information about Genie, see the [documentation](https://docs.databricks.com/genie/index.html).

@@ -2,7 +2,7 @@
 
 This example shows how to define a Genie space using Declarative Automation Bundles. Genie spaces let business users ask questions about data in natural language.
 
-It deploys a Genie space that answers questions about the `samples.nyctaxi.trips` table.
+It deploys a Genie space that answers questions about the `samples.nyctaxi.trips` [table](https://docs.databricks.com/aws/en/discover/databricks-datasets#nyctaxi).
 
 For more information about Genie, see the [Databricks documentation](https://docs.databricks.com/genie/index.html).
 

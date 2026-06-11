@@ -1,0 +1,24 @@
+resources:
+  apps:
+    genie_assistant:
+      name: "genie-assistant"
+      description: "An app that answers questions using a Genie space"
+      source_code_path: ../app
+
+      # The app configuration: the command to start the app and its environment.
+      config:
+        command: ["flask", "--app", "app", "run"]
+        env:
+          # The value is injected by the Databricks Apps runtime from the app
+          # resource named "genie-space" declared below.
+          - name: GENIE_SPACE_ID
+            value_from: "genie-space"
+
+      # The resources which this app has access to:
+      resources:
+        - name: "genie-space"
+          description: "The Genie space that the app sends questions to"
+          genie_space:
+            name: "NYC Taxi Trip Analysis"
+            space_id: ${resources.genie_spaces.nyc_taxi_genie.space_id}
+            permission: CAN_RUN

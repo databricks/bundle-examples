@@ -1,0 +1,56 @@
+{
+  "version": 2,
+  "config": {
+    "sample_questions": [
+      {
+        "id": "11111111111111111111111111111111",
+        "question": ["What is the average fare per trip?"]
+      },
+      {
+        "id": "22222222222222222222222222222222",
+        "question": ["How many trips were longer than 10 miles?"]
+      }
+    ]
+  },
+  "data_sources": {
+    "tables": [
+      {
+        "identifier": "samples.nyctaxi.trips",
+        "column_configs": [
+          { "column_name": "dropoff_zip" },
+          { "column_name": "fare_amount" },
+          { "column_name": "pickup_zip" },
+          { "column_name": "tpep_dropoff_datetime" },
+          { "column_name": "tpep_pickup_datetime" },
+          { "column_name": "trip_distance" }
+        ]
+      }
+    ]
+  },
+  "instructions": {
+    "text_instructions": [
+      {
+        "id": "33333333333333333333333333333333",
+        "content": [
+          "This Genie space answers questions about NYC taxi trips.\n",
+          "All data is in the samples.nyctaxi.trips table.\n",
+          "Fare amounts are in USD. When asked about revenue, use SUM(fare_amount)."
+        ]
+      }
+    ],
+    "example_question_sqls": [
+      {
+        "id": "44444444444444444444444444444444",
+        "question": ["What was the total revenue per pickup zip code?"],
+        "sql": [
+          "SELECT\n",
+          "  pickup_zip,\n",
+          "  SUM(fare_amount) AS total_revenue\n",
+          "FROM samples.nyctaxi.trips\n",
+          "GROUP BY pickup_zip\n",
+          "ORDER BY total_revenue DESC"
+        ]
+      }
+    ]
+  }
+}

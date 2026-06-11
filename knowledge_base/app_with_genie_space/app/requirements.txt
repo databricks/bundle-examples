@@ -1,0 +1,2 @@
+databricks-sdk>=0.60.0
+flask

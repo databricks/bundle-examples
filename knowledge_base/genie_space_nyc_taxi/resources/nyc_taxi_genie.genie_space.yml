@@ -1,0 +1,27 @@
+resources:
+  genie_spaces:
+    nyc_taxi_genie:
+      title: "NYC Taxi Trip Analysis"
+      description: "Ask questions about NYC taxi trip data in natural language"
+
+      # The serialized definition of the Genie space: its data sources,
+      # instructions, and sample questions.
+      #
+      # Instead of referencing a file, the definition can also be inlined
+      # in YAML under the "serialized_space" key. Specify only one of the two.
+      file_path: ../src/nyc_taxi_genie.geniespace.json
+
+      # The warehouse used to run the queries that Genie generates.
+      warehouse_id: ${var.warehouse_id}
+
+      # The "parent_path" field can be configured to place the Genie space in a
+      # non-standard folder in the workspace.
+      #
+      # It defaults to "${workspace.resource_path}", which is located
+      # under the bundle deployment root.
+      #
+      # parent_path: ${workspace.resource_path}
+
+      permissions:
+        - level: CAN_RUN
+          group_name: users

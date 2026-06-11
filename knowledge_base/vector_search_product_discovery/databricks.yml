@@ -27,9 +27,15 @@ include:
   - resources/*.yml
 
 targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://your-workspace.cloud.databricks.com
+    variables:
+      endpoint_name: ${workspace.current_user.short_name}-product-search-endpoint
   prod:
     mode: production
-    default: true
     workspace:
       host: https://your-workspace.cloud.databricks.com
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}

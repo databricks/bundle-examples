@@ -19,9 +19,10 @@ variables:
     default: databricks-gte-large-en
   embedding_dimension:
     description: >-
-      Vector dimension passed to the embedding model and upsert/query notebooks.
-      Must match the dimension used when the index was created (see resources/index.yml).
-    default: "1024"
+      Vector dimension. Referenced by the index spec (resources/vector-search-index.yml)
+      and passed to the upsert/query notebooks, so it is set once here. Immutable after
+      the index is created.
+    default: 1024
 
 include:
   - resources/*.yml

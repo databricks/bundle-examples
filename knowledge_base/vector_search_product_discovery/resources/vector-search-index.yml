@@ -20,4 +20,4 @@ resources:
           }
         embedding_vector_columns:
           - name: description_vector
-            embedding_dimension: 1024
+            embedding_dimension: ${var.embedding_dimension}

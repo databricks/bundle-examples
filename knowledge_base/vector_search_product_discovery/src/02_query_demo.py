@@ -72,6 +72,10 @@ df = pd.DataFrame(rows, columns=result_columns)
 df.index += 1
 print(df.to_string())
 
+# Surface the ranked results to `databricks bundle run` / `jobs get-run-output`.
+# (The print above stays for interactive notebook use.)
+dbutils.notebook.exit(df.to_json(orient="records"))
+
 # COMMAND ----------
 
 # MAGIC %md

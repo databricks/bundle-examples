@@ -64,6 +64,11 @@ ranked results
    ```bash
    databricks bundle deploy
    ```
+   This deploys the default `dev` target in development mode, so resources are namespaced
+   per user — jobs and the schema get a `[dev you]` prefix and the endpoint is named after
+   you — and several people can deploy into the same workspace without colliding. Use
+   `databricks bundle deploy --target prod` for the shared production copy.
+
    > Vector Search endpoint creation takes a few minutes to reach ONLINE status.
 
 4. Load the catalog by running the bundle. This embeds all product descriptions and upserts them into the index.
@@ -75,6 +80,9 @@ ranked results
    ```bash
    databricks bundle run product_discovery_query --params "query=footwear for slippery wet trails"
    ```
+
+   The job returns the ranked results as JSON — view them with
+   `databricks jobs get-run-output <run-id>` or on the run page.
 
 6. Or open `src/02_query_demo.py` in your workspace to run queries interactively.
 
@@ -95,13 +103,13 @@ databricks bundle deploy \
 |---|---|---|
 | `catalog` | `main` | Existing Unity Catalog catalog |
 | `schema` | `product_search` | Schema created by the bundle |
-| `endpoint_name` | `product-search-endpoint` | Vector Search endpoint name (must be unique per workspace) |
+| `endpoint_name` | `product-search-endpoint` | Vector Search endpoint name. Shared in prod; the `dev` target overrides it per user. |
 | `embedding_model` | `databricks-gte-large-en` | Foundation model used for embeddings |
-| `embedding_dimension` | `1024` | Vector dimension — must match `embedding_dimension` in `resources/vector-search-index.yml` |
+| `embedding_dimension` | `1024` | Vector dimension. Drives both the index and the embedding requests; immutable after the index is created. |
 
-> **Note:** `embedding_dimension` in `resources/vector-search-index.yml` is hardcoded to `1024` because
-> it is immutable after index creation. If you need a different dimension, change the value
-> in `vector-search-index.yml` before the first deploy.
+> **Note:** `embedding_dimension` is immutable after the index is created. Set it (via the
+> `embedding_dimension` variable) before the first deploy — the index and the upsert/query
+> jobs all read from that one variable.
 
 ## Index schema
 
@@ -114,7 +122,7 @@ direct_access_index_spec:
      "price":"float","description":"string","description_vector":"array<float>"}
   embedding_vector_columns:
     - name: description_vector
-      embedding_dimension: 1024
+      embedding_dimension: ${var.embedding_dimension}
 ```
 
 `schema_json` is a flat `{"column_name": "type"}` JSON string. `description_vector` stores

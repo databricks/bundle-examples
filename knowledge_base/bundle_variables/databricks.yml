@@ -1,0 +1,24 @@
+bundle:
+  name: bundle_variables
+
+variables:
+  no_default:
+    description: This is a variable with no default value
+
+  with_default:
+    description: This is a variable with a default value
+    value: hello
+
+  with_default_in_targets:
+    description: This is a variable with its default value defined in the targets section
+
+targets:
+  development:
+    default: true
+
+    variables:
+      with_default_in_targets: value_in_development
+
+  production:
+    variables:
+      with_default_in_targets: value_in_production

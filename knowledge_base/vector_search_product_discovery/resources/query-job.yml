@@ -28,6 +28,4 @@ resources:
         - task_key: query
           environment_key: serverless_env
           notebook_task:
-            # Job parameters are pushed down to the notebook automatically;
-            # no base_parameters needed.
             notebook_path: ../src/02_query_demo.py

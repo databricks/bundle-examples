@@ -29,10 +29,3 @@ resources:
           environment_key: serverless_env
           notebook_task:
             notebook_path: ../src/02_query_demo.py
-            base_parameters:
-              index_name: "{{job.parameters.index_name}}"
-              endpoint_name: "{{job.parameters.endpoint_name}}"
-              embedding_model: "{{job.parameters.embedding_model}}"
-              embedding_dimension: "{{job.parameters.embedding_dimension}}"
-              query: "{{job.parameters.query}}"
-              num_results: "{{job.parameters.num_results}}"

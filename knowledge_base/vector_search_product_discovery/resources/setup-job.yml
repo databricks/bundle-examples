@@ -28,11 +28,5 @@ resources:
           environment_key: serverless_env
           notebook_task:
             notebook_path: ../src/01_upsert_products.py
-            base_parameters:
-              index_name: "{{job.parameters.index_name}}"
-              endpoint_name: "{{job.parameters.endpoint_name}}"
-              embedding_model: "{{job.parameters.embedding_model}}"
-              embedding_dimension: "{{job.parameters.embedding_dimension}}"
-              data_path: "{{job.parameters.data_path}}"
 
       max_concurrent_runs: 1

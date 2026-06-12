@@ -1,0 +1,5 @@
+resources:
+  vector_search_endpoints:
+    product_search_endpoint:
+      name: ${var.endpoint_name}
+      endpoint_type: STANDARD

@@ -1,0 +1,202 @@
+[
+  {
+    "product_id": 1,
+    "name": "Alpine Thermal Jacket",
+    "category": "Outdoor Clothing",
+    "brand": "Highcairn",
+    "price": 289.99,
+    "description": "Insulated hardshell designed for alpine conditions. Features a windproof outer layer, sealed seams, and a 700-fill-power down inner. Packs into its own pocket. Ideal for mountaineering, ski touring, and above-treeline travel in sub-zero temperatures."
+  },
+  {
+    "product_id": 2,
+    "name": "Merino Wool Base Layer Top",
+    "category": "Outdoor Clothing",
+    "brand": "Wollund",
+    "price": 89.99,
+    "description": "Next-to-skin mid-weight top made from 100% New Zealand merino wool. Naturally temperature-regulating and odor-resistant. Flatlock seams prevent chafing on long days. Worn as a standalone layer or under a shell in cold weather."
+  },
+  {
+    "product_id": 3,
+    "name": "Softshell Fleece Jacket",
+    "category": "Outdoor Clothing",
+    "brand": "Glidewen",
+    "price": 149.99,
+    "description": "Four-way stretch softshell with a bonded fleece backer. Wind-resistant without being fully waterproof — ideal as a mid-layer or standalone jacket on dry, cool days. Two hand pockets and a chest zip pocket."
+  },
+  {
+    "product_id": 4,
+    "name": "Rain Jacket with Hood",
+    "category": "Outdoor Clothing",
+    "brand": "Stormvel",
+    "price": 199.99,
+    "description": "3-layer waterproof breathable shell rated at 20,000mm hydrostatic head. Helmet-compatible hood with a single-hand adjustment. Pit-zip vents for temperature control during high output activities. Packs to fist size."
+  },
+  {
+    "product_id": 5,
+    "name": "Waterproof Mid Hiking Boot",
+    "category": "Footwear",
+    "brand": "Treadwen",
+    "price": 179.99,
+    "description": "Full-grain leather upper with a waterproof membrane. A grippy rubber outsole bites into wet rock and loose trail. Mid-cut ankle collar supports the ankle on uneven terrain. Recommended for day hikes and multi-day trips with a loaded pack."
+  },
+  {
+    "product_id": 6,
+    "name": "Trail Running Shoe",
+    "category": "Footwear",
+    "brand": "Fellrun",
+    "price": 139.99,
+    "description": "Lightweight trail runner with a rock plate and aggressive lug pattern. 8mm drop and a wide toe box promote natural foot strike. Drainage ports shed water quickly on stream crossings. Built for technical singletrack and ultra-distance racing."
+  },
+  {
+    "product_id": 7,
+    "name": "Ultralight Backpacking Tent",
+    "category": "Camping",
+    "brand": "Tarnost",
+    "price": 349.99,
+    "description": "Two-person freestanding tent weighing 1.1 kg. Silnylon fly sheds rain and condensation. Interior mesh canopy maximizes airflow on warm nights. Sets up in under three minutes. Rated for three-season use; not designed for heavy snow loads."
+  },
+  {
+    "product_id": 8,
+    "name": "20°F Down Sleeping Bag",
+    "category": "Camping",
+    "brand": "Frostlin",
+    "price": 279.99,
+    "description": "Mummy-cut bag with 800-fill-power hydrophobic down. EN-tested lower limit of -7°C. Footbox baffle prevents cold spots at the toes. Corrosion-resistant zipper with anti-snag tape. Compresses to the size of a 1 L water bottle in the included stuff sack."
+  },
+  {
+    "product_id": 9,
+    "name": "Rechargeable Headlamp 350 lm",
+    "category": "Camping",
+    "brand": "Beamwick",
+    "price": 49.99,
+    "description": "USB-C rechargeable lamp with a 350-lumen flood beam and a 100-lumen red night-vision mode. IPX4 splash-resistant housing. Single button cycles through brightness levels. Runtime up to 40 hours on low. Tilt mechanism adjusts beam angle hands-free."
+  },
+  {
+    "product_id": 10,
+    "name": "Gravity Water Filter",
+    "category": "Camping",
+    "brand": "Streamwell",
+    "price": 59.99,
+    "description": "Hollow-fiber gravity filter removes bacteria, protozoa, and microplastics to 0.1 micron. No pumping required — hang the dirty reservoir and let gravity do the work. Filters 1.5 liters per minute. Includes clean and dirty reservoirs and a hydration hose adapter."
+  },
+  {
+    "product_id": 11,
+    "name": "Carbon Fiber Trekking Poles",
+    "category": "Camping",
+    "brand": "Polaract",
+    "price": 119.99,
+    "description": "100% carbon fiber shaft reduces arm fatigue on long days. Quick-lock mechanism adjusts from 100 to 135 cm in seconds. Cork grip wicks sweat and molds to hand shape over time. Tungsten carbide tips with interchangeable rubber feet for paved surfaces."
+  },
+  {
+    "product_id": 12,
+    "name": "Noise-Canceling Wireless Headphones",
+    "category": "Electronics",
+    "brand": "Aurivox",
+    "price": 329.99,
+    "description": "Over-ear headphones with hybrid active noise cancellation that adapts to ambient sound levels. 30-hour battery life. Multipoint pairing connects to two devices simultaneously. Foldable design with a hard carry case. Hi-Res Audio certified with a 4 Hz–40 kHz range."
+  },
+  {
+    "product_id": 13,
+    "name": "Wireless Mechanical Keyboard",
+    "category": "Electronics",
+    "brand": "Clackton",
+    "price": 149.99,
+    "description": "Tenkeyless layout with hot-swappable tactile switches. Bluetooth 5.0 pairs with up to three devices; a 2.4 GHz dongle provides sub-1ms latency for gaming. PBT keycaps resist shine. Per-key RGB lighting with 15 preset effects. 2000 mAh battery lasts two weeks on a single charge with lighting off."
+  },
+  {
+    "product_id": 14,
+    "name": "Portable Laptop Stand",
+    "category": "Electronics",
+    "brand": "Deskwen",
+    "price": 49.99,
+    "description": "Adjustable aluminum stand raises a laptop screen to eye level, reducing neck strain during long work sessions. Six height settings from 15 to 32 cm. Folds flat to 3 mm for bag transport. Supports laptops from 10 to 17 inches and up to 8 kg."
+  },
+  {
+    "product_id": 15,
+    "name": "Smart Air Purifier",
+    "category": "Electronics",
+    "brand": "Puralto",
+    "price": 219.99,
+    "description": "HEPA H13 filter captures 99.97% of particles down to 0.3 microns including pollen, dust mite debris, and pet dander. Activated carbon layer adsorbs VOCs and cooking odors. App-controlled with air quality sensor and auto mode. Covers rooms up to 50 m². Night mode drops fan noise to 22 dB."
+  },
+  {
+    "product_id": 16,
+    "name": "Voice-Controlled Smart Speaker",
+    "category": "Electronics",
+    "brand": "Voxhome",
+    "price": 99.99,
+    "description": "360-degree speaker with a woofer and two tweeters. Built-in voice assistant controls smart home devices, plays music, answers questions, and sets timers. Connects via Wi-Fi and Bluetooth. Multi-room audio links speakers across the home. Privacy mic mute button."
+  },
+  {
+    "product_id": 17,
+    "name": "Cast Iron Dutch Oven 5.5 qt",
+    "category": "Kitchen",
+    "brand": "Ferralto",
+    "price": 89.99,
+    "description": "Enameled cast iron with a tight-fitting lid that seals in moisture for braises, stews, and bread baking. Oven-safe to 260°C. Works on all cooktops including induction. Interior cream enamel shows browning clearly. Self-basting dimpled lid. Lifetime warranty against defects."
+  },
+  {
+    "product_id": 18,
+    "name": "Burr Coffee Grinder",
+    "category": "Kitchen",
+    "brand": "Roastel",
+    "price": 79.99,
+    "description": "40mm stainless steel conical burrs produce consistent grind size from coarse French press to fine espresso. 40g hopper capacity. 18 click-stop settings. Static-reducing grounds bin with a rubber seal. Quiet 120W motor. Removable upper burr for easy cleaning."
+  },
+  {
+    "product_id": 19,
+    "name": "10-Piece Stainless Knife Block Set",
+    "category": "Kitchen",
+    "brand": "Bladely",
+    "price": 159.99,
+    "description": "High-carbon German stainless blades forged from a single billet for full tang strength. Set includes 8-inch chef's, 8-inch bread, 7-inch santoku, 5-inch utility, 3.5-inch paring, six steak knives, shears, honing rod, and a beechwood block. Blades hand-sharpened to 15° per side."
+  },
+  {
+    "product_id": 20,
+    "name": "Pour-Over Coffee Dripper Set",
+    "category": "Kitchen",
+    "brand": "Pournal",
+    "price": 44.99,
+    "description": "Borosilicate glass dripper sits on a matching carafe. Spiral ribs promote even extraction by allowing air to escape uniformly. Includes 40 bleached paper filters and a stainless gooseneck pouring kettle. Produces a clean, bright cup that highlights single-origin floral and fruity notes."
+  },
+  {
+    "product_id": 21,
+    "name": "Extra-Thick Yoga Mat",
+    "category": "Fitness",
+    "brand": "Mattra",
+    "price": 69.99,
+    "description": "6mm natural rubber mat with a microfiber top layer that grips when wet. Non-slip bottom prevents sliding on hardwood and tile. Alignment lines guide stance width in warrior and standing poses. Rolled dimensions: 61 × 183 cm. Includes carrying strap. Free from latex, PVC, and phthalates."
+  },
+  {
+    "product_id": 22,
+    "name": "Vibrating Foam Roller",
+    "category": "Fitness",
+    "brand": "Rollwen",
+    "price": 89.99,
+    "description": "High-density EPP foam roller with four built-in vibration frequencies (20–40 Hz). Vibration penetrates deeper tissue than static rolling for myofascial release and delayed-onset muscle soreness. USB rechargeable; 2-hour runtime per charge. Hollow core stores the charging cable."
+  },
+  {
+    "product_id": 23,
+    "name": "Resistance Band Set",
+    "category": "Fitness",
+    "brand": "Bandwell",
+    "price": 34.99,
+    "description": "Five fabric-wrapped loop bands in progressive resistances from 5 to 40 lbs. Non-roll design stays in place during squats, hip thrusts, and lateral walks. Used for glute activation, mobility work, and upper-body accessory exercises. Includes a mesh carry bag and a printed exercise guide."
+  },
+  {
+    "product_id": 24,
+    "name": "Insulated Stainless Water Bottle 32 oz",
+    "category": "Fitness",
+    "brand": "Vesslo",
+    "price": 39.99,
+    "description": "Double-wall vacuum insulation keeps beverages cold 24 hours or hot 12 hours. 18/8 stainless steel; no plastic liner means no flavor transfer. Wide-mouth lid accepts ice cubes. Compatible with most car cup holders. Powder-coat finish resists dents and scratches."
+  },
+  {
+    "product_id": 25,
+    "name": "Compression Running Tights",
+    "category": "Fitness",
+    "brand": "Stridon",
+    "price": 79.99,
+    "description": "Four-way stretch fabric with graduated compression from ankle to waist improves circulation and reduces muscle oscillation during runs. UPF 50+ sun protection. Rear zip pocket fits a key or gel. Reflective piping increases visibility in low light. Available in lengths for inseams 28–34 inches."
+  }
+]

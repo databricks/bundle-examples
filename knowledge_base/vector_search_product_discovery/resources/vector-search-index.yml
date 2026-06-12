@@ -1,0 +1,23 @@
+resources:
+  vector_search_indexes:
+    product_index:
+      name: ${var.catalog}.${resources.schemas.product_search_schema.name}.product_index
+      endpoint_name: ${resources.vector_search_endpoints.product_search_endpoint.name}
+      primary_key: product_id
+      index_type: DIRECT_ACCESS
+      direct_access_index_spec:
+        # schema_json is a flat {"column_name": "type"} map serialised as a JSON string.
+        # description_vector stores the pre-computed embedding produced by 01_upsert_products.py.
+        schema_json: |-
+          {
+            "product_id": "int",
+            "name": "string",
+            "category": "string",
+            "brand": "string",
+            "price": "float",
+            "description": "string",
+            "description_vector": "array<float>"
+          }
+        embedding_vector_columns:
+          - name: description_vector
+            embedding_dimension: ${var.embedding_dimension}

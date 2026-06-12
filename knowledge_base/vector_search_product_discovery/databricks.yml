@@ -1,0 +1,47 @@
+# This is a Declarative Automation Bundle definition for vector_search_product_discovery.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: vector_search_product_discovery
+  engine: direct
+
+variables:
+  catalog:
+    description: Unity Catalog catalog name for an existing catalog
+    default: main
+  schema:
+    description: Unity Catalog schema name for the product search use case
+    default: product_search
+  endpoint_name:
+    description: Name of the Vector Search endpoint
+    default: product-search-endpoint
+  embedding_model:
+    description: Model serving endpoint used to embed product descriptions
+    default: databricks-gte-large-en
+  embedding_dimension:
+    description: >-
+      Vector dimension. Referenced by the index spec (resources/vector-search-index.yml)
+      and passed to the upsert/query notebooks, so it is set once here. Immutable after
+      the index is created.
+    default: 1024
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://your-workspace.cloud.databricks.com
+    variables:
+      endpoint_name: ${workspace.current_user.short_name}-product-search-endpoint
+  prod:
+    mode: production
+    workspace:
+      host: https://your-workspace.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE
+      - group_name: users
+        level: CAN_VIEW

@@ -22,15 +22,15 @@ to use databricks CLI bundles to deploy ML code together with resource configs t
 
 This will allow you to develop locally and use databricks CLI bundles to deploy to your dev workspace to test out code and config changes.
 
-### Develop on Databricks using Databricks Repos
+### Develop on Databricks using Databricks Git folders
 
 #### Prerequisites
 You'll need:
 * Access to run commands on a cluster running Databricks Runtime ML version 11.0 or above in your dev Databricks workspace
-* To set up [Databricks Repos](https://learn.microsoft.com/azure/databricks/repos/index): see instructions below
+* To set up [Databricks Git folders](https://learn.microsoft.com/azure/databricks/repos/index): see instructions below
 
-#### Configuring Databricks Repos
-To use Repos, [set up git integration](https://learn.microsoft.com/azure/databricks/repos/repos-setup) in your dev workspace.
+#### Configuring Databricks Git folders
+To use Git folders, [set up git integration](https://learn.microsoft.com/azure/databricks/repos/repos-setup) in your dev workspace.
 
 If the current project has already been pushed to a hosted Git repo, follow the
 [UI workflow](https://learn.microsoft.com/azure/databricks/repos/git-operations-with-repos#add-a-repo-and-connect-remotely-later)
@@ -49,7 +49,7 @@ Otherwise, e.g. if iterating on ML code for a new project, follow the steps belo
 
 #### Running code on Databricks
 You can iterate on the sample ML code by running the provided `mlops_stacks/training/notebooks/Train.py` notebook on Databricks using
-[Repos](https://learn.microsoft.com/azure/databricks/repos/index). 
+[Git folders](https://learn.microsoft.com/azure/databricks/repos/index). 
 
 
 ## Next Steps

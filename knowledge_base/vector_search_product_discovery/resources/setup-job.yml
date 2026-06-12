@@ -24,7 +24,7 @@ resources:
 
       tasks:
         - task_key: upsert_products
-          description: Load products from JSON, embed descriptions, and upsert into the Vector Search index
+          description: Load products from JSON, embed descriptions, and upsert into the AI Search index
           environment_key: serverless_env
           notebook_task:
             notebook_path: ../src/01_upsert_products.py

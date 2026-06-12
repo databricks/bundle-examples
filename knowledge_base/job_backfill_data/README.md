@@ -60,7 +60,7 @@ with this project. You can also use the CLI:
    (Note: "dev" is the default target, so `--target` is optional.)
 
    This deploys everything defined for this project, including the job
-   `[dev yourname] sql_backfill_example`. You can find it under **Workflows** (or **Jobs & Pipelines**) in your workspace.
+   `[dev yourname] sql_backfill_example`. You can find it under **Jobs & Pipelines** in your workspace.
 
 3. To run the job with the default `run_date`:
    ```

@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC # Semantic Product Search Demo
 # MAGIC
-# MAGIC Queries the Vector Search index to find products that match a natural-language
+# MAGIC Queries the AI Search index to find products that match a natural-language
 # MAGIC description. Try queries that would fail keyword search — e.g. *"something to
 # MAGIC keep my coffee hot all day"* or *"gear for sleeping outside in freezing weather"*.
 

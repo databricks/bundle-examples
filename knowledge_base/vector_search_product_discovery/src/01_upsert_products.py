@@ -1,10 +1,10 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Upsert Products into Vector Search Index
+# MAGIC # Upsert Products into AI Search Index
 # MAGIC
 # MAGIC Reads the product catalog from the JSON file deployed with the bundle,
-# MAGIC embeds each product description, then upserts all records into the Vector
-# MAGIC Search index. Re-running is safe — upsert is idempotent on `product_id`.
+# MAGIC embeds each product description, then upserts all records into the AI Search
+# MAGIC index. Re-running is safe — upsert is idempotent on `product_id`.
 
 # COMMAND ----------
 

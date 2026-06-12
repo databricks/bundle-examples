@@ -1,0 +1,4 @@
+/.databricks
+/.venv
+/.vscode
+__pycache__

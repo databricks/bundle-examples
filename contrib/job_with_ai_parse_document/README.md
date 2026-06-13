@@ -1,6 +1,6 @@
 # AI Document Processing Job with Structured Streaming
 
-A Declarative Automation Bundle demonstrating **incremental document processing** using `ai_parse_document`, `ai_query`, and Databricks Jobs with Structured Streaming.
+This Declarative Automation Bundles example demonstrates incremental document processing using `ai_parse_document`, `ai_query`, and Databricks Jobs with Structured Streaming.
 
 ## Overview
 

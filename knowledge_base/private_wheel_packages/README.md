@@ -15,7 +15,7 @@ wheels from a private repository in a notebook. You can use the workaround docum
 # Usage
 
 You can refer to private wheel files from job libraries or serverless environments by downloading the wheel
-and making it part of your Declarative Automation Bundle deployment.
+and making it part of your bundle deployment.
 
 To emulate this for this example, we will download a wheel from PyPI, include it in deployment, and refer to it from job configuration.
 

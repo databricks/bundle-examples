@@ -1,6 +1,6 @@
 # job_backfill_data
 
-This example demonstrates a Declarative Automation Bundle Job that runs a SQL task with a date parameter for backfilling data.
+This Declarative Automation Bundles example demonstrates how to define a job that runs a SQL task with a date parameter for backfilling data.
 
 The Job consists of:
 

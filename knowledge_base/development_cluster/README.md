@@ -1,6 +1,6 @@
 # Development cluster
 
-This example demonstrates how to define and use a development (all-purpose) cluster in a Declarative Automation Bundle.
+This Declarative Automation Bundles example demonstrates how to define and use a development (all-purpose) cluster.
 
 This bundle defines an `example_job` which is run on a job cluster in production mode.
 

@@ -1,6 +1,6 @@
 # Databricks App for working with Databricks jobs
 
-This example demonstrates how to define an Databricks App in a Declarative Automation Bundle.
+This Declarative Automation Bundles example demonstrates how to define a Databricks App.
 
 It includes and deploys an example app and a job managed by DABs to a Databricks workspace.
 The app shows current status of the job and lists all existing runs.

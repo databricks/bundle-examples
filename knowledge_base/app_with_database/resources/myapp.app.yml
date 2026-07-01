@@ -8,7 +8,7 @@ resources:
       resources:
         - name: "app-db"
           description: "A database for the app to be able to connect to and query"
-          database:
-            database_name: ${resources.database_catalogs.my_catalog.database_name}
-            instance_name: ${resources.database_catalogs.my_catalog.database_instance_name}
+          postgres:
+            branch: ${resources.postgres_projects.my_project.id}/branches/production
+            database: ${resources.postgres_databases.my_database.id}
             permission: "CAN_CONNECT_AND_CREATE"

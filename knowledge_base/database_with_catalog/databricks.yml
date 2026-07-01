@@ -5,16 +5,17 @@ bundle:
 #   host: https://myworkspace.cloud.databricks.com
 
 resources:
-  database_instances:
-    my_instance:
-      name: my-instance
-      capacity: CU_1
-  database_catalogs:
+  postgres_projects:
+    my_project:
+      project_id: my-project
+      display_name: "Example project"
+      pg_version: 16
+  postgres_catalogs:
     my_catalog:
-      database_instance_name: ${resources.database_instances.my_instance.name}
-      name: example_catalog
-      database_name: my_database
-      create_database_if_not_exists: true
+      catalog_id: example_catalog
+      branch: ${resources.postgres_projects.my_project.id}/branches/production
+      postgres_database: my_database
+      create_database_if_missing: true
 
 
 # Defines the targets for this bundle.

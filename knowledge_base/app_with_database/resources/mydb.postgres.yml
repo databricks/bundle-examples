@@ -1,0 +1,34 @@
+resources:
+  postgres_projects:
+    my_project:
+      project_id: example-database
+      display_name: "Example app database"
+      pg_version: 16
+
+  # An owner role for the database. Lakebase requires a role when creating a
+  # database, and declaring it explicitly keeps the bundle portable across users
+  # (the auto-created project-owner role's id is derived from the creator's
+  # identity).
+  postgres_roles:
+    my_role:
+      parent: ${resources.postgres_projects.my_project.id}/branches/production
+      role_id: app-owner
+      postgres_role: app_owner
+
+  # Declare the database explicitly so it has a stable id that the app can
+  # reference. Relying on the catalog's create_database_if_missing would create a
+  # database with an auto-generated id, which the app cannot reference by path.
+  postgres_databases:
+    my_database:
+      parent: ${resources.postgres_projects.my_project.id}/branches/production
+      database_id: example-database
+      postgres_database: example_database
+      role: ${resources.postgres_roles.my_role.id}
+
+  # A Unity Catalog catalog backed by the Postgres database, so its data can be
+  # browsed in Unity Catalog.
+  postgres_catalogs:
+    my_catalog:
+      catalog_id: example_database_catalog
+      branch: ${resources.postgres_projects.my_project.id}/branches/production
+      postgres_database: ${resources.postgres_databases.my_database.postgres_database}

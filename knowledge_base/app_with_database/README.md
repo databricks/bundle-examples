@@ -12,7 +12,7 @@ For more information about managing Lakebase with bundles see the [documentation
 
 ## Prerequisites
 
-* Databricks CLI v1.0.0 or above
+* Databricks CLI v1.4.0 or above
 
 ## Usage
 

@@ -37,6 +37,7 @@ on the next deploy — no per-model YAML to maintain.
 flowchart TD
     subgraph setup["One-time setup"]
       T["dbt-factory bundle template"] -->|databricks bundle init| B["Scaffolded project:<br/>dbt project + PyDABs hook + factory code"]
+      X["Existing dbt project<br/>(optional)"] -.->|move models/seeds/... into src/| B
     end
     subgraph deploy["Every deploy"]
       C["make manifest<br/>(dbt parse)"] --> D["target/manifest.json"]
@@ -49,6 +50,9 @@ flowchart TD
     end
     B --> C
     F --> G
+
+    classDef optional stroke:#999,stroke-dasharray:5 4,color:#888;
+    class X optional;
 ```
 
 ## Usage

@@ -1,0 +1,31 @@
+[project]
+name = "{{.project_name}}"
+version = "0.0.1"
+requires-python = ">=3.10,<3.13"
+# Runtime dependency of the vendored databricks_dbt_factory core (read by load_resources
+# during `bundle deploy`).
+dependencies = [
+    "PyYAML~=6.0.1",
+]
+
+[dependency-groups]
+dev = [
+    # Required by the PyDABs hook (resources/__init__.py) at `bundle deploy` time.
+    "databricks-bundles==0.295.0",
+    # Used locally to regenerate the dbt manifest (`make manifest`). At runtime dbt is
+    # installed into the serverless environment (see resources/__init__.py).
+    "dbt-databricks>=1.8.0,<2.0.0",
+    "pytest",
+    "ruff",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Only the vendored library is packaged; the dbt project (src/models, ...) is not a package.
+[tool.hatch.build.targets.wheel]
+packages = ["src/databricks_dbt_factory"]
+
+[tool.ruff]
+line-length = 120

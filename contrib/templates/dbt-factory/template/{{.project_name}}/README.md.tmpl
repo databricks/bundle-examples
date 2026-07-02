@@ -1,0 +1,81 @@
+# {{.project_name}}
+
+The '{{.project_name}}' project was generated using the **dbt-factory** template for
+Databricks Asset Bundles. It runs a [dbt](https://docs.getdbt.com/) project on Databricks as a
+Databricks Workflow with **one task per dbt object** (model, seed, snapshot, test), instead of
+running the whole project as a single opaque task.
+
+It combines two pieces:
+
+* **[databricks-dbt-factory](https://github.com/mwojtyczka/databricks-dbt-factory)** — reads a
+  dbt `manifest.json` and expands it into Databricks job tasks with their dependencies wired up.
+  Vendored under `src/databricks_dbt_factory/` (see [`NOTICE`](NOTICE)).
+* **[PyDABs](https://docs.databricks.com/dev-tools/bundles/python)** — at `bundle deploy` time
+  the Databricks CLI calls `load_resources` in [`resources/__init__.py`](resources/__init__.py),
+  which runs the factory against the manifest and returns the generated job. **No per-model job
+  YAML is checked in** — the task graph is generated on the fly from the manifest.
+
+This project uses **serverless compute** and the **notebook task type** for the fastest task
+start times.
+
+## Setup
+
+1. Install the [Databricks CLI](https://docs.databricks.com/dev-tools/cli/databricks-cli.html)
+   and the [uv](https://docs.astral.sh/uv/) package manager.
+
+2. Authenticate to your Databricks workspace:
+   ```
+   $ databricks configure
+   ```
+
+3. Install dependencies into the `.venv` the bundle uses:
+   ```
+   $ make setup      # == uv sync --dev
+   ```
+
+4. Check the SQL warehouse `http_path`, `catalog`, and `schema` in `dbt_profiles/profiles.yml`.
+
+## Generate the dbt manifest (required before the first deploy)
+
+`resources/__init__.py` reads the dbt manifest at deploy time. Generate it from your models:
+
+```
+$ make manifest      # == uv run dbt deps && uv run dbt parse
+```
+
+`dbt parse` only reads your project files; it does not connect to a warehouse. Rerun it whenever
+you change your models. The manifest location is configurable via the `DBT_MANIFEST_PATH` env var
+or the `MANIFEST_PATH` constant in `resources/__init__.py`.
+
+## Deploy and run
+
+```
+$ databricks bundle deploy --target dev      # or: make deploy (regenerates the manifest first)
+$ databricks bundle run {{.project_name}}_job # or: make run
+```
+
+Open the run URL the CLI prints to watch the generated per-model task graph execute.
+
+## Configuring the generated job
+
+The knobs you chose at init are constants at the top of `resources/__init__.py`
+(`BUNDLE_TESTS`, `ENVIRONMENT_KEY`, `EXTRA_DBT_COMMAND_OPTIONS`); edit them there to change
+behavior. The dbt target, warehouse, catalog, and schema live in `dbt_profiles/profiles.yml` and
+are selected per bundle target via `--target ${bundle.target}`.
+
+## Tests
+
+```
+$ make test      # == uv run pytest tests   (run `make manifest` first)
+```
+
+Runs the vendored factory's test suite plus an offline test of the PyDABs integration against the
+generated manifest.
+
+## Folding in an existing dbt project
+
+Already have a dbt project you'd rather use? Just move your dbt sources into this project's `src/`
+folders (`src/models`, `src/seeds`, …) in place of the starter models, then run `make manifest`.
+See the
+[Migrating an existing dbt project](https://github.com/databricks/bundle-examples/blob/main/contrib/dbt_factory/README.md#migrating-an-existing-dbt-project)
+guide for the full steps.

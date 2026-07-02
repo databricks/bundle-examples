@@ -1,0 +1,27 @@
+.PHONY: setup deps manifest validate deploy run test
+
+# Install dependencies into the .venv used by the bundle (databricks.yml -> python.venv_path).
+setup:
+	uv sync --dev
+
+# Install dbt package dependencies declared in packages.yml / dependencies.yml (if any).
+deps:
+	uv run dbt deps
+
+# Regenerate the dbt manifest that resources/__init__.py reads at deploy time.
+# `dbt parse` does not connect to a warehouse; it only reads the project files.
+manifest: deps
+	uv run dbt parse --profiles-dir dbt_profiles
+
+validate:
+	databricks bundle validate
+
+# Regenerate the manifest and deploy the generated job to the dev target.
+deploy: manifest
+	databricks bundle deploy --target dev
+
+run:
+	databricks bundle run dbt_factory_job
+
+test:
+	uv run pytest tests

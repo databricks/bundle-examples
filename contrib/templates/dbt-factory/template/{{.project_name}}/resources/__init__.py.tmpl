@@ -1,0 +1,123 @@
+"""
+PyDABs integration for databricks-dbt-factory.
+
+At ``databricks bundle deploy`` time the Databricks CLI calls :func:`load_resources`, which
+reads the dbt manifest and expands it into a Databricks job with one task per dbt object
+(model / seed / snapshot / test) using the vendored ``databricks_dbt_factory`` core. No
+per-model YAML is generated or checked in — the job graph is built on the fly from the manifest.
+
+This module is the only integration glue; the vendored core under ``src/databricks_dbt_factory``
+is unchanged. It mirrors the wiring in ``databricks_dbt_factory.main`` but is fixed to the
+options this project exposes (serverless + notebook task type) and returns a ``Resources``
+object instead of writing a job-spec YAML file.
+"""
+
+import os
+
+from databricks.bundles.core import Bundle, Resources
+from databricks.bundles.jobs import Job
+
+from databricks_dbt_factory.DbtFactory import DbtFactory
+from databricks_dbt_factory.SpecsHandler import SpecsHandler
+from databricks_dbt_factory.DbtTask import DbtTaskOptions, TaskType
+from databricks_dbt_factory.TaskFactory import (
+    DbtDependencyResolver,
+    ModelTaskFactory,
+    SnapshotTaskFactory,
+    SeedTaskFactory,
+    TestTaskFactory,
+)
+
+# --- Configuration -------------------------------------------------------------------------
+
+# Path to the dbt manifest, read at deploy time. Regenerate with `make manifest` (dbt parse).
+# Override the location without editing this file via the DBT_MANIFEST_PATH env var.
+MANIFEST_PATH = os.environ.get("DBT_MANIFEST_PATH", "target/manifest.json")
+
+# Name of the generated Databricks job.
+JOB_NAME = "{{.project_name}}_job"
+
+# Key of the serverless environment (defined on the job below).
+ENVIRONMENT_KEY = "{{.environment_key}}"
+
+# Bundle single-model tests per resource into one `dbt test` task (fewer task startups,
+# faster end-to-end runtime for projects with many tests). See the databricks-dbt-factory
+# README "DBT Tests handling" section for the trade-offs.
+BUNDLE_TESTS = {{if eq .bundle_tests "yes"}}True{{else}}False{{end}}
+
+# Extra options appended to every generated dbt command (e.g. "--vars '{...}'").
+# `printf "%q"` renders a safely-quoted string literal so values containing quotes stay valid Python.
+EXTRA_DBT_COMMAND_OPTIONS = {{ printf "%q" .extra_dbt_command_options }}
+
+# dbt-databricks version installed into the serverless environment at runtime.
+DBT_DATABRICKS_DEPENDENCY = "dbt-databricks>=1.8.0,<2.0.0"
+
+# The runner notebook shipped with the core, referenced in place (path relative to the bundle
+# root). `PROJECT_DIRECTORY` is the path from the notebook's own directory back up to the dbt
+# project root (== bundle root), where the runner changes directory to before running dbt. It is
+# derived from the notebook path so the two stay consistent if the layout ever changes.
+RUNNER_NOTEBOOK_PATH = "src/databricks_dbt_factory/notebook/run_dbt_command.py"
+PROJECT_DIRECTORY = os.path.relpath(".", os.path.dirname(RUNNER_NOTEBOOK_PATH))
+PROFILES_DIRECTORY = "dbt_profiles"
+
+
+def _build_tasks(target: str) -> list[dict]:
+    """Reads the dbt manifest and returns the list of Databricks task dicts (one per dbt node)."""
+    resolver = DbtDependencyResolver()
+    task_options = DbtTaskOptions(
+        task_type=TaskType.NOTEBOOK,
+        environment_key=ENVIRONMENT_KEY,
+        notebook_path=RUNNER_NOTEBOOK_PATH,
+        project_directory=PROJECT_DIRECTORY,
+        profiles_directory=PROFILES_DIRECTORY,
+    )
+    dbt_options = f"--target {target} {EXTRA_DBT_COMMAND_OPTIONS}".strip()
+
+    task_factories = {
+        "model": ModelTaskFactory(resolver, task_options, dbt_options),
+        "snapshot": SnapshotTaskFactory(resolver, task_options, dbt_options),
+        "seed": SeedTaskFactory(resolver, task_options, dbt_options),
+        "test": TestTaskFactory(resolver, task_options, dbt_options),
+    }
+
+    handler = SpecsHandler()
+    factory = DbtFactory(handler, task_factories, bundle_tests=BUNDLE_TESTS)
+    manifest = handler.read_dbt_manifest(MANIFEST_PATH)
+    return factory.create_tasks(manifest)
+
+
+def build_job(target: str) -> Job:
+    """Builds the Databricks job that runs the dbt project on serverless via notebook tasks."""
+    return Job.from_dict(
+        {
+            "name": JOB_NAME,
+            "queue": {"enabled": True},
+            "trigger": {
+                # Run this job every day, exactly one day from the last run;
+                # see https://docs.databricks.com/api/workspace/jobs/create#trigger
+                "periodic": {"interval": 1, "unit": "DAYS"},
+            },
+            "tasks": _build_tasks(target),
+            "environments": [
+                {
+                    "environment_key": ENVIRONMENT_KEY,
+                    "spec": {
+                        "environment_version": "4",
+                        "dependencies": [DBT_DATABRICKS_DEPENDENCY],
+                    },
+                }
+            ],
+        }
+    )
+
+
+def load_resources(bundle: Bundle) -> Resources:
+    """
+    Called by the Databricks CLI during `bundle deploy` to load resources defined in Python.
+
+    Reads the dbt manifest and registers the generated job. After deployment this function is
+    not used.
+    """
+    resources = Resources()
+    resources.add_job(JOB_NAME, build_job(bundle.target))
+    return resources

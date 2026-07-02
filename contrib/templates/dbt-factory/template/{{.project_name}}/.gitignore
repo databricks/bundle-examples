@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.databricks/
+logs/
+dbt_packages/
+dbt_profiles/.user.yml
+uv.lock
+
+# dbt build artifacts, but keep the committed manifest that resources/__init__.py reads at
+# deploy time. Regenerate it with `make manifest`.
+target/*
+!target/manifest.json

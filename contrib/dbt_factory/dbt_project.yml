@@ -1,0 +1,28 @@
+name: 'dbt_factory'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'dbt_factory'
+
+# These configurations specify where dbt should look for different types of files.
+# Everything dbt-related lives under src/ so the project can also hold non-dbt resources
+# (such as the vendored databricks_dbt_factory library under src/databricks_dbt_factory).
+model-paths: ["src/models"]
+analysis-paths: ["src/analyses"]
+test-paths: ["src/tests"]
+seed-paths: ["src/seeds"]
+macro-paths: ["src/macros"]
+snapshot-paths: ["src/snapshots"]
+
+clean-targets: # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views by default. These settings can be overridden in the
+# individual model files using the `{{ config(...) }}` macro.
+models:
+  dbt_factory:
+    example:
+      +materialized: view

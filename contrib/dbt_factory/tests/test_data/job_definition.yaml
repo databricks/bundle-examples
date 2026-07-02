@@ -1,0 +1,342 @@
+resources:
+  jobs:
+    dbt_sql_job:
+      name: dbt_job
+      git_source:
+        git_url: https://github.com/mwojtyczka/dbt-demo.git
+        git_provider: gitHub
+        git_branch: main
+      queue:
+        enabled: true
+      environments:
+      - environment_key: Default
+        spec:
+          client: '1'
+          dependencies:
+          - dbt-databricks
+      tasks:
+      - task_key: model_dbt_demo_diamonds_list_colors
+        depends_on:
+        - task_key: model_dbt_demo_diamonds_four_cs
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt run --select diamonds_list_colors --target dev
+          source: GIT
+      - task_key: model_dbt_demo_diamonds_prices
+        depends_on: []
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt run --select diamonds_prices --target dev
+          source: GIT
+      - task_key: model_dbt_demo_diamonds_four_cs
+        depends_on: []
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt run --select diamonds_four_cs --target dev
+          source: GIT
+      - task_key: model_dbt_demo_zzz_game_details
+        depends_on: []
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt run --select zzz_game_details --target dev
+          source: GIT
+      - task_key: model_dbt_demo_second_dbt_model
+        depends_on:
+        - task_key: model_dbt_demo_first_dbt_model
+        - task_key: test_dbt_demo_unique_first_dbt_model_id_9dda05743e
+        - task_key: test_dbt_demo_not_null_first_dbt_model_id_bd8d25d061
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt run --select second_dbt_model --target dev
+          source: GIT
+      - task_key: model_dbt_demo_first_dbt_model
+        depends_on: []
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt run --select first_dbt_model --target dev
+          source: GIT
+      - task_key: test_dbt_demo_zzz_game_details_check_scores
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select zzz_game_details_check_scores --target dev
+          source: GIT
+      - task_key: test_dbt_demo_zzz_game_details_check_dates
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select zzz_game_details_check_dates --target dev
+          source: GIT
+      - task_key: test_dbt_demo_zzz_win_loss_records_check_records
+        depends_on:
+        - task_key: model_dbt_demo_zzz_win_loss_records
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select zzz_win_loss_records_check_records --target dev
+          source: GIT
+      - task_key: test_dbt_demo_diamonds_list_colors_test
+        depends_on:
+        - task_key: model_dbt_demo_diamonds_list_colors
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select diamonds_list_colors_test --target dev
+          source: GIT
+      - task_key: seed_dbt_demo_country_codes
+        depends_on: []
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt seed --select country_codes --target dev
+          source: GIT
+      - task_key: test_dbt_demo_unique_zzz_game_details_game_id_80431e7218
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select unique_zzz_game_details_game_id --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_game_details_game_id_3b5747f905
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_game_details_game_id --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_game_details_home_a99d25edd5
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_game_details_home --target dev
+          source: GIT
+      - task_key: test_dbt_demo_accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle_3771faef40
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_game_details_visitor_990a91372e
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_game_details_visitor --target dev
+          source: GIT
+      - task_key: test_dbt_demo_accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle_f0c81c502d
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_game_details_home_score_8c55a8fe39
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_game_details_home_score --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_game_details_visitor_score_f31e89be7f
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_game_details_visitor_score --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_game_details_winner_7f08e737be
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_game_details_winner --target dev
+          source: GIT
+      - task_key: test_dbt_demo_accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle_344bd88c4c
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_game_details_date_a9f3a56f68
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_game_details_date --target dev
+          source: GIT
+      - task_key: test_dbt_demo_unique_first_dbt_model_id_9dda05743e
+        depends_on:
+        - task_key: model_dbt_demo_first_dbt_model
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select unique_first_dbt_model_id --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_first_dbt_model_id_bd8d25d061
+        depends_on:
+        - task_key: model_dbt_demo_first_dbt_model
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_first_dbt_model_id --target dev
+          source: GIT
+      - task_key: test_dbt_demo_unique_second_dbt_model_id_3d7f6966a4
+        depends_on:
+        - task_key: model_dbt_demo_second_dbt_model
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select unique_second_dbt_model_id --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_second_dbt_model_id_c791c712a2
+        depends_on:
+        - task_key: model_dbt_demo_second_dbt_model
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_second_dbt_model_id --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_second_dbt_model_amount_usd_28ae55e16f
+        depends_on:
+        - task_key: model_dbt_demo_second_dbt_model
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_second_dbt_model_amount_usd --target dev
+          source: GIT
+      - task_key: model_dbt_demo_changed_country
+        depends_on:
+        - task_key: snapshot_dbt_demo_country_snapshot
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt run --select changed_country --target dev
+          source: GIT
+      - task_key: model_dbt_demo_country
+        depends_on:
+        - task_key: seed_dbt_demo_country_codes
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt run --select country --target dev
+          source: GIT
+      - task_key: snapshot_dbt_demo_country_snapshot
+        depends_on:
+        - task_key: model_dbt_demo_country
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt snapshot --select country_snapshot --target dev
+          source: GIT
+      - task_key: model_dbt_demo_zzz_win_loss_records
+        depends_on:
+        - task_key: model_dbt_demo_zzz_game_details
+        - task_key: test_dbt_demo_zzz_game_details_check_scores
+        - task_key: test_dbt_demo_zzz_game_details_check_dates
+        - task_key: test_dbt_demo_unique_zzz_game_details_game_id_80431e7218
+        - task_key: test_dbt_demo_not_null_zzz_game_details_game_id_3b5747f905
+        - task_key: test_dbt_demo_not_null_zzz_game_details_home_a99d25edd5
+        - task_key: test_dbt_demo_accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle_3771faef40
+        - task_key: test_dbt_demo_not_null_zzz_game_details_visitor_990a91372e
+        - task_key: test_dbt_demo_accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle_f0c81c502d
+        - task_key: test_dbt_demo_not_null_zzz_game_details_home_score_8c55a8fe39
+        - task_key: test_dbt_demo_not_null_zzz_game_details_visitor_score_f31e89be7f
+        - task_key: test_dbt_demo_not_null_zzz_game_details_winner_7f08e737be
+        - task_key: test_dbt_demo_accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle_344bd88c4c
+        - task_key: test_dbt_demo_not_null_zzz_game_details_date_a9f3a56f68
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt run --select zzz_win_loss_records --target dev
+          source: GIT
+      - task_key: test_dbt_demo_unique_zzz_win_loss_records_team_b989062105
+        depends_on:
+        - task_key: model_dbt_demo_zzz_win_loss_records
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select unique_zzz_win_loss_records_team --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_win_loss_records_team_9a18f33f86
+        depends_on:
+        - task_key: model_dbt_demo_zzz_win_loss_records
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_win_loss_records_team --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_win_loss_records_wins_f6815357fe
+        depends_on:
+        - task_key: model_dbt_demo_zzz_win_loss_records
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_win_loss_records_wins --target dev
+          source: GIT
+      - task_key: test_dbt_demo_not_null_zzz_win_loss_records_losses_82bf4ea601
+        depends_on:
+        - task_key: model_dbt_demo_zzz_win_loss_records
+        environment_key: Default
+        dbt_task:
+          commands:
+          - dbt deps --target dev
+          - dbt test --select not_null_zzz_win_loss_records_losses --target dev
+          source: GIT

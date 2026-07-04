@@ -1,0 +1,13 @@
+version: 2
+
+seeds:
+  - name: countries
+    description: "Country code lookup seed."
+    columns:
+      - name: country_code
+        tests:
+          - not_null
+          - unique
+      - name: country_name
+        tests:
+          - not_null

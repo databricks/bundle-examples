@@ -1,16 +1,14 @@
-import pytest
+import json
 
-from databricks_dbt_factory.DbtTask import DbtTask, DbtTaskOptions, TaskType
+from databricks_dbt_factory.DbtTask import DbtTask, DbtTaskOptions
 
 
-def test_notebook_task_with_job_cluster_key():
+def test_renders_serverless_notebook_task():
     options = DbtTaskOptions(
-        task_type="notebook",
+        environment_key="Default",
         notebook_path="./notebooks/dbt_runner.py",
-        source="WORKSPACE",
         project_directory="/project",
         profiles_directory="/profiles",
-        job_cluster_key="dbt_cluster",
     )
     task = DbtTask(
         task_key="my_model",
@@ -21,76 +19,27 @@ def test_notebook_task_with_job_cluster_key():
 
     result = task.to_dict()
 
-    assert result["job_cluster_key"] == "dbt_cluster"
-    assert "environment_key" not in result
     assert result["task_key"] == "my_model"
+    assert result["environment_key"] == "Default"  # serverless
+    assert "job_cluster_key" not in result
     assert result["depends_on"] == [{"task_key": "upstream_model"}]
-    assert result["notebook_task"]["source"] == "WORKSPACE"
-    assert result["notebook_task"]["base_parameters"]["project_directory"] == "/project"
-    assert result["notebook_task"]["base_parameters"]["profiles_directory"] == "/profiles"
+
+    notebook_task = result["notebook_task"]
+    assert notebook_task["notebook_path"] == "./notebooks/dbt_runner.py"
+    assert notebook_task["base_parameters"]["project_directory"] == "/project"
+    assert notebook_task["base_parameters"]["profiles_directory"] == "/profiles"
+    assert json.loads(notebook_task["base_parameters"]["dbt_commands"]) == ["dbt run --select my_model --target dev"]
 
 
-def test_notebook_task_without_job_cluster_key_uses_environment():
-    options = DbtTaskOptions(
-        task_type="notebook",
-        notebook_path="./notebooks/dbt_runner.py",
-    )
-    task = DbtTask(task_key="my_model", commands=["dbt run --select my_model"], options=options)
-
-    result = task.to_dict()
-
-    assert result["environment_key"] == "Default"
-    assert "job_cluster_key" not in result
-
-
-def test_dbt_task_without_job_cluster_key_uses_environment():
-    options = DbtTaskOptions(environment_key="Default")
-    task = DbtTask(task_key="my_model", commands=["dbt run --select my_model"], options=options)
+def test_defaults_and_optional_directories_are_omitted():
+    options = DbtTaskOptions(notebook_path="./runner.py")
+    task = DbtTask(task_key="m", commands=["dbt run --select m"], options=options)
 
     result = task.to_dict()
 
-    assert result["environment_key"] == "Default"
-    assert "job_cluster_key" not in result
-
-
-def test_task_type_string_is_coerced_to_enum():
-    options = DbtTaskOptions(task_type="notebook", notebook_path="./runner.py")
-    assert options.task_type is TaskType.NOTEBOOK
-
-
-def test_task_type_invalid_value_raises():
-    with pytest.raises(ValueError, match="not a valid TaskType"):
-        DbtTaskOptions(task_type="Notebook")
-    with pytest.raises(ValueError, match="not a valid TaskType"):
-        DbtTaskOptions(task_type="dbt_task")
-
-
-def test_notebook_task_rejects_warehouse_schema_catalog():
-    for kwargs in (
-        {"warehouse_id": "wh123"},
-        {"schema": "silver"},
-        {"catalog": "main"},
-    ):
-        with pytest.raises(ValueError, match="notebook tasks connect via profiles.yml"):
-            DbtTaskOptions(task_type=TaskType.NOTEBOOK, notebook_path="/n", **kwargs)
-
-
-def test_notebook_task_rejects_multiple_incompatible_fields_at_once():
-    with pytest.raises(ValueError, match=r"warehouse_id, schema, catalog"):
-        DbtTaskOptions(
-            task_type=TaskType.NOTEBOOK,
-            notebook_path="/n",
-            warehouse_id="wh123",
-            schema="silver",
-            catalog="main",
-        )
-
-
-def test_dbt_task_still_accepts_warehouse_schema_catalog():
-    options = DbtTaskOptions(
-        task_type=TaskType.DBT,
-        warehouse_id="wh123",
-        schema="silver",
-        catalog="main",
-    )
-    assert options.warehouse_id == "wh123"
+    assert result["environment_key"] == "Default"  # default serverless environment
+    assert result["depends_on"] == []
+    base_parameters = result["notebook_task"]["base_parameters"]
+    assert "project_directory" not in base_parameters
+    assert "profiles_directory" not in base_parameters
+    assert json.loads(base_parameters["dbt_commands"]) == ["dbt run --select m"]

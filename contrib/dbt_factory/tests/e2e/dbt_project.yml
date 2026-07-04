@@ -1,0 +1,10 @@
+name: "dbt_factory_e2e"
+version: "1.0.0"
+profile: "dbt_factory_e2e"
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages", "logs"]

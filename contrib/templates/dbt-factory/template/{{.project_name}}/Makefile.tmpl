@@ -1,4 +1,4 @@
-.PHONY: setup deps manifest validate deploy run test
+.PHONY: setup deps manifest validate deploy run test test-update-expected-tasks
 
 # Install dependencies into the .venv used by the bundle (databricks.yml -> python.venv_path).
 setup:
@@ -25,3 +25,8 @@ run:
 
 test:
 	uv run pytest tests
+
+# Refresh the saved "expected tasks" file the tests compare against, after you intentionally
+# change the generated output.
+test-update-expected-tasks:
+	uv run python tests/update_expected_tasks.py

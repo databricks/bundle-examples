@@ -11,3 +11,6 @@ uv.lock
 # deploy time. Regenerate it with `make manifest`.
 target/*
 !target/manifest.json
+
+# Serverless base-environment file, regenerated on every `bundle deploy` by resources/__init__.py.
+dbt_serverless_env.yaml

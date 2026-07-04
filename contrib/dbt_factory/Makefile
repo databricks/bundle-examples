@@ -1,4 +1,4 @@
-.PHONY: setup deps manifest validate deploy run test
+.PHONY: setup deps manifest validate deploy run test test-update-expected-tasks test-e2e
 
 # Install dependencies into the .venv used by the bundle (databricks.yml -> python.venv_path).
 setup:
@@ -25,3 +25,13 @@ run:
 
 test:
 	uv run pytest tests
+
+# Refresh the saved "expected tasks" file the tests compare against, after you intentionally
+# change the generated output.
+test-update-expected-tasks:
+	uv run python tests/update_expected_tasks.py
+
+# End-to-end test: generate a project from the template, deploy the factory-generated job to your
+# workspace, run it, verify the output, and tear it all down. Needs DBX_E2E_* env (see tests/e2e/run_e2e.py).
+test-e2e:
+	uv run python tests/e2e/run_e2e.py

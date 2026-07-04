@@ -1,0 +1,9 @@
+version: 2
+
+snapshots:
+  - name: orders_snapshot
+    description: "SCD2 snapshot of orders (tracks amount changes)."
+    columns:
+      - name: order_id
+        tests:
+          - not_null

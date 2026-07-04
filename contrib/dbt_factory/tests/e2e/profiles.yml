@@ -1,0 +1,16 @@
+# Profile for the e2e fixture project.
+#   * http_path / catalog / schema come from env vars the `make test-e2e` harness sets to point at the
+#     developer's own workspace (the fallbacks below let `dbt parse` run offline with no workspace).
+#   * host / token are injected by the runner notebook at run time (DBT_HOST / DBT_ACCESS_TOKEN).
+dbt_factory_e2e:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      method: http
+      http_path: "{{ env_var('DBX_E2E_HTTP_PATH', '/sql/1.0/warehouses/0000000000000000') }}"
+      catalog: "{{ env_var('DBX_E2E_CATALOG', 'main') }}"
+      schema: "{{ env_var('DBX_E2E_SCHEMA', 'default') }}"
+      host: "{{ env_var('DBT_HOST', '') }}"
+      token: "{{ env_var('DBT_ACCESS_TOKEN', '') }}"
+      threads: 4

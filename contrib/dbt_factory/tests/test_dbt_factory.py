@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from databricks_dbt_factory.SpecsHandler import SpecsHandler
+from databricks_dbt_factory.Utils import read_dbt_manifest
 
 BASE_PATH = str(Path(__file__).resolve().parent)
 
@@ -16,8 +16,10 @@ def _model(package: str, name: str, depends_on: list[str] | None = None) -> tupl
     }
 
 
-def _test(package: str, name: str, depends_on: list[str], severity: str = "error") -> tuple[str, dict]:
-    full_name = f"test.{package}.{name}"
+def _test(
+    package: str, name: str, depends_on: list[str], severity: str = "error", test_hash: str = ""
+) -> tuple[str, dict]:
+    full_name = f"test.{package}.{name}" + (f".{test_hash}" if test_hash else "")
     return full_name, {
         "resource_type": "test",
         "name": name,
@@ -351,12 +353,80 @@ def test_single_package_bundled_test_uses_qualified_select(dbt_factory_bundled):
     assert by_key["orders_run"]["depends_on"] == [{"task_key": "customers_test"}]
 
 
+def test_flat_mode_same_named_tests_get_unique_keys_and_both_gate_downstream(dbt_factory):
+    # dbt allows the same custom test name on two different models, telling the nodes apart
+    # only via the unique_id hash. Both tests must keep distinct task keys AND both must gate
+    # the downstream model (a post-hoc rename could not fix the dep list, hence the key map).
+    nodes = dict(
+        [
+            _model("pkg", "customers"),
+            _model("pkg", "orders", depends_on=["model.pkg.customers"]),
+            _test("pkg", "dup_check", ["model.pkg.customers"], test_hash="6ea6b2ac82"),
+            _test("pkg", "dup_check", ["model.pkg.customers"], test_hash="a9ab3a6e12"),
+        ]
+    )
+
+    tasks = dbt_factory.create_tasks({"nodes": nodes})
+    by_key = {t["task_key"]: t for t in tasks}
+
+    assert "dup_check_6ea6b2ac82_test" in by_key
+    assert "dup_check_a9ab3a6e12_test" in by_key
+    assert {dep["task_key"] for dep in by_key["orders_run"]["depends_on"]} == {
+        "customers_run",
+        "dup_check_6ea6b2ac82_test",
+        "dup_check_a9ab3a6e12_test",
+    }
+
+
+def test_flat_mode_cross_package_models_get_package_prefixed_keys(dbt_factory):
+    # Two packages may ship a model with the same name (materialized to different schemas).
+    nodes = dict(
+        [
+            _model("shop", "stg_orders"),
+            _model("subpkg", "stg_orders"),
+            _model("shop", "mart", depends_on=["model.shop.stg_orders", "model.subpkg.stg_orders"]),
+        ]
+    )
+
+    tasks = dbt_factory.create_tasks({"nodes": nodes})
+    by_key = {t["task_key"]: t for t in tasks}
+
+    assert "shop_stg_orders_run" in by_key
+    assert "subpkg_stg_orders_run" in by_key
+    assert {dep["task_key"] for dep in by_key["mart_run"]["depends_on"]} == {
+        "shop_stg_orders_run",
+        "subpkg_stg_orders_run",
+    }
+
+
+def test_bundled_mode_singular_test_named_like_tested_model_keeps_keys_unique(dbt_factory_bundled):
+    # The bundled test task for model `orders` claims `orders_test`, and so does a singular
+    # test file named `orders`. Both stay unique (and deploy cannot fail on a duplicate key).
+    nodes = dict(
+        [
+            _model("pkg", "orders"),
+            _test("pkg", "unique_orders_id", ["model.pkg.orders"], test_hash="9a1b2c3d4e"),
+            _test("pkg", "orders", []),
+        ]
+    )
+
+    tasks = dbt_factory_bundled.create_tasks({"nodes": nodes})
+    keys = [t["task_key"] for t in tasks]
+    by_key = {t["task_key"]: t for t in tasks}
+
+    assert len(keys) == len(set(keys))
+    assert _commands(by_key["pkg_orders_test"]) == ["dbt test --select orders --target dev"]
+    assert _commands(by_key["model_pkg_orders_test"]) == [
+        "dbt test --select pkg.orders --indirect-selection cautious --target dev"
+    ]
+
+
 def test_generated_tasks_match_expected(dbt_factory):
     """Safety check: the full set of tasks generated for the sample manifest matches the saved
     copy in test_data/expected_tasks.json. If you change the generated output on purpose, refresh
     that file with `make test-update-expected-tasks`.
     """
-    manifest = SpecsHandler.read_dbt_manifest(BASE_PATH + "/test_data/manifest.json")
+    manifest = read_dbt_manifest(BASE_PATH + "/test_data/manifest.json")
     tasks = dbt_factory.create_tasks(manifest)
 
     expected = json.loads(Path(BASE_PATH + "/test_data/expected_tasks.json").read_text())

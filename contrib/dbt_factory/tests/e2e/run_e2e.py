@@ -69,25 +69,39 @@ def _run(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproc
     return result
 
 
+SQL_DEADLINE_SECONDS = 600
+
+
+def _api(method: str, path: str, body: dict | None = None) -> dict:
+    cmd = ["databricks", "api", method, path]
+    if body is not None:
+        cmd += ["--json", json.dumps(body)]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(f"API call failed ({method} {path}): {result.stderr.strip()}")
+    return json.loads(result.stdout) if result.stdout.strip() else {}
+
+
 def _sql(cfg: Config, statement: str, schema: str | None = None) -> list[list]:
-    """Runs a SQL statement on the warehouse via the Statement Execution API; returns result rows."""
+    """Runs a SQL statement on the warehouse via the Statement Execution API; returns result rows.
+    The API caps its synchronous wait at 50s, which a cold warehouse can exceed, so this polls the
+    statement until it reaches a terminal state instead of cancelling it."""
     body = {
         "warehouse_id": cfg.warehouse_id,
         "statement": statement,
         "catalog": cfg.catalog,
         "wait_timeout": "50s",
-        "on_wait_timeout": "CANCEL",
+        "on_wait_timeout": "CONTINUE",
     }
     if schema:
         body["schema"] = schema
-    result = subprocess.run(
-        ["databricks", "api", "post", "/api/2.0/sql/statements", "--json", json.dumps(body)],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"SQL API call failed: {result.stderr.strip()}")
-    payload = json.loads(result.stdout)
+    payload = _api("post", "/api/2.0/sql/statements", body)
+    deadline = time.time() + SQL_DEADLINE_SECONDS
+    while payload.get("status", {}).get("state") in ("PENDING", "RUNNING"):
+        if time.time() > deadline:
+            raise RuntimeError(f"SQL not finished after {SQL_DEADLINE_SECONDS}s: {statement}")
+        time.sleep(5)
+        payload = _api("get", f"/api/2.0/sql/statements/{payload['statement_id']}")
     state = payload.get("status", {}).get("state")
     if state != "SUCCEEDED":
         raise RuntimeError(f"SQL did not succeed ({state}): {statement}\n{json.dumps(payload.get('status', {}))}")
@@ -220,10 +234,16 @@ def run(cfg: Config) -> bool:
         print("  cleanup: destroy bundle + drop schema")
         if project and project.exists():
             _run(["databricks", "bundle", "destroy", "--target", "dev", "--auto-approve"], cwd=project, check=False)
-        try:
-            _sql(cfg, f"DROP SCHEMA IF EXISTS {cfg.catalog}.{schema} CASCADE")
-        except Exception as exc:  # noqa: BLE001
-            print(f"    WARNING: could not drop schema {schema}: {exc}")
+        for attempt in (1, 2):
+            try:
+                _sql(cfg, f"DROP SCHEMA IF EXISTS {cfg.catalog}.{schema} CASCADE")
+                break
+            except Exception as exc:  # noqa: BLE001
+                if attempt == 2:
+                    print(f"    WARNING: could not drop schema {schema}: {exc}")
+                else:
+                    print(f"    schema drop failed, retrying: {exc}")
+                    time.sleep(10)
         shutil.rmtree(work, ignore_errors=True)
 
 

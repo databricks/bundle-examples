@@ -87,12 +87,17 @@ $ make test      # == uv run pytest tests   (run `make manifest` first)
 ```
 
 Runs the vendored factory's test suite plus an offline test of the PyDABs integration against the
-generated manifest.
+generated manifest. One test compares the generated tasks with a saved snapshot
+(`tests/test_data/expected_tasks.json`); after an intentional change to the generated output,
+refresh it with `make test-update-expected-tasks`.
 
 ## Folding in an existing dbt project
 
 Already have a dbt project you'd rather use? Just move your dbt sources into this project's `src/`
 folders (`src/models`, `src/seeds`, …) in place of the starter models, then run `make manifest`.
+If you use dbt packages, copy your `packages.yml` to the project root too: `make manifest`
+installs them (`dbt deps`) and the bundle syncs the resulting `dbt_packages/` to the workspace,
+so the job never installs packages at runtime.
 See the
 [Migrating an existing dbt project](https://github.com/databricks/bundle-examples/blob/main/contrib/dbt_factory/README.md#migrating-an-existing-dbt-project)
 guide for the full steps.

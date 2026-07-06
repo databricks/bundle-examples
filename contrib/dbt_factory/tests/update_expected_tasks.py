@@ -14,13 +14,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from conftest import create_dbt_factory  # noqa: E402
-from databricks_dbt_factory.SpecsHandler import SpecsHandler  # noqa: E402
+from databricks_dbt_factory.Utils import read_dbt_manifest  # noqa: E402
 
 TEST_DATA = Path(__file__).resolve().parent / "test_data"
 
 
 def main() -> None:
-    manifest = SpecsHandler.read_dbt_manifest(str(TEST_DATA / "manifest.json"))
+    manifest = read_dbt_manifest(str(TEST_DATA / "manifest.json"))
     tasks = create_dbt_factory().create_tasks(manifest)
     (TEST_DATA / "expected_tasks.json").write_text(json.dumps(tasks, indent=2) + "\n")
     print(f"Wrote {len(tasks)} tasks to {TEST_DATA / 'expected_tasks.json'}")

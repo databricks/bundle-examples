@@ -91,3 +91,31 @@ def test_load_resources_registers_the_job():
         assert content["dependencies"] == [pin]
     finally:
         (PROJECT_ROOT / resources.SERVERLESS_ENV_FILE).unlink(missing_ok=True)
+
+
+def test_dependency_pin_rejects_non_pypi_versions(monkeypatch):
+    # A local or dev build cannot be pip-installed from PyPI when Databricks builds the
+    # serverless environment, so the deploy must fail early with a clear message.
+    for installed in ("1.9.0+custom", "1.13.0.dev0", "not-a-version"):
+        monkeypatch.setattr(resources, "version", lambda name, v=installed: v)
+        with pytest.raises(RuntimeError, match="PyPI"):
+            resources._dbt_databricks_dependency()
+
+
+def test_environment_file_write_is_idempotent():
+    env_file = PROJECT_ROOT / resources.SERVERLESS_ENV_FILE
+    try:
+        resources._write_serverless_environment_file()
+        env_file.chmod(0o444)
+        # Content already matches: no write is attempted, so a read-only file is fine.
+        resources._write_serverless_environment_file()
+        env_file.chmod(0o644)
+
+        env_file.write_text("stale: true\n")
+        resources._write_serverless_environment_file()
+        pin = f"dbt-databricks=={version('dbt-databricks')}"
+        assert yaml.safe_load(env_file.read_text())["dependencies"] == [pin]
+    finally:
+        if env_file.exists():
+            env_file.chmod(0o644)
+            env_file.unlink()

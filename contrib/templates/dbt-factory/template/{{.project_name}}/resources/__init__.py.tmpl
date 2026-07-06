@@ -19,7 +19,6 @@ from databricks.bundles.core import Bundle, Resources
 from databricks.bundles.jobs import Job
 
 from databricks_dbt_factory.DbtFactory import DbtFactory
-from databricks_dbt_factory.SpecsHandler import SpecsHandler
 from databricks_dbt_factory.DbtTask import DbtTaskOptions
 from databricks_dbt_factory.TaskFactory import (
     DbtDependencyResolver,
@@ -28,6 +27,7 @@ from databricks_dbt_factory.TaskFactory import (
     SeedTaskFactory,
     TestTaskFactory,
 )
+from databricks_dbt_factory.Utils import read_dbt_manifest
 
 # --- Configuration -------------------------------------------------------------------------
 
@@ -85,9 +85,8 @@ def _build_tasks(target: str) -> list[dict]:
         "test": TestTaskFactory(resolver, task_options, dbt_options),
     }
 
-    handler = SpecsHandler()
     factory = DbtFactory(task_factories, bundle_tests=BUNDLE_TESTS)
-    manifest = handler.read_dbt_manifest(MANIFEST_PATH)
+    manifest = read_dbt_manifest(MANIFEST_PATH)
     return factory.create_tasks(manifest)
 
 
@@ -96,13 +95,29 @@ def _dbt_databricks_dependency() -> str:
     version used to generate the manifest (`make manifest`) and to develop locally. pyproject.toml
     is therefore the single source of truth for the dbt version, and the version that runs in
     Databricks is guaranteed to match the one you tested with (no separate range that can drift).
+    Local or dev builds (e.g. `1.9.0+custom`) are rejected: pip cannot resolve them from PyPI
+    when Databricks builds the serverless environment, which would fail every task at runtime.
     """
     try:
-        return f"dbt-databricks=={version('dbt-databricks')}"
+        installed = version("dbt-databricks")
     except PackageNotFoundError as exc:
         raise RuntimeError(
             "dbt-databricks is not installed in the bundle venv — run `make setup` before deploying."
         ) from exc
+
+    from packaging.version import InvalidVersion, Version
+
+    try:
+        parsed = Version(installed)
+    except InvalidVersion:
+        parsed = None
+    if parsed is None or parsed.local or parsed.is_devrelease:
+        raise RuntimeError(
+            f"The installed dbt-databricks version ({installed}) is not a plain PyPI release, so the "
+            "serverless environment cannot install it. Set a released version in pyproject.toml and "
+            "re-run `make setup` before deploying."
+        )
+    return f"dbt-databricks=={installed}"
 
 
 def _serverless_environment_spec() -> dict:
@@ -113,9 +128,24 @@ def _serverless_environment_spec() -> dict:
 
 def _write_serverless_environment_file() -> None:
     """Write the base-environment file to the bundle root so `bundle deploy` syncs it to the
-    workspace, where the generated job references it via base_environment."""
-    with open(SERVERLESS_ENV_FILE, "w") as f:
-        yaml.safe_dump(_serverless_environment_spec(), f, sort_keys=False)
+    workspace, where the generated job references it via base_environment. The write is skipped
+    when the file already has the desired content, so commands like `bundle validate` stay free
+    of side effects once the file exists."""
+    content = yaml.safe_dump(_serverless_environment_spec(), sort_keys=False)
+    try:
+        with open(SERVERLESS_ENV_FILE, "r", encoding="utf-8") as f:
+            if f.read() == content:
+                return
+    except OSError:
+        pass
+    try:
+        with open(SERVERLESS_ENV_FILE, "w", encoding="utf-8") as f:
+            f.write(content)
+    except OSError as exc:
+        raise RuntimeError(
+            f"Cannot write {SERVERLESS_ENV_FILE}, which the generated job needs as its serverless "
+            f"base environment: {exc}"
+        ) from exc
 
 
 def build_job(target: str) -> Job:

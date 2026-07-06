@@ -81,7 +81,7 @@ dbt_factory/
 ├── target/manifest.json        # committed dbt manifest, read at deploy time (regenerate with `make manifest`)
 ├── tests/                      # tests for the vendored factory + the PyDABs integration
 ├── pyproject.toml              # dependencies (installed into .venv via `uv sync`)
-└── Makefile                    # convenience targets: setup, manifest, validate, deploy, run, test
+└── Makefile                    # convenience targets: setup, manifest, validate, deploy, run, test, test-e2e
 ```
 
 ## Setup
@@ -120,9 +120,9 @@ variable or by editing `MANIFEST_PATH` in `resources/__init__.py`.
 > next to the manifest. The bundle syncs it (`sync.include` in `databricks.yml`) and each notebook
 > task injects it to **skip dbt's parse phase** — a large win on big projects, where parsing (not
 > the SQL) dominates each task's time. No `git add -f` needed: because the runtime dbt is pinned to
-> your local version (see above), the version-specific msgpack always loads instead of being
-> silently ignored. Deploy with `make deploy` (or run `make manifest` first) so the shipped msgpack
-> always matches your current models.
+> your local version (see "dbt version and the serverless environment" below), the version-specific
+> msgpack always loads instead of being silently ignored. Deploy with `make deploy` (or run
+> `make manifest` first) so the shipped msgpack always matches your current models.
 
 ## Deploy and run
 
@@ -198,7 +198,9 @@ project already ships all of that.
    own `dbt_project.yml` into the generated one (keep the generated `name`/`profile`), and remove
    the leftover `models: dbt_factory: example:` block that referenced the deleted starter models —
    otherwise `dbt parse` warns that those config paths don't apply to any resource. If you use dbt
-   packages, copy your `packages.yml` to the project root too.
+   packages, copy your `packages.yml` to the project root too: `make manifest` installs them
+   (`dbt deps`) and the bundle syncs the resulting `dbt_packages/` to the workspace, so the job
+   never installs packages at runtime.
 
 3. Point `dbt_profiles/profiles.yml` at your warehouse (`http_path`, `catalog`, `schema`). Leave
    the `host`/`token` lines as they are — the runner notebook sets those at runtime.
@@ -222,9 +224,21 @@ your project's existing directory structure instead of `src/`, edit the `*-paths
 $ make test      # == uv run pytest tests
 ```
 
-This runs the vendored factory's own test suite (proving the vendored core is intact) plus an
-offline test that exercises the PyDABs integration against the committed manifest — no workspace
-required.
+This runs the factory's unit tests plus an offline test that exercises the PyDABs integration
+against the committed manifest; no workspace is required. One test compares the generated tasks
+with a saved snapshot (`tests/test_data/expected_tasks.json`), so unintended changes to the
+generated job fail the suite. After an intentional change to the generated output, refresh the
+snapshot with `make test-update-expected-tasks`.
+
+There is also a live end-to-end test that generates a project from the template, deploys it to
+your workspace, runs the generated job, verifies the output tables, and tears everything down
+again:
+
+```
+$ make test-e2e
+```
+
+See [`tests/e2e/README.md`](tests/e2e/README.md) for the required environment variables.
 
 ## Local development with dbt
 

@@ -1,0 +1,552 @@
+[
+  {
+    "task_key": "diamonds_list_colors_run",
+    "depends_on": [
+      {
+        "task_key": "diamonds_four_cs_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt run --select diamonds_list_colors --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "diamonds_prices_run",
+    "depends_on": [],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt run --select diamonds_prices --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "diamonds_four_cs_run",
+    "depends_on": [],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt run --select diamonds_four_cs --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "zzz_game_details_run",
+    "depends_on": [],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt run --select zzz_game_details --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "second_dbt_model_run",
+    "depends_on": [
+      {
+        "task_key": "first_dbt_model_run"
+      },
+      {
+        "task_key": "unique_first_dbt_model_id_test"
+      },
+      {
+        "task_key": "not_null_first_dbt_model_id_test"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt run --select second_dbt_model --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "first_dbt_model_run",
+    "depends_on": [],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt run --select first_dbt_model --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "zzz_game_details_check_scores_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select zzz_game_details_check_scores --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "zzz_game_details_check_dates_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select zzz_game_details_check_dates --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "zzz_win_loss_records_check_records_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_win_loss_records_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select zzz_win_loss_records_check_records --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "diamonds_list_colors_test_test",
+    "depends_on": [
+      {
+        "task_key": "diamonds_list_colors_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select diamonds_list_colors_test --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "country_codes_seed",
+    "depends_on": [],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt seed --select country_codes --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "unique_zzz_game_details_game_id_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select unique_zzz_game_details_game_id --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_game_details_game_id_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_game_id --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_game_details_home_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_home --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_game_details_visitor_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_visitor --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_game_details_home_score_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_home_score --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_game_details_visitor_score_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_visitor_score --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_game_details_winner_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_winner --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_game_details_date_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_date --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "unique_first_dbt_model_id_test",
+    "depends_on": [
+      {
+        "task_key": "first_dbt_model_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select unique_first_dbt_model_id --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_first_dbt_model_id_test",
+    "depends_on": [
+      {
+        "task_key": "first_dbt_model_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_first_dbt_model_id --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "unique_second_dbt_model_id_test",
+    "depends_on": [
+      {
+        "task_key": "second_dbt_model_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select unique_second_dbt_model_id --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_second_dbt_model_id_test",
+    "depends_on": [
+      {
+        "task_key": "second_dbt_model_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_second_dbt_model_id --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_second_dbt_model_amount_usd_test",
+    "depends_on": [
+      {
+        "task_key": "second_dbt_model_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_second_dbt_model_amount_usd --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "changed_country_run",
+    "depends_on": [
+      {
+        "task_key": "country_snapshot_snapshot"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt run --select changed_country --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "country_run",
+    "depends_on": [
+      {
+        "task_key": "country_codes_seed"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt run --select country --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "country_snapshot_snapshot",
+    "depends_on": [
+      {
+        "task_key": "country_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt snapshot --select country_snapshot --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "zzz_win_loss_records_run",
+    "depends_on": [
+      {
+        "task_key": "zzz_game_details_run"
+      },
+      {
+        "task_key": "zzz_game_details_check_scores_test"
+      },
+      {
+        "task_key": "zzz_game_details_check_dates_test"
+      },
+      {
+        "task_key": "unique_zzz_game_details_game_id_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_game_id_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_home_test"
+      },
+      {
+        "task_key": "accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_visitor_test"
+      },
+      {
+        "task_key": "accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_home_score_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_visitor_score_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_winner_test"
+      },
+      {
+        "task_key": "accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_date_test"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt run --select zzz_win_loss_records --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "unique_zzz_win_loss_records_team_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_win_loss_records_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select unique_zzz_win_loss_records_team --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_win_loss_records_team_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_win_loss_records_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_win_loss_records_team --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_win_loss_records_wins_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_win_loss_records_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_win_loss_records_wins --target dev\"]"
+      }
+    }
+  },
+  {
+    "task_key": "not_null_zzz_win_loss_records_losses_test",
+    "depends_on": [
+      {
+        "task_key": "zzz_win_loss_records_run"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select not_null_zzz_win_loss_records_losses --target dev\"]"
+      }
+    }
+  }
+]

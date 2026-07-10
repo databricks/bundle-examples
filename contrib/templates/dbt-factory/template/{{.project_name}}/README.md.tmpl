@@ -44,14 +44,24 @@ $ make manifest      # == uv run dbt deps && uv run dbt parse
 ```
 
 `dbt parse` only reads your project files; it does not connect to a warehouse. Rerun it whenever
-you change your models. The manifest location is configurable via the `DBT_MANIFEST_PATH` env var
-or the `MANIFEST_PATH` constant in `resources/__init__.py`.
+you change your models. It also writes `target/partial_parse.msgpack` — the bundle syncs it and
+each task injects it to skip dbt's parse phase at runtime (a big speedup on large projects; it
+works because the runtime dbt is pinned to your local version). The manifest location is
+configurable via the `DBT_MANIFEST_PATH` env var or the `MANIFEST_PATH` constant in
+`resources/__init__.py`.
 
 ## Deploy and run
 
 ```
-$ databricks bundle deploy --target dev      # or: make deploy (regenerates the manifest first)
-$ databricks bundle run {{.project_name}}_job # or: make run
+$ make deploy      # regenerates the manifest + parse cache, then deploys
+$ make run         # == databricks bundle run {{.project_name}}_job
+```
+
+Or call the CLI directly (run `make manifest` first so the manifest + parse cache are current):
+
+```
+$ databricks bundle deploy --target dev
+$ databricks bundle run {{.project_name}}_job
 ```
 
 Open the run URL the CLI prints to watch the generated per-model task graph execute.
@@ -63,6 +73,13 @@ The knobs you chose at init are constants at the top of `resources/__init__.py`
 behavior. The dbt target, warehouse, catalog, and schema live in `dbt_profiles/profiles.yml` and
 are selected per bundle target via `--target ${bundle.target}`.
 
+The runtime dbt-databricks version is not a knob: at deploy time `resources/__init__.py` pins the
+serverless environment to the exact `dbt-databricks` installed in your `.venv` (the version that
+generated the manifest), shipped as a `dbt_serverless_env.yaml` [base environment](https://docs.databricks.com/aws/en/compute/serverless/dependencies)
+the bundle generates and syncs each deploy. `pyproject.toml` is the single source of truth: change
+the version there, re-run `make setup`, and the next deploy uses it — so what runs in Databricks
+matches what you tested with.
+
 ## Tests
 
 ```
@@ -70,12 +87,17 @@ $ make test      # == uv run pytest tests   (run `make manifest` first)
 ```
 
 Runs the vendored factory's test suite plus an offline test of the PyDABs integration against the
-generated manifest.
+generated manifest. One test compares the generated tasks with a saved snapshot
+(`tests/test_data/expected_tasks.json`); after an intentional change to the generated output,
+refresh it with `make test-update-expected-tasks`.
 
 ## Folding in an existing dbt project
 
 Already have a dbt project you'd rather use? Just move your dbt sources into this project's `src/`
 folders (`src/models`, `src/seeds`, …) in place of the starter models, then run `make manifest`.
+If you use dbt packages, copy your `packages.yml` to the project root too: `make manifest`
+installs them (`dbt deps`) and the bundle syncs the resulting `dbt_packages/` to the workspace,
+so the job never installs packages at runtime.
 See the
 [Migrating an existing dbt project](https://github.com/databricks/bundle-examples/blob/main/contrib/dbt_factory/README.md#migrating-an-existing-dbt-project)
 guide for the full steps.

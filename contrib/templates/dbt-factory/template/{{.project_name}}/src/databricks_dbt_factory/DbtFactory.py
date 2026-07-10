@@ -1,17 +1,15 @@
 from dataclasses import replace
 
-from databricks_dbt_factory import TaskFactory
-from databricks_dbt_factory.SpecsHandler import SpecsHandler
+from databricks_dbt_factory.TaskFactory import TaskFactory
 from databricks_dbt_factory.DbtTask import DbtTask
-from databricks_dbt_factory.Utils import generate_task_key
+from databricks_dbt_factory.Utils import build_task_key_maps
 
 
 class DbtFactory:
-    """A factory for generating Databricks job definitions from dbt manifests."""
+    """Generates Databricks job task definitions from a dbt manifest."""
 
     def __init__(
         self,
-        file_handler: SpecsHandler,
         task_factories: dict[str, TaskFactory],
         bundle_tests: bool = False,
     ):
@@ -19,46 +17,16 @@ class DbtFactory:
         Initializes the dbt factory.
 
         Args:
-            file_handler (SpecsHandler): Handles reading the dbt manifest and writing the job spec.
             task_factories (dict[str, TaskFactory]): Maps dbt resource types (`model`, `seed`,
                 `snapshot`, `test`) to their respective `TaskFactory` instances. Omitting `test`
                 disables test-task generation entirely.
-            bundle_tests (bool): When True, emit one `tests_<resource>` task per tested resource
+            bundle_tests (bool): When True, emit one `<resource>_test` task per tested resource
                 and rewire downstream models/seeds/snapshots to depend on the upstream's
-                `tests_<resource>` task so failing tests halt the DAG. When False, emit one task
+                `<resource>_test` task so failing tests halt the DAG. When False, emit one task
                 per dbt test node.
         """
-        self.file_handler = file_handler
         self.task_factories = task_factories
         self.bundle_tests = bundle_tests
-
-    def create_tasks_and_update_job_spec(
-        self,
-        dbt_manifest_path: str,
-        input_job_spec_path: str,
-        target_job_spec_path: str,
-        new_job_name: str | None = None,
-        dry_run: bool = False,
-    ):
-        """
-        Generates tasks from a dbt manifest and writes them into a Databricks job spec.
-
-        Args:
-            dbt_manifest_path (str): Path to the dbt `manifest.json`.
-            input_job_spec_path (str): Path to the input (template) job spec YAML.
-            target_job_spec_path (str): Path to write the updated job spec YAML.
-            new_job_name (str | None): Optional replacement job name. If provided, overrides the
-                name in the input spec.
-            dry_run (bool): When True, print the generated tasks instead of writing to disk.
-        """
-        manifest = self.file_handler.read_dbt_manifest(dbt_manifest_path)
-        tasks = self.create_tasks(manifest)
-        if dry_run:
-            print(tasks)
-        else:
-            self.file_handler.replace_tasks_in_job_spec(
-                input_job_spec_path, tasks, target_job_spec_path, new_job_name
-            )
 
     def create_tasks(self, dbt_manifest: dict) -> list[dict]:
         """
@@ -93,28 +61,58 @@ class DbtFactory:
         bundle = "test" in self.task_factories and self.bundle_tests
         single_model_tested: set[str] = set()
         standalone_tests: list[tuple[str, dict]] = []
-        tests_by_resource: dict[str, list[tuple[str, frozenset[str]]]] = {}
-        ancestors: dict[str, set[str]] = {}
         if bundle:
             single_model_tested, standalone_tests = self._classify_tests(
                 dbt_nodes, dbt_sources
             )
-        elif "test" in self.task_factories:
-            tests_by_resource = self._index_tests_by_resource(dbt_nodes, dbt_sources)
+        standalone_test_ids = {full_name for full_name, _ in standalone_tests}
+        task_ids = [
+            full_name
+            for full_name, info in dbt_nodes.items()
+            if info["resource_type"] in self.task_factories
+            and (
+                not bundle
+                or info["resource_type"] != "test"
+                or full_name in standalone_test_ids
+            )
+        ]
+        task_keys, bundled_test_keys = build_task_key_maps(
+            task_ids, sorted(single_model_tested)
+        )
+
+        tests_by_resource: dict[str, list[tuple[str, frozenset[str]]]] = {}
+        ancestors: dict[str, set[str]] = {}
+        if not bundle and "test" in self.task_factories:
+            tests_by_resource = self._index_tests_by_resource(
+                dbt_nodes, dbt_sources, task_keys
+            )
             ancestors = self._compute_ancestors(dbt_nodes, dbt_sources)
-        task_keys_with_tests = {generate_task_key(fn) for fn in single_model_tested}
+        test_key_by_resource = {
+            task_keys[fn]: bundled_test_keys[fn]
+            for fn in single_model_tested
+            if fn in task_keys
+        }
 
         tasks = self._build_resource_tasks(
-            dbt_nodes, bundle, task_keys_with_tests, tests_by_resource, ancestors
+            dbt_nodes,
+            bundle,
+            task_keys,
+            test_key_by_resource,
+            tests_by_resource,
+            ancestors,
         )
 
         if bundle:
             tasks.extend(
                 self._build_bundled_test_tasks(
-                    dbt_nodes, dbt_sources, single_model_tested
+                    dbt_nodes,
+                    dbt_sources,
+                    single_model_tested,
+                    task_keys,
+                    bundled_test_keys,
                 )
             )
-            tasks.extend(self._build_standalone_test_tasks(standalone_tests))
+            tasks.extend(self._build_standalone_test_tasks(standalone_tests, task_keys))
 
         return tasks
 
@@ -150,7 +148,7 @@ class DbtFactory:
         return ancestors
 
     def _index_tests_by_resource(
-        self, dbt_nodes: dict, dbt_sources: dict
+        self, dbt_nodes: dict, dbt_sources: dict, task_keys: dict[str, str]
     ) -> dict[str, list[tuple[str, frozenset[str]]]]:
         """
         Maps each testable resource's full name to a list of (test_task_key, test_refs) pairs
@@ -171,7 +169,7 @@ class DbtFactory:
                 continue
             if self._test_severity(node_info) != "error":
                 continue
-            test_task_key = generate_task_key(node_full_name)
+            test_task_key = task_keys[node_full_name]
             refs: set[str] = set()
             for dep in node_info.get("depends_on", {}).get("nodes", []):
                 if dep.startswith(self._DBT_TEST_TARGET_PREFIXES) and (
@@ -259,7 +257,8 @@ class DbtFactory:
         self,
         dbt_nodes: dict,
         bundle: bool,
-        task_keys_with_tests: set[str],
+        task_keys: dict[str, str],
+        test_key_by_resource: dict[str, str],
         tests_by_resource: dict[str, list[tuple[str, frozenset[str]]]],
         ancestors_by_node: dict[str, set[str]],
     ) -> list[DbtTask]:
@@ -272,16 +271,18 @@ class DbtFactory:
             if bundle and resource_type == "test":
                 continue
 
-            task_key = generate_task_key(node_full_name)
+            task_key = task_keys[node_full_name]
             factory = self.task_factories[resource_type]
-            task = factory.create_task(node_info["name"], node_info, task_key)
+            task = factory.create_task(
+                node_info["name"], node_info, task_key, task_keys
+            )
 
             if resource_type in self._GATEABLE_TYPES:
                 if bundle:
                     task = replace(
                         task,
                         depends_on=self._rewire_deps(
-                            task.depends_on, task_keys_with_tests
+                            task.depends_on, test_key_by_resource
                         ),
                     )
                 elif tests_by_resource:
@@ -300,29 +301,25 @@ class DbtFactory:
 
     @staticmethod
     def _rewire_deps(
-        deps: list[str] | None, task_keys_with_tests: set[str]
+        deps: list[str] | None, test_key_by_resource: dict[str, str]
     ) -> list[str]:
-        """Rewrites dependencies that point at a tested resource to its `tests_<resource>` gating task."""
-        rewired: list[str] = []
-        for dep_key in deps or []:
-            rewired.append(
-                f"tests_{dep_key}" if dep_key in task_keys_with_tests else dep_key
-            )
-        return rewired
+        """Rewrites a dependency on a tested resource to that resource's gating `<resource>_test` task."""
+        return [test_key_by_resource.get(dep_key, dep_key) for dep_key in (deps or [])]
 
     def _build_bundled_test_tasks(
         self,
         dbt_nodes: dict,
         dbt_sources: dict,
         nodes_with_tests: set[str],
+        task_keys: dict[str, str],
+        bundled_test_keys: dict[str, str],
     ) -> list[DbtTask]:
-        """Emits one `tests_<resource>` task per tested resource using `TestTaskFactory.create_bundled_task`."""
+        """Emits one `<resource>_test` task per tested resource using `TestTaskFactory.create_bundled_task`."""
         test_factory = self.task_factories["test"]
         tasks: list[DbtTask] = []
         for full_name in sorted(nodes_with_tests):
             is_source = full_name.startswith("source.")
             info = dbt_sources[full_name] if is_source else dbt_nodes[full_name]
-            resource_task_key = generate_task_key(full_name)
             bare_name = info["name"]
             qualified = f"{info['package_name']}.{bare_name}"
             select = (
@@ -332,10 +329,9 @@ class DbtFactory:
             )
             tasks.append(
                 test_factory.create_bundled_task(
-                    task_key=f"tests_{resource_task_key}",
+                    task_key=bundled_test_keys[full_name],
                     select=select,
-                    deps_command_name=bare_name,
-                    depends_on=[] if is_source else [resource_task_key],
+                    depends_on=[] if is_source else [task_keys[full_name]],
                 )
             )
         return tasks
@@ -343,6 +339,7 @@ class DbtFactory:
     def _build_standalone_test_tasks(
         self,
         standalone_tests: list[tuple[str, dict]],
+        task_keys: dict[str, str],
     ) -> list[DbtTask]:
         """
         Emits one task per standalone test — cross-model tests (e.g. `relationships`) gated on
@@ -353,8 +350,10 @@ class DbtFactory:
         for test_full_name, test_info in sorted(
             standalone_tests, key=lambda item: item[0]
         ):
-            test_task_key = generate_task_key(test_full_name)
+            test_task_key = task_keys[test_full_name]
             tasks.append(
-                test_factory.create_task(test_info["name"], test_info, test_task_key)
+                test_factory.create_task(
+                    test_info["name"], test_info, test_task_key, task_keys
+                )
             )
         return tasks

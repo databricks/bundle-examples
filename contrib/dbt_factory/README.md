@@ -23,8 +23,8 @@ the dbt manifest each time you deploy.
 By default dbt's integration with Databricks Workflows treats the whole project as a single
 task — a black box. Expanding it into one task per object gives:
 
-* **Faster execution** — independent models run in parallel, and the notebook task type keeps
-  dbt's dependencies pre-cached in the serverless environment, avoiding a cold start on every task.
+* **Faster execution** — independent models run in parallel, and the notebook task type runs dbt
+  from a pre-built serverless base environment, avoiding a dependency install on every task.
 * **Visibility & simplified troubleshooting** — pinpoint and fix issues at the model level right
   in the Databricks Workflows UI.
 * **Enhanced logging & notifications** — per-task logs and precise, model-level error alerts.
@@ -77,11 +77,11 @@ dbt_factory/
 ├── resources/__init__.py       # PyDABs glue: manifest -> generated job (the only integration code)
 ├── src/
 │   ├── models/                 # your dbt models (example: orders_raw, orders_daily)
-│   └── databricks_dbt_factory/ # vendored factory library (unchanged; see NOTICE)
+│   └── databricks_dbt_factory/ # vendored factory library (trimmed; see NOTICE)
 ├── target/manifest.json        # committed dbt manifest, read at deploy time (regenerate with `make manifest`)
 ├── tests/                      # tests for the vendored factory + the PyDABs integration
 ├── pyproject.toml              # dependencies (installed into .venv via `uv sync`)
-└── Makefile                    # convenience targets: setup, manifest, validate, deploy, run, test
+└── Makefile                    # convenience targets: setup, manifest, validate, deploy, run, test, test-e2e
 ```
 
 ## Setup
@@ -116,19 +116,28 @@ $ make manifest      # == uv run dbt deps && uv run dbt parse
 location is configurable — point at a different file via the `DBT_MANIFEST_PATH` environment
 variable or by editing `MANIFEST_PATH` in `resources/__init__.py`.
 
-> **Large projects with many parallel tasks.** At runtime each task runs dbt from the shared
-> project directory and writes dbt's artifacts (`target/`, `logs/`) there, which can contend
-> under high parallelism. To avoid this, generate a `target/partial_parse.msgpack` (a local
-> `dbt parse` produces it next to the manifest) and ship it with the bundle — it's `.gitignore`d
-> by default, so force-add it (`git add -f target/partial_parse.msgpack`). The runner notebook
-> then routes each task's artifacts to a private temp dir and skips re-parsing. See the
-> databricks-dbt-factory README, "Faster parsing on large projects".
+> **Faster task startup (automatic).** `make manifest` also writes `target/partial_parse.msgpack`
+> next to the manifest. The bundle syncs it (`sync.include` in `databricks.yml`) and each notebook
+> task injects it to **skip dbt's parse phase** — a large win on big projects, where parsing (not
+> the SQL) dominates each task's time. No `git add -f` needed: because the runtime dbt is pinned to
+> your local version (see "dbt version and the serverless environment" below), the version-specific
+> msgpack always loads instead of being silently ignored. Deploy with `make deploy` (or run
+> `make manifest` first) so the shipped msgpack always matches your current models.
 
 ## Deploy and run
 
 ```
-$ databricks bundle deploy --target dev      # or: make deploy
-$ databricks bundle run dbt_factory_job       # or: make run
+$ make deploy      # regenerates the manifest + parse cache, then deploys
+$ make run         # == databricks bundle run dbt_factory_job
+```
+
+`make deploy` regenerates `target/manifest.json` and `target/partial_parse.msgpack` (via `dbt
+parse`) before deploying, so the task graph and the synced parse cache always match your current
+models. You can also call the CLI directly — just run `make manifest` first:
+
+```
+$ databricks bundle deploy --target dev
+$ databricks bundle run dbt_factory_job
 ```
 
 Open the run URL the CLI prints to watch the generated per-model task graph execute. Deploying
@@ -147,6 +156,18 @@ A few knobs are exposed as constants at the top of `resources/__init__.py`:
 
 The dbt target, warehouse, catalog, and schema are configured in `dbt_profiles/profiles.yml`
 and selected per bundle target via `--target ${bundle.target}`.
+
+### dbt version and the serverless environment
+
+You don't set the runtime dbt version by hand. At deploy time `resources/__init__.py` pins the
+serverless environment to the **exact `dbt-databricks` version installed in the bundle's `.venv`** —
+the same version you use locally to generate the manifest and develop with. `pyproject.toml` is the
+single source of truth: change the version there, re-run `make setup`, and the next deploy uses it.
+This guarantees the version running in Databricks matches the one you tested with.
+
+The version is shipped as a small `dbt_serverless_env.yaml` [base environment](https://docs.databricks.com/aws/en/compute/serverless/dependencies)
+that the bundle generates and syncs on every deploy (git-ignored), so Databricks pre-builds the
+environment once instead of installing dbt on every task.
 
 ## Migrating an existing dbt project
 
@@ -177,7 +198,9 @@ project already ships all of that.
    own `dbt_project.yml` into the generated one (keep the generated `name`/`profile`), and remove
    the leftover `models: dbt_factory: example:` block that referenced the deleted starter models —
    otherwise `dbt parse` warns that those config paths don't apply to any resource. If you use dbt
-   packages, copy your `packages.yml` to the project root too.
+   packages, copy your `packages.yml` to the project root too: `make manifest` installs them
+   (`dbt deps`) and the bundle syncs the resulting `dbt_packages/` to the workspace, so the job
+   never installs packages at runtime.
 
 3. Point `dbt_profiles/profiles.yml` at your warehouse (`http_path`, `catalog`, `schema`). Leave
    the `host`/`token` lines as they are — the runner notebook sets those at runtime.
@@ -201,9 +224,21 @@ your project's existing directory structure instead of `src/`, edit the `*-paths
 $ make test      # == uv run pytest tests
 ```
 
-This runs the vendored factory's own test suite (proving the vendored core is intact) plus an
-offline test that exercises the PyDABs integration against the committed manifest — no workspace
-required.
+This runs the factory's unit tests plus an offline test that exercises the PyDABs integration
+against the committed manifest; no workspace is required. One test compares the generated tasks
+with a saved snapshot (`tests/test_data/expected_tasks.json`), so unintended changes to the
+generated job fail the suite. After an intentional change to the generated output, refresh the
+snapshot with `make test-update-expected-tasks`.
+
+There is also a live end-to-end test that generates a project from the template, deploys it to
+your workspace, runs the generated job, verifies the output tables, and tears everything down
+again:
+
+```
+$ make test-e2e
+```
+
+See [`tests/e2e/README.md`](tests/e2e/README.md) for the required environment variables.
 
 ## Local development with dbt
 

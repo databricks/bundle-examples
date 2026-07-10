@@ -5,8 +5,9 @@ This project includes code adapted from the "databricks-dbt-factory" library.
     Adapted from: commit e767a9d865581226e4f144fb17b7a822df1ea1f4 (v0.2.1)
     Location:     src/databricks_dbt_factory/
 
-The code under src/databricks_dbt_factory/ originates from that repository (reformatted to
-this repository's style; otherwise functionally unchanged) and is provided under the MIT
+The code under src/databricks_dbt_factory/ originates from that repository (trimmed to the
+serverless + notebook-task subset used here, then reformatted to this repository's style) and is
+provided under the MIT
 license reproduced below, which this NOTICE preserves for attribution. All other files are
 part of the bundle-examples repository and are covered by that repository's license.
 

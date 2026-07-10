@@ -7,12 +7,15 @@ the job on a Resources object (which runs Job.from_dict, validating the task dic
 """
 
 import json
+from importlib.metadata import version
 from pathlib import Path
 
 import pytest
+import yaml
 from databricks.bundles.core import Bundle
 
 import resources
+from databricks_dbt_factory.Utils import generate_task_key
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -31,18 +34,18 @@ def _chdir_to_project_root(monkeypatch):
 
 
 def test_build_tasks_covers_every_buildable_node():
-    # Every model/seed/snapshot node gets its own task regardless of the BUNDLE_TESTS mode
-    # (tests may be collapsed into per-resource `tests_*` tasks when bundling is on).
+    # Every model/seed/snapshot node gets its own run task regardless of the BUNDLE_TESTS mode
+    # (tests may be collapsed into per-resource `<resource>_test` tasks when bundling is on).
     tasks = resources._build_tasks("dev")
     task_keys = {task["task_key"] for task in tasks}
 
     manifest = json.loads((PROJECT_ROOT / resources.MANIFEST_PATH).read_text())
-    buildable = {
-        name
-        for name, node in manifest.get("nodes", {}).items()
+    buildable = [
+        uid
+        for uid, node in manifest.get("nodes", {}).items()
         if node.get("resource_type") in {"model", "seed", "snapshot"}
-    }
-    expected_keys = {name.replace(".", "_") for name in buildable}
+    ]
+    expected_keys = {generate_task_key(uid) for uid in buildable}
 
     assert buildable, "committed manifest has no model/seed/snapshot nodes"
     assert expected_keys <= task_keys
@@ -61,10 +64,58 @@ def test_generated_tasks_are_serverless_notebook_tasks():
         assert "--target dev" in notebook_task["base_parameters"]["dbt_commands"]
 
 
+def test_environment_pins_installed_dbt_databricks():
+    # Single source of truth: the serverless env pins dbt-databricks to the exact
+    # version installed in the bundle venv (the one used to generate the manifest).
+    spec = resources._serverless_environment_spec()
+    assert spec["dependencies"] == [f"dbt-databricks=={version('dbt-databricks')}"]
+
+    # The generated job points its serverless environment at the synced env file.
+    job = resources.build_job("dev")
+    assert job.environments[0].spec.base_environment == resources.SERVERLESS_ENV_PATH
+
+
 def test_load_resources_registers_the_job():
     result = resources.load_resources(Bundle(target="dev"))
+    try:
+        assert resources.JOB_NAME in result.jobs
+        job = result.jobs[resources.JOB_NAME]
+        assert job.environments[0].environment_key == resources.ENVIRONMENT_KEY
 
-    assert resources.JOB_NAME in result.jobs
-    job = result.jobs[resources.JOB_NAME]
-    # Job.from_dict succeeded and the environment carries the dbt-databricks dependency.
-    assert job.environments[0].environment_key == resources.ENVIRONMENT_KEY
+        # load_resources writes the base-environment file to the bundle root for
+        # the bundle to sync; it pins dbt-databricks to the installed version.
+        env_file = PROJECT_ROOT / resources.SERVERLESS_ENV_FILE
+        assert env_file.exists()
+        content = yaml.safe_load(env_file.read_text())
+        pin = f"dbt-databricks=={version('dbt-databricks')}"
+        assert content["dependencies"] == [pin]
+    finally:
+        (PROJECT_ROOT / resources.SERVERLESS_ENV_FILE).unlink(missing_ok=True)
+
+
+def test_dependency_pin_rejects_non_pypi_versions(monkeypatch):
+    # A local or dev build cannot be pip-installed from PyPI when Databricks builds the
+    # serverless environment, so the deploy must fail early with a clear message.
+    for installed in ("1.9.0+custom", "1.13.0.dev0", "not-a-version"):
+        monkeypatch.setattr(resources, "version", lambda name, v=installed: v)
+        with pytest.raises(RuntimeError, match="PyPI"):
+            resources._dbt_databricks_dependency()
+
+
+def test_environment_file_write_is_idempotent():
+    env_file = PROJECT_ROOT / resources.SERVERLESS_ENV_FILE
+    try:
+        resources._write_serverless_environment_file()
+        env_file.chmod(0o444)
+        # Content already matches: no write is attempted, so a read-only file is fine.
+        resources._write_serverless_environment_file()
+        env_file.chmod(0o644)
+
+        env_file.write_text("stale: true\n")
+        resources._write_serverless_environment_file()
+        pin = f"dbt-databricks=={version('dbt-databricks')}"
+        assert yaml.safe_load(env_file.read_text())["dependencies"] == [pin]
+    finally:
+        if env_file.exists():
+            env_file.chmod(0o644)
+            env_file.unlink()

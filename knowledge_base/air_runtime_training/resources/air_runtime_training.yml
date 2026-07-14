@@ -1,0 +1,35 @@
+resources:
+  jobs:
+    train:
+      name: Example AI Runtime training
+
+      # The serverless environment that carries the runtime channel. The AI
+      # Runtime task references it by environment_key.
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+
+      tasks:
+        - task_key: train
+          environment_key: default
+
+          # ai_runtime_task launches a distributed training run on Serverless GPU.
+          # Full documentation:
+          # https://docs.databricks.com/api/workspace/jobs/create#tasks-ai_runtime_task
+          ai_runtime_task:
+            experiment: air_runtime_training
+
+            # The uploaded code archive. Extracted on each node to
+            # /databricks/code_source/<top-level-dir> (here: air_runtime_training).
+            code_source_path: ${workspace.artifact_path}/.internal/code.tgz
+
+            # A single deployment: every node runs the same bash launch script.
+            deployments:
+              - command_path: ${workspace.file_path}/src/command.sh
+                compute:
+                  # One of GPU_1xA10, GPU_1xH100, GPU_8xH100. accelerator_count is
+                  # the total across all nodes and must be a multiple of the
+                  # per-node count encoded in the type name.
+                  accelerator_type: GPU_1xA10
+                  accelerator_count: 1

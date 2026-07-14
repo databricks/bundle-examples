@@ -1,0 +1,35 @@
+bundle:
+  name: air_runtime_training
+
+include:
+  - resources/*.yml
+
+# Build the training code into a gzipped tarball at deploy time. The bundle
+# uploads it to ${workspace.artifact_path}/.internal/ (like a Python wheel), and
+# the ai_runtime_task references that uploaded path as its code_source.
+artifacts:
+  code_source:
+    build: bash build_tarball.sh
+    files:
+      - source: ./dist/code.tgz
+
+# The AI Runtime launcher reads the launch script (command.sh) and its sidecar
+# files (requirements.yaml, ...) as workspace files, so they must be synced. This
+# example lives outside a git repo, so include the source directory explicitly.
+sync:
+  include:
+    - src/**
+
+# Optional: content-addressed, immutable deployments. When enabled, `bundle
+# deploy` uploads all files + artifacts into a single immutable snapshot folder
+# and repoints ${workspace.file_path} / ${workspace.artifact_path} into it, so the
+# task paths below resolve into the snapshot with no other changes. Requires the
+# direct deployment engine (DATABRICKS_BUNDLE_ENGINE=direct).
+#
+# experimental:
+#   immutable_folder: true
+
+targets:
+  dev:
+    default: true
+    mode: development

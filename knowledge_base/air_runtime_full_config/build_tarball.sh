@@ -1,0 +1,16 @@
+#!/bin/bash
+# Package the training code (src/) into a gzipped tarball with a single top-level
+# directory. The AI Runtime node runs `tar -tzf` on the archive, reads that
+# top-level dir name, and extracts to /databricks/code_source/<dir>. The bundle
+# uploads the result as an artifact (see databricks.yml).
+set -euo pipefail
+
+PREFIX=air_runtime_full_config
+rm -rf dist build
+mkdir -p dist "build/${PREFIX}"
+cp -R src/. "build/${PREFIX}/"
+tar -czf dist/code.tgz -C build "${PREFIX}"
+rm -rf build
+
+echo "built dist/code.tgz:"
+tar -tzf dist/code.tgz

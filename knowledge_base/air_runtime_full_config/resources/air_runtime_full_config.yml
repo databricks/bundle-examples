@@ -1,0 +1,48 @@
+resources:
+  jobs:
+    train:
+      name: Example AI Runtime training (full config)
+
+      # Job-level settings the AI Runtime CLI validates but a native bundle also
+      # honors: grant access to the job.
+      permissions:
+        - level: CAN_MANAGE
+          user_name: ${workspace.current_user.userName}
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+
+      tasks:
+        - task_key: train
+          environment_key: default
+
+          # Framework-level knobs live on the task, not on ai_runtime_task.
+          max_retries: 2
+          retry_on_timeout: true
+          timeout_seconds: 5400 # 90 minutes
+
+          ai_runtime_task:
+            experiment: air_runtime_full_config
+
+            # Name the MLflow run. mlflow_experiment_directory can also be set to
+            # place the experiment under a specific workspace directory (that
+            # directory must already exist); omitted here so it defaults to the
+            # caller's home.
+            mlflow_run: air_runtime_full_config_baseline
+
+            code_source_path: ${workspace.artifact_path}/.internal/code.tgz
+
+            deployments:
+              - command_path: ${workspace.file_path}/src/command.sh
+                compute:
+                  accelerator_type: GPU_1xA10
+                  accelerator_count: 1
+
+      # The env vars, secrets, hyperparameters, and dependencies are delivered as
+      # sidecar files next to command.sh (src/env_vars.json,
+      # src/secret_env_vars.json, src/hyperparameters.yaml, src/requirements.yaml)
+      # — the AI Runtime launcher reads them by convention. Update
+      # src/secret_env_vars.json to reference a real secret scope/key in your
+      # workspace before running.

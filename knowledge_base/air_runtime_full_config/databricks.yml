@@ -1,0 +1,32 @@
+bundle:
+  name: air_runtime_full_config
+
+include:
+  - resources/*.yml
+
+# Build the training code into a tarball, uploaded to
+# ${workspace.artifact_path}/.internal/ and referenced as the task's code_source.
+artifacts:
+  code_source:
+    build: bash build_tarball.sh
+    files:
+      - source: ./dist/code.tgz
+
+# command.sh and its sidecars (requirements.yaml, hyperparameters.yaml,
+# env_vars.json, secret_env_vars.json) must be synced so the launcher can read
+# them from command_path's directory.
+sync:
+  include:
+    - src/**
+
+# Optional: content-addressed, immutable deployments. When enabled, files and
+# artifacts are uploaded into a single immutable snapshot and ${workspace.*} paths
+# resolve into it. Requires the direct engine (DATABRICKS_BUNDLE_ENGINE=direct).
+#
+# experimental:
+#   immutable_folder: true
+
+targets:
+  dev:
+    default: true
+    mode: development

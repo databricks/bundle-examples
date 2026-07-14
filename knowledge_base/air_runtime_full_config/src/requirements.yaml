@@ -1,0 +1,4 @@
+# Base-environment version + pip dependencies, read by the launcher.
+version: "4"
+dependencies:
+  - mlflow>=3.7

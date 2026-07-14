@@ -1,0 +1,5 @@
+# Arbitrary structured config passed to the training script (read via
+# $HYPERPARAMETERS_PATH).
+learning_rate: 0.001
+batch_size: 32
+epochs: 3

@@ -10,6 +10,7 @@ df = spark.table(
 ).drop("fare_amount")
 
 df.write.mode("overwrite").saveAsTable(
-    name="<catalog>.my-mlops-project.feature_store_inference_input"
+    name="<catalog>.mlops_stacks.feature_store_inference_input"
 )
 ```
+

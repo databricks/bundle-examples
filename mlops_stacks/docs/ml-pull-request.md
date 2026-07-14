@@ -6,18 +6,10 @@
 ML resources, per the [MLOps setup guide](mlops-setup.md).
 
 ## Table of contents
-* [Intro](#intro)
 * [Opening a pull request](#opening-a-pull-request)
 * [Viewing test status and debug logs](#viewing-test-status-and-debug-logs)
 * [Merging your pull request](#merging-your-pull-request)
 * [Next steps](#next-steps)
-
-## Intro
-After following the
-[ML quickstart](ml-developer-guide.md).
-to iterate on ML code, the next step is to get
-your updated code merged back into the repo for production use. This page walks you through the workflow
-for doing so via a pull request.
 
 ## Opening a pull request
 
@@ -31,19 +23,16 @@ is planned for the future.
 
 ## Viewing test status and debug logs
 Opening a pull request will trigger a[workflow](../.github/workflows/mlops_stacks-run-tests.yml) 
-that runs unit and integration tests for the model training pipeline on Databricks against a test dataset.
+that runs unit and integration tests for the model training (and feature engineering if added) pipeline on Databricks against a test dataset.
 You can view test status and debug logs from the pull request UI, and push new commits to your pull request branch
 to address any test failures.
 
 The integration test runs the model training notebook in the staging workspace, training, validating,
-and registering a new model version in the model registry. The fitted model along with its metrics and params
+and registering a new model version in UC.
+The fitted model along with its metrics and params
 will also be logged to an MLflow run. To debug failed integration test runs, click into the Databricks job run
-URL printed in the test logs. The job run page will contain a link to the MLflow model training run:
-
-![Link to MLFlow Run](images/MLFlowRunLink.png)
-
-Click the MLflow run link to view training metrics or fetch and debug the model as needed.
-
+URL printed in the test logs. The executed notebook of the job run will contain a link to the MLflow model training run. You can also use the Experiments page in the workspace
+to view training metrics or fetch and debug the model as needed.
 
 
 ## Merging your pull request
@@ -54,9 +43,13 @@ and then merge it into the upstream repo.
 After merging your pull request, subsequent runs of the model training and batch inference
 jobs in staging and production will automatically use your updated ML code.
 
-You can track the state of the ML pipelines for the current project from the MLflow registered model UI. Links:
-* [Staging workspace registered model](https://adb-xxxx.xx.azuredatabricks.net#mlflow/models/staging-mlops_stacks-model)
-* [Prod workspace registered model](https://adb-xxxx.xx.azuredatabricks.net#mlflow/models/prod-mlops_stacks-model)
+You can track the state of the ML pipelines for the current project from the MLflow registered model UI. 
+
+Links:
+* [Staging model in UC](https://adb-xxxx.xx.azuredatabricks.net/explore/data/models/staging/mlops_stacks/mlops_stacks-model)
+* [Prod model in UC](https://adb-xxxx.xx.azuredatabricks.net/explore/data/models/prod/mlops_stacks/mlops_stacks-model)
+
+
 
 In both the staging and prod workspaces, the MLflow registered model contains links to:
 * The model versions produced through automated retraining

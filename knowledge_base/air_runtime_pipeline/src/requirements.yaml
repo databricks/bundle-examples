@@ -1,0 +1,6 @@
+# Environment for the training nodes: the serverless base-environment version and
+# the pip dependencies to install. The AI Runtime launcher reads this file (by
+# convention) from the same directory as command.sh.
+version: "4"
+dependencies:
+  - mlflow>=3.7

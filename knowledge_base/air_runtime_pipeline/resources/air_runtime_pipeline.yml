@@ -1,0 +1,45 @@
+resources:
+  jobs:
+    pipeline:
+      name: Example AI Runtime pipeline (preprocess -> train -> evaluate)
+
+      # Job-level parameter, referenceable by tasks as {{job.parameters.epochs}}.
+      parameters:
+        - name: epochs
+          default: ${var.epochs}
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+
+      tasks:
+        # 1. Data prep on serverless; publishes a dataset path as a task value.
+        - task_key: preprocess
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/preprocess.py
+            parameters:
+              - "{{job.parameters.epochs}}"
+
+        # 2. The AI Runtime training node; runs after preprocess.
+        - task_key: train
+          environment_key: default
+          depends_on:
+            - task_key: preprocess
+          ai_runtime_task:
+            experiment: air_runtime_pipeline
+            code_source_path: ${workspace.artifact_path}/.internal/code.tgz
+            deployments:
+              - command_path: ${workspace.file_path}/src/command.sh
+                compute:
+                  accelerator_type: GPU_1xA10
+                  accelerator_count: 1
+
+        # 3. Evaluate on serverless; reads the task value published by preprocess.
+        - task_key: evaluate
+          environment_key: default
+          depends_on:
+            - task_key: train
+          spark_python_task:
+            python_file: ../src/evaluate.py

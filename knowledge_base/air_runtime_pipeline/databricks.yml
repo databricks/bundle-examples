@@ -1,0 +1,50 @@
+bundle:
+  name: air_runtime_pipeline
+
+include:
+  - resources/*.yml
+
+# A job-level parameter, referenced by tasks as {{job.parameters.epochs}}.
+variables:
+  epochs:
+    description: Number of training epochs.
+    default: "3"
+
+# Build the training code into a tarball, uploaded and referenced as the AI
+# Runtime task's code_source.
+artifacts:
+  code_source:
+    build: bash build_tarball.sh
+    files:
+      - source: ./dist/code.tgz
+
+# All task files live under src/ and are synced to the workspace. The serverless
+# preprocess/evaluate tasks read their python_file from here, and the AI Runtime
+# task reads command.sh from here.
+sync:
+  include:
+    - src/**
+
+# Optional: content-addressed, immutable deployments. This bundle works unchanged
+# with it enabled — the serverless tasks read their python_file from the snapshot
+# too, as long as it's in the sync set (it is). Keep python_file as a local
+# ./src/... path so it passes deploy-time validation and is rewritten into the
+# snapshot. Requires the direct engine (DATABRICKS_BUNDLE_ENGINE=direct).
+#
+# experimental:
+#   immutable_folder: true
+
+targets:
+  dev:
+    default: true
+    mode: development
+
+  # Promotion target — same config, production-shaped deployment with more epochs.
+  # Deploy with: databricks bundle deploy --target prod
+  prod:
+    mode: production
+    # Production mode requires an explicit root_path so only one copy is deployed.
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/prod
+    variables:
+      epochs: "10"

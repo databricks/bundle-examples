@@ -10,9 +10,16 @@ environment variables, secrets, dependencies, and hyperparameters.
 
 * Databricks CLI v1.7.0 or above.
 * A workspace with Serverless GPU (AI Runtime) enabled.
-* A secret scope/key for the secret-backed env var. Update
-  `src/secret_env_vars.json` to reference one that exists in your workspace, or
-  remove that entry.
+* A secret scope/key for the secret-backed env var. The training run resolves it
+  as its own identity, which must have READ on the scope, so create one you own:
+
+  ```
+  databricks secrets create-scope air_runtime_demo
+  databricks secrets put-secret air_runtime_demo hf_token --string-value "<token>"
+  ```
+
+  `src/secret_env_vars.json` references `air_runtime_demo/hf_token`; change it to
+  your scope/key, or remove that entry if you don't need a secret-backed env var.
 
 ## Usage
 

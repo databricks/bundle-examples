@@ -1,24 +1,24 @@
 """Task 3 (serverless): evaluate after training.
 
-Reads the dataset path published by the preprocess task (cross-task data flow)
-and stands in for a post-training eval / model-registration step.
+Reads back the dataset the preprocess task wrote (proving cross-task data flow
+through a durable workspace location), and stands in for a post-training eval or
+model-registration step.
 """
+
+from pyspark.dbutils import DBUtils
+from pyspark.sql import SparkSession
 
 
 def main() -> None:
-    dataset_path = "<unknown>"
-    try:
-        from pyspark.dbutils import DBUtils
-        from pyspark.sql import SparkSession
+    dbutils = DBUtils(SparkSession.builder.getOrCreate())
+    dataset_path = dbutils.jobs.taskValues.get(taskKey="preprocess", key="dataset_path")
+    print(f"[evaluate] reading dataset from {dataset_path}")
 
-        dbutils = DBUtils(SparkSession.builder.getOrCreate())
-        dataset_path = dbutils.jobs.taskValues.get(
-            taskKey="preprocess", key="dataset_path", default="<none>", debugValue="<debug>"
-        )
-    except Exception as e:  # noqa: BLE001
-        print(f"[evaluate] could not read task value (non-fatal): {e}")
+    with open(dataset_path) as f:
+        rows = f.read().splitlines()
 
-    print(f"[evaluate] scoring model trained on {dataset_path}")
+    num_examples = max(len(rows) - 1, 0)  # minus the header
+    print(f"[evaluate] scored model on {num_examples} examples")
     print("[evaluate] eval_accuracy=0.91")
     print("[evaluate] done")
 

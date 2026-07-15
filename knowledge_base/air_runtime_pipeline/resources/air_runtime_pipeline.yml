@@ -3,10 +3,15 @@ resources:
     pipeline:
       name: Example AI Runtime pipeline (preprocess -> train -> evaluate)
 
-      # Job-level parameter, referenceable by tasks as {{job.parameters.epochs}}.
+      # Job-level parameters, referenceable by tasks as {{job.parameters.<name>}}.
       parameters:
         - name: epochs
           default: ${var.epochs}
+        # A workspace directory the preprocess and evaluate tasks share. Job task
+        # compute is ephemeral and not shared, so intermediate data must live in a
+        # durable location (here, the bundle's workspace files tree).
+        - name: shared_dir
+          default: ${workspace.file_path}/shared
 
       environments:
         - environment_key: default
@@ -14,15 +19,20 @@ resources:
             environment_version: "4"
 
       tasks:
-        # 1. Data prep on serverless; publishes a dataset path as a task value.
+        # 1. Data prep on serverless: writes a dataset file into the shared
+        #    workspace dir and publishes its path as a task value.
         - task_key: preprocess
           environment_key: default
           spark_python_task:
             python_file: ../src/preprocess.py
             parameters:
+              - "{{job.parameters.shared_dir}}"
               - "{{job.parameters.epochs}}"
 
-        # 2. The AI Runtime training node; runs after preprocess.
+        # 2. The AI Runtime training node; runs after preprocess. Note:
+        #    ai_runtime_task fields do not accept {{...}} templating, so the
+        #    training task reads its inputs from code_source / its command's
+        #    environment rather than from task values.
         - task_key: train
           environment_key: default
           depends_on:
@@ -36,7 +46,8 @@ resources:
                   accelerator_type: GPU_1xA10
                   accelerator_count: 1
 
-        # 3. Evaluate on serverless; reads the task value published by preprocess.
+        # 3. Evaluate on serverless: reads back the dataset the preprocess task
+        #    wrote, using the path it published as a task value.
         - task_key: evaluate
           environment_key: default
           depends_on:

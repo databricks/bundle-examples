@@ -29,8 +29,15 @@ Deploy the production variant (more epochs) with
 
 * **Multi-task DAG** — `train` and `evaluate` declare `depends_on`, so they run in
   order and skip if an upstream fails.
-* **Task values** — `preprocess` calls `dbutils.jobs.taskValues.set(...)` and
-  `evaluate` reads it with `dbutils.jobs.taskValues.get(...)`.
+* **Cross-task data flow** — `preprocess` writes a dataset file into a shared
+  workspace directory (`{{job.parameters.shared_dir}}`, under `/Workspace`) and
+  publishes its path with `dbutils.jobs.taskValues.set(...)`; `evaluate` reads the
+  path with `dbutils.jobs.taskValues.get(...)` and opens the file. Job task
+  compute is ephemeral, so intermediate data lives in the workspace file system,
+  not on local disk.
+  Note: `ai_runtime_task` fields don't accept `{{...}}` templating, so the `train`
+  task can't consume task values directly — it takes its inputs via `code_source`
+  and its command's environment.
 * **Job parameter** — `epochs` is defined once and passed to `preprocess` as
   `{{job.parameters.epochs}}`.
 * **Promotion** — the `prod` target overrides `epochs` and deploys in production

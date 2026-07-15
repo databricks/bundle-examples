@@ -8,7 +8,7 @@ carry environment variables, secrets, dependencies, and hyperparameters.
 
 ## Prerequisites
 
-* Databricks CLI v0.256.0 or above.
+* Databricks CLI v1.7.0 or above.
 * A workspace with Serverless GPU (AI Runtime) enabled.
 * A secret scope/key for the secret-backed env var. Update
   `src/secret_env_vars.json` to reference one that exists in your workspace, or

@@ -10,7 +10,7 @@ script (`src/command.sh`).
 
 ## Prerequisites
 
-* Databricks CLI v0.256.0 or above.
+* Databricks CLI v1.7.0 or above.
 * A workspace with Serverless GPU (AI Runtime) enabled.
 
 ## Usage

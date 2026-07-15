@@ -9,7 +9,7 @@ include:
 # the ai_runtime_task references that uploaded path as its code_source.
 artifacts:
   code_source:
-    build: bash build_tarball.sh
+    build: bash .bin/build_tarball.sh
     files:
       - source: ./dist/code.tgz
 

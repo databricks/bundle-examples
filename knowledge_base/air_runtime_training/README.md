@@ -30,7 +30,7 @@ Run URL: https://...
 
 ## How it works
 
-* `artifacts.code_source` runs `build_tarball.sh` to produce `dist/code.tgz` — a
+* `artifacts.code_source` runs `.bin/build_tarball.sh` to produce `dist/code.tgz` — a
   gzipped tar with a single top-level directory (`air_runtime_training/`). The
   bundle uploads it to `${workspace.artifact_path}/.internal/`.
 * `ai_runtime_task.code_source_path` points at that uploaded tarball. On the node

@@ -14,7 +14,7 @@ variables:
 # Runtime task's code_source.
 artifacts:
   code_source:
-    build: bash build_tarball.sh
+    build: bash .bin/build_tarball.sh
     files:
       - source: ./dist/code.tgz
 

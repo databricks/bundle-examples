@@ -1,0 +1,21 @@
+{
+  "welcome_message": "\nWelcome to the AI Runtime training template for Declarative Automation Bundles!\n\nThis scaffolds a bundle that launches a distributed training run on Databricks\nServerless GPU using an ai_runtime_task.\n\nA workspace was selected based on your current profile. For information about how\nto change this, see https://docs.databricks.com/dev-tools/cli/profiles.html.\nworkspace_host: {{workspace_host}}",
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "description": "\nPlease provide a name for this AI Runtime training project.\nProject Name",
+      "order": 1,
+      "default": "air_training",
+      "pattern": "^[a-z_][a-z0-9_]{0,254}$",
+      "pattern_match_failure_message": "Name must start with a letter or underscore and consist only of lowercase letters, numbers, and underscores."
+    },
+    "accelerator_type": {
+      "type": "string",
+      "description": "\nGPU type for the training run.\nAccelerator Type",
+      "order": 2,
+      "default": "GPU_1xA10",
+      "enum": ["GPU_1xA10", "GPU_1xH100", "GPU_8xH100"]
+    }
+  },
+  "success_message": "\nProject '{{.project_name}}' has been created.\n\nDeploy and run it with:\n  cd {{.project_name}}\n  databricks bundle deploy\n  databricks bundle run train\n\nSee README.md for details."
+}

@@ -1,0 +1,39 @@
+# {{.project_name}}
+
+A Declarative Automation Bundle that launches a distributed training run on
+Databricks Serverless GPU using an `ai_runtime_task`.
+
+The bundle builds the training code into a tarball at deploy time (via the
+`artifacts` section), uploads it, and references it as the task's `code_source`.
+The AI Runtime launcher extracts the archive on each GPU node and runs the launch
+script (`src/command.sh`).
+
+## Prerequisites
+
+* Databricks CLI v0.256.0 or above.
+* A workspace with Serverless GPU (AI Runtime) enabled.
+
+## Usage
+
+Deploy and run:
+
+```
+databricks bundle deploy
+databricks bundle run train
+```
+
+## Layout
+
+* `src/train.py` — your training entrypoint. Replace it with your real code.
+* `src/command.sh` — the launch script run on each node (invokes `train.py`).
+* `src/requirements.yaml` — base-environment version and pip dependencies.
+* `resources/{{.project_name}}.yml` — the job and its `ai_runtime_task`
+  (experiment, GPU type `{{.accelerator_type}}`, and count).
+* `.bin/build_tarball.sh` — packages `src/` into the `code_source` tarball.
+
+## Immutable deployments (optional)
+
+Uncomment the `experimental.immutable_folder` block in `databricks.yml` to deploy
+all files and artifacts as a single content-addressed, immutable snapshot. The
+`${workspace.*}` paths in the task resolve into the snapshot automatically. This
+requires the direct deployment engine (`DATABRICKS_BUNDLE_ENGINE=direct`).

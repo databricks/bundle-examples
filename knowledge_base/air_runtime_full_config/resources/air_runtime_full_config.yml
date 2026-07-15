@@ -3,12 +3,6 @@ resources:
     train:
       name: Example AI Runtime training (full config)
 
-      # Job-level settings the AI Runtime CLI validates but a native bundle also
-      # honors: grant access to the job.
-      permissions:
-        - level: CAN_MANAGE
-          user_name: ${workspace.current_user.userName}
-
       environments:
         - environment_key: default
           spec:

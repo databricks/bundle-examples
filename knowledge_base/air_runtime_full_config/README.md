@@ -3,8 +3,8 @@
 This Declarative Automation Bundles example is a fuller Serverless GPU (AI
 Runtime) training job than [`air_runtime_training`](../air_runtime_training). It
 shows how every configurable input maps onto a native bundle: task compute,
-retries and timeout, permissions, MLflow, code_source, and the sidecar files that
-carry environment variables, secrets, dependencies, and hyperparameters.
+retries and timeout, MLflow, code_source, and the sidecar files that carry
+environment variables, secrets, dependencies, and hyperparameters.
 
 ## Prerequisites
 
@@ -33,7 +33,6 @@ Run `databricks bundle run train` to start the training run.
 | Environment variables | `src/env_vars.json` |
 | Secret-backed env variables | `src/secret_env_vars.json` |
 | Retries / timeout | `tasks[].max_retries`, `retry_on_timeout`, `timeout_seconds` |
-| Permissions | `resources.jobs.train.permissions` |
 
 The environment variables, secrets, dependencies, and hyperparameters are
 delivered as sidecar files co-located with `command.sh`; the AI Runtime launcher

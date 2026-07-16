@@ -12,7 +12,7 @@ variables:
     description: Unity Catalog schema name for the product search use case
     default: product_search
   endpoint_name:
-    description: Name of the Vector Search endpoint
+    description: Name of the AI Search endpoint
     default: product-search-endpoint
   embedding_model:
     description: Model serving endpoint used to embed product descriptions

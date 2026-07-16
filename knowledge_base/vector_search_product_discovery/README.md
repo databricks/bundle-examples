@@ -1,8 +1,9 @@
-# Vector Search: Semantic Product Discovery
+# AI Search: Semantic Product Discovery
 
 A Declarative Automation Bundle demonstrating semantic product search using
-[Databricks Vector Search](https://docs.databricks.com/en/generative-ai/vector-search.html).
-It automates the full setup — the Unity Catalog schema, the Vector Search endpoint and
+[Databricks AI Search](https://docs.databricks.com/aws/en/ai-search/ai-search) (formerly
+Vector Search).
+It automates the full setup — the Unity Catalog schema, the AI Search endpoint and
 index, and the jobs that load and query the catalog — so a single `databricks bundle deploy`
 gives you a working semantic-search example to explore and adapt.
 
@@ -22,7 +23,7 @@ products in vector space.
 ```
 data/products.json  (synced to workspace by bundle deploy)
         ↓  embed descriptions → upsert_data()
-product_index  (Direct Access Vector Search index)
+product_index  (Direct Access AI Search index)
         ↓  embed query → similarity_search(query_vector=...)
 ranked results
 ```
@@ -36,7 +37,7 @@ ranked results
 │   └── products.json                    # Product catalog — synced to the workspace on deploy
 ├── resources/
 │   ├── schema.yml                       # Unity Catalog schema that namespaces the index
-│   ├── vector-search-endpoint.yml       # Vector Search endpoint (managed ANN serving)
+│   ├── vector-search-endpoint.yml       # AI Search endpoint (managed ANN serving)
 │   ├── vector-search-index.yml          # Direct Access index — schema defined inline
 │   ├── setup-job.yml                    # Job: embed product descriptions and upsert them
 │   └── query-job.yml                    # Job: embed a query and return ranked results
@@ -44,6 +45,9 @@ ranked results
     ├── 01_upsert_products.py            # Reads products.json, embeds, calls upsert_data
     └── 02_query_demo.py                 # Semantic search — runs as a job or interactively
 ```
+
+Bundle resource types are unchanged by the rename to AI Search: the endpoint and index
+are still declared as `vector_search_endpoints` and `vector_search_indexes`.
 
 ## Prerequisites
 
@@ -69,7 +73,7 @@ ranked results
    you — and several people can deploy into the same workspace without colliding. Use
    `databricks bundle deploy --target prod` for the shared production copy.
 
-   > Vector Search endpoint creation takes a few minutes to reach ONLINE status.
+   > AI Search endpoint creation takes a few minutes to reach ONLINE status.
 
 4. Load the catalog by running the bundle. This embeds all product descriptions and upserts them into the index.
    ```bash
@@ -103,7 +107,7 @@ databricks bundle deploy \
 |---|---|---|
 | `catalog` | `main` | Existing Unity Catalog catalog |
 | `schema` | `product_search` | Schema created by the bundle |
-| `endpoint_name` | `product-search-endpoint` | Vector Search endpoint name. Shared in prod; the `dev` target overrides it per user. |
+| `endpoint_name` | `product-search-endpoint` | AI Search endpoint name. Shared in prod; the `dev` target overrides it per user. |
 | `embedding_model` | `databricks-gte-large-en` | Foundation model used for embeddings |
 | `embedding_dimension` | `1024` | Vector dimension. Drives both the index and the embedding requests; immutable after the index is created. |
 
@@ -150,6 +154,6 @@ table and it keeps itself up to date. Replace `index_type: DIRECT_ACCESS` and
 
 ## Resources
 
-- [Databricks Vector Search](https://docs.databricks.com/en/generative-ai/vector-search.html)
+- [Databricks AI Search](https://docs.databricks.com/aws/en/ai-search/ai-search)
 - [Declarative Automation Bundles](https://docs.databricks.com/dev-tools/bundles/)
 - [Foundation Models — GTE Large](https://docs.databricks.com/en/machine-learning/foundation-models/supported-models.html)

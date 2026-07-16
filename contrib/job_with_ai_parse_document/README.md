@@ -63,7 +63,7 @@ Source Documents (UC Volume)
 
 5. **Upload documents** to your source volume
 
-6. **Run job** from the Databricks UI (Workflows)
+6. **Run job** from the Databricks UI (Jobs & Pipelines)
 
 ## Configuration
 
@@ -172,7 +172,7 @@ The included notebook visualizes parsing results with interactive bounding boxes
 ## Resources
 
 - [Declarative Automation Bundles](https://docs.databricks.com/dev-tools/bundles/)
-- [Databricks Workflows](https://docs.databricks.com/workflows/)
+- [Lakeflow Jobs](https://docs.databricks.com/aws/en/jobs/)
 - [Structured Streaming](https://docs.databricks.com/structured-streaming/)
 - [`ai_parse_document` Function](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_parse_document)
 - [`ai_query` Function](https://docs.databricks.com/aws/en/sql/language-manual/functions/ai_query)

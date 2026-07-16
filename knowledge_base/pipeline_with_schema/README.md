@@ -1,6 +1,6 @@
 # Pipeline with a dedicated Unity Catalog schema
 
-This example demonstrates how to define a Unity Catalog schema and a Delta Live Tables pipeline that uses it.
+This example demonstrates how to define a Unity Catalog schema and a [Lakeflow Spark Declarative Pipelines](https://docs.databricks.com/aws/en/dlt/) pipeline that uses it.
 
 ## Prerequisites
 

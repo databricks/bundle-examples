@@ -11,7 +11,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     # Required by the PyDABs hook (resources/__init__.py) at `bundle deploy` time.
-    "databricks-bundles==0.295.0",
+    "databricks-bundles==1.8.0",
     # Single source of truth for the dbt-databricks version: used locally to generate the
     # manifest (`make manifest`), and resources/__init__.py pins the serverless runtime to this
     # exact installed version at deploy time. Pin/lock it for fully reproducible deploys.

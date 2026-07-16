@@ -18,14 +18,15 @@ env:
   ARM_TENANT_ID: ${{ secrets.PROD_AZURE_SP_TENANT_ID }}
   ARM_CLIENT_ID: ${{ secrets.PROD_AZURE_SP_APPLICATION_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.PROD_AZURE_SP_CLIENT_SECRET }}
+  
 
 jobs:
   prod:
     concurrency: mlops_stacks-prod-bundle-job
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: databricks/setup-cli@main
+      - uses: actions/checkout@v4
+      - uses: databricks/setup-cli@v0.236.0
       - name: Validate Bundle For Prod
         id: validate
         run: |

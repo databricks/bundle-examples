@@ -28,32 +28,8 @@ dbutils.widgets.text("input_table_name", "", label="Input Table Name")
 dbutils.widgets.text("output_table_name", "", label="Output Table Name")
 # Unity Catalog registered model name to use for the trained mode.
 dbutils.widgets.text(
-    "model_name", "dev.my-mlops-project.mlops_stacks-model", label="Full (Three-Level) Model Name"
+    "model_name", "dev.mlops_stacks.mlops_stacks-model", label="Full (Three-Level) Model Name"
 )
-
-# COMMAND ----------
-
-import os
-
-notebook_path =  '/Workspace/' + os.path.dirname(dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get())
-%cd $notebook_path
-
-# COMMAND ----------
-
-# MAGIC %pip install -r ../../../requirements.txt
-
-# COMMAND ----------
-
-dbutils.library.restartPython()
-
-# COMMAND ----------
-
-import sys
-import os
-notebook_path =  '/Workspace/' + os.path.dirname(dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get())
-%cd $notebook_path
-%cd ..
-sys.path.append("../..")
 
 # COMMAND ----------
 
@@ -66,7 +42,7 @@ model_name = dbutils.widgets.get("model_name")
 assert input_table_name != "", "input_table_name notebook parameter must be specified"
 assert output_table_name != "", "output_table_name notebook parameter must be specified"
 assert model_name != "", "model_name notebook parameter must be specified"
-alias = "Champion"
+alias = "champion"
 model_uri = f"models:/{model_name}@{alias}"
 
 # COMMAND ----------
@@ -74,7 +50,7 @@ model_uri = f"models:/{model_name}@{alias}"
 from mlflow import MlflowClient
 
 # Get model version from alias
-client = MlflowClient(registry_uri="databricks-uc")
+client = MlflowClient()
 model_version = client.get_model_version_by_alias(model_name, alias).version
 
 # COMMAND ----------

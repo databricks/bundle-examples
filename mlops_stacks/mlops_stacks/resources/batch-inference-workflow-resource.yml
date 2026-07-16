@@ -1,12 +1,4 @@
-new_cluster: &new_cluster
-  new_cluster:
-    num_workers: 3
-    spark_version: 13.3.x-cpu-ml-scala2.12
-    node_type_id: Standard_D3_v2
-    custom_tags:
-      clusterSource: mlops-stack/0.2
-
-permissions: &permissions
+common_permissions: &permissions
   permissions:
     - level: CAN_VIEW
       group_name: users
@@ -17,17 +9,23 @@ resources:
       name: ${bundle.target}-mlops_stacks-batch-inference-job
       tasks:
         - task_key: batch_inference_job
-          <<: *new_cluster
+          environment_key: default
           notebook_task:
-            notebook_path: ../deployment/batch_inference/notebooks/BatchInference.py
+            notebook_path: ../deployment/batch_inference/BatchInference.py
             base_parameters:
               env: ${bundle.target}
               input_table_name: taxi_scoring_sample  # TODO: create input table for inference
-              output_table_name: ${bundle.target}.my-mlops-project.predictions
-              model_name: ${bundle.target}.my-mlops-project.${var.model_name}
+              output_table_name: ${var.catalog_name}.mlops_stacks.predictions
+              model_name: ${var.catalog_name}.mlops_stacks.${var.model_name}
               # git source information of current ML resource deployment. It will be persisted as part of the workflow run
               git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
 
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+            dependencies:
+              - -r ../requirements.txt
       schedule:
         quartz_cron_expression: "0 0 11 * * ?" # daily at 11am
         timezone_id: UTC

@@ -3,7 +3,7 @@
 # Model Validation Notebook
 ##
 # This notebook uses mlflow model validation API to run mode validation after training and registering a model
-# in model registry, before deploying it to the "Champion" alias.
+# in model registry, before deploying it to the "champion" alias.
 #
 # It runs as part of CD and by an automated model training job -> validation -> deployment job defined under ``mlops_stacks/resources/model-workflow-resource.yml``
 #
@@ -14,49 +14,23 @@
 # * `run_mode`                              - The `run_mode` defines whether model validation is enabled or not. It can be one of the three values:
 #                                             * `disabled` : Do not run the model validation notebook.
 #                                             * `dry_run`  : Run the model validation notebook. Ignore failed model validation rules and proceed to move
-#                                                            model to the "Champion" alias.
-#                                             * `enabled`  : Run the model validation notebook. Move model to the "Champion" alias only if all model validation
+#                                                            model to the "champion" alias.
+#                                             * `enabled`  : Run the model validation notebook. Move model to the "champion" alias only if all model validation
 #                                                            rules are passing.
-# * enable_baseline_comparison              - Whether to load the current registered "Champion" model as baseline.
+# * enable_baseline_comparison              - Whether to load the current registered "champion" model as baseline.
 #                                             Baseline model is a requirement for relative change and absolute change validation thresholds.
 # * validation_input                        - Validation input. Please refer to data parameter in mlflow.evaluate documentation https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate
 # * model_type                              - A string describing the model type. The model type can be either "regressor" and "classifier".
 #                                             Please refer to model_type parameter in mlflow.evaluate documentation https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate
 # * targets                                 - The string name of a column from data that contains evaluation labels.
 #                                             Please refer to targets parameter in mlflow.evaluate documentation https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate
-# * custom_metrics_loader_function          - Specifies the name of the function in mlops_stacks/validation/validation.py that returns custom metrics.
-# * validation_thresholds_loader_function   - Specifies the name of the function in mlops_stacks/validation/validation.py that returns model validation thresholds.
+#
+# Custom metrics, validation thresholds, and evaluator config are defined in validation/validation.py.
 #
 # For details on mlflow evaluate API, see doc https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.evaluate
 # For details and examples about performing model validation, see the Model Validation documentation https://mlflow.org/docs/latest/models.html#model-validation
 #
 ##################################################################################
-
-# COMMAND ----------
-
-# MAGIC %load_ext autoreload
-# MAGIC %autoreload 2
-
-# COMMAND ----------
-
-import os
-notebook_path =  '/Workspace/' + os.path.dirname(dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get())
-%cd $notebook_path
-
-# COMMAND ----------
-
-# MAGIC %pip install -r ../../requirements.txt
-
-# COMMAND ----------
-
-dbutils.library.restartPython()
-
-# COMMAND ----------
-
-import os
-notebook_path =  '/Workspace/' + os.path.dirname(dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get())
-%cd $notebook_path
-%cd ../
 
 # COMMAND ----------
 
@@ -68,17 +42,13 @@ dbutils.widgets.text(
 dbutils.widgets.dropdown("run_mode", "disabled", ["disabled", "dry_run", "enabled"], "Run Mode")
 dbutils.widgets.dropdown("enable_baseline_comparison", "false", ["true", "false"], "Enable Baseline Comparison")
 dbutils.widgets.text("validation_input", "SELECT * FROM delta.`dbfs:/databricks-datasets/nyctaxi-with-zipcodes/subsampled`", "Validation Input")
-
 dbutils.widgets.text("model_type", "regressor", "Model Type")
 dbutils.widgets.text("targets", "fare_amount", "Targets")
-dbutils.widgets.text("custom_metrics_loader_function", "custom_metrics", "Custom Metrics Loader Function")
-dbutils.widgets.text("validation_thresholds_loader_function", "validation_thresholds", "Validation Thresholds Loader Function")
-dbutils.widgets.text("evaluator_config_loader_function", "evaluator_config", "Evaluator Config Loader Function")
-dbutils.widgets.text("model_name", "dev.my-mlops-project.mlops_stacks-model", "Full (Three-Level) Model Name")
+dbutils.widgets.text("model_name", "dev.mlops_stacks.mlops_stacks-model", "Full (Three-Level) Model Name")
+
 dbutils.widgets.text("model_version", "", "Candidate Model Version")
 
 # COMMAND ----------
-
 run_mode = dbutils.widgets.get("run_mode").lower()
 assert run_mode == "disabled" or run_mode == "dry_run" or run_mode == "enabled"
 
@@ -100,20 +70,17 @@ else:
 
 # COMMAND ----------
 
-import importlib
 import mlflow
 import os
 import tempfile
 import traceback
+from mlflow import MlflowClient
 
-from mlflow.tracking.client import MlflowClient
-
-client = MlflowClient(registry_uri="databricks-uc")
+client = MlflowClient()
 
 # set experiment
 experiment_name = dbutils.widgets.get("experiment_name")
 mlflow.set_experiment(experiment_name)
-
 # set model evaluation parameters that can be inferred from the job
 model_uri = dbutils.jobs.taskValues.get("Train", "model_uri", debugValue="")
 model_name = dbutils.jobs.taskValues.get("Train", "model_name", debugValue="")
@@ -124,7 +91,7 @@ if model_uri == "":
     model_version = dbutils.widgets.get("model_version")
     model_uri = "models:/" + model_name + "/" + model_version
 
-baseline_model_uri = "models:/" + model_name + "@Champion"
+baseline_model_uri = "models:/" + model_name + "@champion"
 
 evaluators = "default"
 assert model_uri != "", "model_uri notebook parameter must be specified"
@@ -135,6 +102,8 @@ assert model_version != "", "model_version notebook parameter must be specified"
 
 # take input
 enable_baseline_comparison = dbutils.widgets.get("enable_baseline_comparison")
+
+
 assert enable_baseline_comparison == "true" or enable_baseline_comparison == "false"
 enable_baseline_comparison = enable_baseline_comparison == "true"
 
@@ -148,24 +117,10 @@ targets = dbutils.widgets.get("targets")
 assert model_type
 assert targets
 
-custom_metrics_loader_function_name = dbutils.widgets.get("custom_metrics_loader_function")
-validation_thresholds_loader_function_name = dbutils.widgets.get("validation_thresholds_loader_function")
-evaluator_config_loader_function_name = dbutils.widgets.get("evaluator_config_loader_function")
-assert custom_metrics_loader_function_name
-assert validation_thresholds_loader_function_name
-assert evaluator_config_loader_function_name
-custom_metrics_loader_function = getattr(
-    importlib.import_module("validation"), custom_metrics_loader_function_name
-)
-validation_thresholds_loader_function = getattr(
-    importlib.import_module("validation"), validation_thresholds_loader_function_name
-)
-evaluator_config_loader_function = getattr(
-    importlib.import_module("validation"), evaluator_config_loader_function_name
-)
-custom_metrics = custom_metrics_loader_function()
-validation_thresholds = validation_thresholds_loader_function()
-evaluator_config = evaluator_config_loader_function()
+from validation import custom_metrics as _custom_metrics, validation_thresholds as _validation_thresholds, evaluator_config as _evaluator_config
+custom_metrics = _custom_metrics()
+validation_thresholds = _validation_thresholds()
+evaluator_config = _evaluator_config()
 
 # COMMAND ----------
 
@@ -178,7 +133,9 @@ def get_run_link(run_info):
 
 def get_training_run(model_name, model_version):
     version = client.get_model_version(model_name, model_version)
-    return mlflow.get_run(run_id=version.run_id)
+    if version.run_id:
+        return mlflow.get_run(run_id=version.run_id)
+    return None
 
 
 def generate_run_name(training_run):
@@ -206,7 +163,11 @@ def log_to_model_description(run, success):
         name=model_name, version=model_version, description=description
     )
 
+
+
 # COMMAND ----------
+
+
 
 training_run = get_training_run(model_name, model_version)
 
@@ -228,7 +189,9 @@ with mlflow.start_run(
 
     try:
         eval_result = mlflow.evaluate(
+            
             model=model_uri,
+            
             data=data,
             targets=targets,
             model_type=model_type,
@@ -262,11 +225,9 @@ with mlflow.start_run(
                 )
         mlflow.log_artifact(metrics_file)
         log_to_model_description(run, True)
-        
-        # Assign "Challenger" alias to indicate model version has passed validation checks
-        print("Validation checks passed. Assigning 'Challenger' alias to model version.")
-        client.set_registered_model_alias(model_name, "Challenger", model_version)
-        
+        # Assign "challenger" alias to indicate model version has passed validation checks
+        print("Validation checks passed. Assigning 'challenger' alias to model version.")
+        client.set_registered_model_alias(model_name, "challenger", model_version)
     except Exception as err:
         log_to_model_description(run, False)
         error_file = os.path.join(tmp_dir, "error.txt")

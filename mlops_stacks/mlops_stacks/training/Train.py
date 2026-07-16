@@ -10,32 +10,13 @@
 # * env (required):                 - Environment the notebook is run in (staging, or prod). Defaults to "staging".
 # * training_data_path (required)   - Path to the training data.
 # * experiment_name (required)      - MLflow experiment name for the training runs. Will be created if it doesn't exist.
-# * model_name (required)           - Three-level name (<catalog>.<schema>.<model_name>) to register the trained model in Unity Catalog. 
-#  
+# * model_name (required)           - Three-level name (<catalog>.<schema>.<model_name>) to register the trained model in Unity Catalog.
+#
 ##################################################################################
 
 # COMMAND ----------
 
-# MAGIC %load_ext autoreload
-# MAGIC %autoreload 2
-
-# COMMAND ----------
-
-import os
-notebook_path =  '/Workspace/' + os.path.dirname(dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get())
-%cd $notebook_path
-
-# COMMAND ----------
-
-# MAGIC %pip install -r ../../requirements.txt
-
-# COMMAND ----------
-
-dbutils.library.restartPython()
-
-# COMMAND ----------
 # DBTITLE 1, Notebook arguments
-
 # List of input args needed to run this notebook as a job.
 # Provide them via DB widgets or notebook arguments.
 
@@ -56,35 +37,37 @@ dbutils.widgets.text(
     f"/dev-mlops_stacks-experiment",
     label="MLflow experiment name",
 )
+
 # Unity Catalog registered model name to use for the trained model.
 dbutils.widgets.text(
-    "model_name", "dev.my-mlops-project.mlops_stacks-model", label="Full (Three-Level) Model Name"
+    "model_name", "dev.mlops_stacks.mlops_stacks-model", label="Full (Three-Level) Model Name"
 )
 
-# COMMAND ----------
-# DBTITLE 1,Define input and output variables
 
+# COMMAND ----------
+
+# DBTITLE 1,Define input and output variables
 input_table_path = dbutils.widgets.get("training_data_path")
 experiment_name = dbutils.widgets.get("experiment_name")
 model_name = dbutils.widgets.get("model_name")
 
 # COMMAND ----------
-# DBTITLE 1, Set experiment
 
+# DBTITLE 1, Set experiment
 import mlflow
 
 mlflow.set_experiment(experiment_name)
-mlflow.set_registry_uri('databricks-uc')
 
 # COMMAND ----------
-# DBTITLE 1, Load raw data
 
+# DBTITLE 1, Load raw data
 training_df = spark.read.format("delta").load(input_table_path)
 training_df.display()
 
 # COMMAND ----------
+
 # DBTITLE 1, Helper function
-from mlflow.tracking import MlflowClient
+from mlflow import MlflowClient
 import mlflow.pyfunc
 
 
@@ -104,8 +87,8 @@ def get_latest_model_version(model_name):
 # MAGIC Train a LightGBM model on the data, then log and register the model with MLflow.
 
 # COMMAND ----------
-# DBTITLE 1, Train model
 
+# DBTITLE 1, Train model
 import mlflow
 from sklearn.model_selection import train_test_split
 import lightgbm as lgb
@@ -133,8 +116,8 @@ num_rounds = 100
 model = lgb.train(param, train_lgb_dataset, num_rounds)
 
 # COMMAND ----------
-# DBTITLE 1, Log model and return output.
 
+# DBTITLE 1, Log model and return output.
 # Take the first row of the training dataset as the model input example.
 input_example = X_train.iloc[[0]]
 

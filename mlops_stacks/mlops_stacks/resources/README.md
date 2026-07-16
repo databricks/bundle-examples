@@ -1,12 +1,12 @@
 # Databricks ML Resource Configurations
-[(back to main README)](../../README.md)
+[(back to project README)](../README.md)
 
 ## Table of contents
 * [Intro](#intro)
 * [Local development and dev workspace](#local-development-and-dev-workspace)
+* [Develop and test config changes](#develop-and-test-config-changes)
 * [CI/CD](#set-up-cicd)
 * [Deploy initial ML resources](#deploy-initial-ml-resources)
-* [Develop and test config changes](#develop-and-test-config-changes)
 * [Deploy config changes](#deploy-config-changes)
 
 ## Intro
@@ -21,7 +21,7 @@ During databricks CLI bundles deployment, the root config file will be loaded, v
 ML Resource Configurations in this directory:
  - model workflow (`mlops_stacks/resources/model-workflow-resource.yml`)
  - batch inference workflow (`mlops_stacks/resources/batch-inference-workflow-resource.yml`)
- - monitoring workflow (`mlops_stacks/resources/monitoring-workflow-resource.yml`)
+ - monitoring resource and workflow (`mlops_stacks/resources/monitoring-resource.yml`)
  - feature engineering workflow (`mlops_stacks/resources/feature-engineering-workflow-resource.yml`)
  - model definition and experiment definition (`mlops_stacks/resources/ml-artifacts-resource.yml`)
 
@@ -29,10 +29,10 @@ ML Resource Configurations in this directory:
 ### Deployment Config & CI/CD integration
 The ML resources can be deployed to databricks workspace based on the databricks CLI bundles deployment config.
 Deployment configs of different deployment targets share the general ML resource configurations with added ability to specify deployment target specific values (workspace URI, model name, jobs notebook parameters, etc).
-
 This project ships with CI/CD workflows for developing and deploying ML resource configurations based on deployment config.
 
-NOTE: For Model Registry in Unity Catalog, we expect a catalog to exist with the name of the deployment target by default. For example, if the deployment target is `dev`, we expect a catalog named `dev` to exist in the workspace. 
+
+For Model Registry in Unity Catalog, we expect a catalog to exist with the name of the deployment target by default. For example, if the deployment target is `dev`, we expect a catalog named `dev` to exist in the workspace.
 If you want to use different catalog names, please update the `targets` declared in the `mlops_stacks/databricks.yml` and `mlops_stacks/resources/ml-artifacts-resource.yml` files.
 If changing the `staging`, `prod`, or `test` deployment targets, you'll need to update the workflows located in the `.github/workflows` directory.
 
@@ -52,9 +52,7 @@ The PR will trigger Python unit tests, followed by an integration test executed 
 Upon merging a PR to the main branch, the main branch content will be deployed to the staging workspace with `staging` environment resource configurations.
 
 Upon merging code into the release branch, the release branch content will be deployed to prod workspace with `prod` environment resource configurations.
-
-
-![ML resource config diagram](../../docs/images/mlops-resource-config.png)
+![ML resource config diagram](../../docs/images/mlops-stack-deploy.png)
 
 ## Local development and dev workspace
 
@@ -64,7 +62,7 @@ To set up the databricks CLI using a Databricks personal access token, take the 
 
 1. Follow [databricks CLI](https://learn.microsoft.com/azure/databricks/dev-tools/cli/databricks-cli) to download and set up the databricks CLI locally.
 2. Complete the `TODO` in `mlops_stacks/databricks.yml` to add the dev workspace URI under `targets.dev.workspace.host`.
-3. [Create a personal access token](https://learn.microsoft.com/azure/databricks/dev-tools/auth#personal-access-tokens-for-users)
+3. [Create a personal access token](https://learn.microsoft.com/azure/databricks/dev-tools/auth/pat)
   in your dev workspace and copy it.
 4. Set an env variable `DATABRICKS_TOKEN` with your Databricks personal access token in your terminal. For example, run `export DATABRICKS_TOKEN=dapi12345` if the access token is dapi12345.
 5. You can now use the databricks CLI to validate and deploy ML resource configurations to the dev workspace.
@@ -74,12 +72,11 @@ Alternatively, you can use the other approaches described in the [databricks CLI
 ### Validate and provision ML resource configurations
 1. After installing the databricks CLI and creating the `DATABRICKS_TOKEN` env variable, change to the `mlops_stacks` directory.
 2. Run `databricks bundle validate` to validate the Databricks resource configurations. 
-3. Run `databricks bundle deploy` to provision the Databricks resource configurations to the dev workspace. The resource configurations and your ML code will be copied together to the dev workspace. The defined resources such as Databricks Workflows, MLflow Model and MLflow Experiment will be provisioned according to the config files under `mlops_stacks/resources`.
+3. Run `databricks bundle deploy` to provision the Databricks resource configurations to the dev workspace. The resource configurations and your ML code will be copied together to the dev workspace. The defined resources such as Lakeflow Jobs, MLflow Model and MLflow Experiment will be provisioned according to the config files under `mlops_stacks/resources`.
 4. Go to the Databricks dev workspace, check the defined model, experiment and workflows status, and interact with the created workflows.
 
 ### Destroy ML resource configurations
 After development is done, you can run `databricks bundle destroy` to destroy (remove) the defined Databricks resources in the dev workspace. Any model version with `Production` or `Staging` stage will prevent the model from being deleted. Please update the version stage to `None` or `Archived` before destroying the ML resources.
-
 ## Set up CI/CD
 Please refer to [mlops-setup](../../docs/mlops-setup.md#configure-cicd) for instructions to set up CI/CD.
 
@@ -96,13 +93,37 @@ Upon creating this PR, the CI workflows will be triggered.
 These CI workflow will run unit and integration tests of the ML code, 
 in addition to validating the Databricks resources to be deployed to both staging and prod workspaces.
 Once CI passes, merge the PR into the `main` branch. This will deploy an initial set of Databricks resources to the staging workspace.
-Resources will be deployed to the prod workspace on pushing code to the `release` branch.
+resources will be deployed to the prod workspace on pushing code to the `release` branch.
 
 Follow the next section to configure the input and output data tables for the batch inference job.
 
 ### Setting up the batch inference job
-The batch inference job expects an input Delta table with a schema that your registered model accepts. To use the batch
-inference job, set up such a Delta table in both your staging and prod workspaces.
+The batch inference job expects an input Delta table with a schema that your registered model accepts (out-of-the-box we provide a working example using the `nyctaxi` dataset with the schema [trip_distance, pickup_zip and dropoff_zip]). To use the batch
+inference job, set up such a Delta table in both your staging and prod workspaces. For example, with the `nyctaxi` dataset, the following code can be run in a Databricks notebook to create the batch inference input table:
+```
+# To test the batch job the training data can be used as input
+
+input_table_path = "/databricks-datasets/nyctaxi-with-zipcodes/subsampled"
+training_df = spark.read.format("delta").load(input_table_path)
+
+# drop unused columns
+df = df.drop("tpep_pickup_datetime", "tpep_dropoff_datetime")
+
+# target column used for monitoring, not for predictions
+df = df.withColumnRenamed('fare_amount', 'price')
+
+spark.sql("CREATE DATABASE IF NOT EXISTS my_catalog.my_schema")
+
+def write_to_table(df, database, table):
+  (df.write
+   .format("delta")
+   .mode("overwrite")
+   .option("overwriteSchema", "true")
+   .saveAsTable(f"{database}.{table}"))
+
+# Write the DataFrame to a Delta table
+write_to_table(training_df, database="my_catalog.my_schema", table="batch_input_table")
+```
 Following this, update the batch_inference_job base parameters in `mlops_stacks/resources/batch-inference-workflow-resource.yml` to pass
 the name of the input Delta table and the name of the output Delta table to which to write batch predictions.
 
@@ -121,10 +142,46 @@ Its central purpose is to evaluate a registered model and validate its quality b
 Model validation contains three components: 
 * [model-workflow-resource.yml](./model-workflow-resource.yml) contains the resource config and input parameters for model validation.
 * [validation.py](../validation/validation.py) defines custom metrics and validation thresholds that are referenced by the above resource config files.
-* [notebooks/ModelValidation](../validation/notebooks/ModelValidation.py) contains the validation job implementation. In most cases you don't need to modify this file.
+* [ModelValidation](../validation/ModelValidation.py) contains the validation job implementation. In most cases you don't need to modify this file.
 
 To set up and enable model validation, update [validation.py](../validation/validation.py) to return desired custom metrics and validation thresholds, then 
 resolve the `TODOs` in the ModelValidation task of [model-workflow-resource.yml](./model-workflow-resource.yml).
+
+
+### Setting up monitoring
+The monitoring workflow focuses on building a plug-and-play stack component for monitoring the feature drifts and model drifts and retrain based on the
+violation threshold defined given the ground truth labels.
+
+Its central purpose is to track production model performances, feature distributions and comparing different versions.
+
+Monitoring contains four components:
+* [metric_violation_check_query.py](../monitoring/metric_violation_check_query.py) defines a query that checks for violation of the monitored metric.
+* [MonitoredMetricViolationCheck](../monitoring/MonitoredMetricViolationCheck.py) acts as an entry point, executing the violation check query against the monitored inference table.
+It emits a boolean value based on the query result.
+* [monitoring-resource.yml](./monitoring-resource.yml) contains the resource config, inputs parameters for monitoring, and orchestrates model retraining based on monitoring. It first runs the [MonitoredMetricViolationCheck](../monitoring/MonitoredMetricViolationCheck.py)
+entry point then decides whether to execute the model retraining workflow.
+
+To set up and enable monitoring:
+* If it is not done already, generate inference table, join it with ground truth labels, and update the table name in [monitoring-resource.yml](./monitoring-resource.yml).
+* Resolve the `TODOs`  in [monitoring-resource.yml](./monitoring-resource.yml)
+* Uncomment the monitoring workflow in [databricks.yml](../databricks.yml)
+* OPTIONAL: Update the query in [metric_violation_check_query.py](../monitoring/metric_violation_check_query.py) to customize when the metric is considered to be in violation.
+
+NOTE: If ground truth labels are not available, you can still set up monitoring but should disable the retraining workflow.
+
+Retraining Constraints:
+The retraining job has constraints for optimal functioning:
+* Labels must be provided by the user, joined correctly for retraining history, and available on time with the retraining frequency.
+* Retraining Frequency is tightly coupled with the granularity of the monitor. Users should take into account and ensure that their retraining frequency is equal to or close to the granularity of the monitor.
+    * If the granularity of the monitor is 1 day and retraining frequency is 1 hour, the job will preemptively stop as there is no new data to evaluate retraining criteria
+    * If the granularity of the monitor is 1 day and retraining frequency is 1 week, retraining would be stale and not be efficient
+
+Permissions:
+Permissions for monitoring are inherited from the original table's permissions.
+* Users who own the monitored table or its parent catalog/schema can create, update, and view monitors.
+* Users with read permissions on the monitored table can view its monitor.
+
+Therefore, ensure that service principals are the owners or have the necessary permissions to manage the monitored table.
 
 ## Develop and test config changes
 
@@ -132,36 +189,35 @@ resolve the `TODOs` in the ModelValidation task of [model-workflow-resource.yml]
 To get started, open `mlops_stacks/resources/batch-inference-workflow-resource.yml`.  The file contains the ML resource definition of a batch inference job, like:
 
 ```$xslt
-new_cluster: &new_cluster
-  new_cluster:
-    num_workers: 3
-    spark_version: 13.3.x-cpu-ml-scala2.12
-    node_type_id: Standard_D3_v2
-    custom_tags:
-      clusterSource: mlops-stack/0.2
-
 resources:
   jobs:
     batch_inference_job:
       name: ${bundle.target}-mlops_stacks-batch-inference-job
       tasks:
         - task_key: batch_inference_job
-          <<: *new_cluster
+          environment_key: default
           notebook_task:
-            notebook_path: ../deployment/batch_inference/notebooks/BatchInference.py
+            notebook_path: ../deployment/batch_inference/BatchInference.py
             base_parameters:
               env: ${bundle.target}
               input_table_name: batch_inference_input_table_name
               ...
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+            dependencies:
+              - -r ../requirements.txt
 ```
 
 The example above defines a Databricks job with name `${bundle.target}-mlops_stacks-batch-inference-job`
-that runs the notebook under `mlops_stacks/deployment/batch_inference/notebooks/BatchInference.py` to regularly apply your ML model for batch inference. 
+that runs the notebook under `mlops_stacks/deployment/batch_inference/BatchInference.py` to regularly apply your ML model for batch inference.
 
-At the start of the resource definition, we declared an anchor `new_cluster` that will be referenced and used later. For more information about anchors in yaml schema, please refer to the [yaml documentation](https://yaml.org/spec/1.2.2/#3222-anchors-and-aliases).
+Jobs run on [serverless compute](https://learn.microsoft.com/azure/databricks/jobs/run-serverless-jobs) by default: the task references a serverless environment by its `environment_key` (`default` here), and that key is defined once under `environments`, with its own dependencies installed from `requirements.txt`. Multiple tasks in the same job can share the same `environment_key` to reuse one environment definition.
 
 We specify a `batch_inference_job` under `resources/jobs` to define a databricks workflow with internal key `batch_inference_job` and job name `{bundle.target}-mlops_stacks-batch-inference-job`.
-The workflow contains a single task with task key `batch_inference_job`. The task runs notebook `../deployment/batch_inference/notebooks/BatchInference.py` with provided parameters `env` and `input_table_name` passing to the notebook.
+The workflow contains a single task with task key `batch_inference_job`. The task runs notebook `../deployment/batch_inference/BatchInference.py` with provided parameters `env` and `input_table_name` passing to the notebook.
 After setting up databricks CLI, you can run command `databricks bundle schema`  to learn more about databricks CLI bundles schema.
 
 The notebook_path is the relative path starting from the resource yaml file.
@@ -187,27 +243,26 @@ targets:
     variables:
       batch_inference_input_table: test_table
 
-new_cluster: &new_cluster
-  new_cluster:
-    num_workers: 3
-    spark_version: 13.3.x-cpu-ml-scala2.12
-    node_type_id: Standard_D3_v2
-    custom_tags:
-      clusterSource: mlops-stack/0.2
-
 resources:
   jobs:
     batch_inference_job:
       name: ${bundle.target}-mlops_stacks-batch-inference-job
       tasks:
         - task_key: batch_inference_job
-          <<: *new_cluster
+          environment_key: default
           notebook_task:
-            notebook_path: ../deployment/batch_inference/notebooks/BatchInference.py
+            notebook_path: ../deployment/batch_inference/BatchInference.py
             base_parameters:
               env: ${bundle.target}
               input_table_name: ${var.batch_inference_input_table}
               ...
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+            dependencies:
+              - -r ../requirements.txt
 ```
 The `batch_inference_job` notebook parameter `input_table_name` is using a bundle variable `batch_inference_input_table` with default value "input_table".
 The variable value will be overwritten with "dev_table" for `dev` environment config and "test_table" for `test` environment config:
@@ -221,7 +276,6 @@ To test out a config change, simply edit one of the fields above. For example, i
 
 Then follow [Local development and dev workspace](#local-development-and-dev-workspace) to deploy the change to the dev workspace.
 Alternatively you can open a PR. Continuous integration will then validate the updated config and deploy tests to the to staging workspace.
-
 ## Deploy config changes
 
 ### Dev workspace deployment
@@ -236,4 +290,4 @@ After merging a PR to the main branch, continuous deployment automation will dep
 
 When you about to cut a release, you can create and merge a PR to merge changes from main to release. Continuous deployment automation will deploy `prod` resources to the prod workspace.
 
-[Back to main project README](../../README.md)
+[Back to project README](../README.md)

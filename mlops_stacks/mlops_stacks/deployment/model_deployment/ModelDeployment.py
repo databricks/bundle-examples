@@ -16,7 +16,7 @@
 #  * model_uri (required)  - URI of the model to deploy. Must be in the format "models:/<name>/<version-id>", as described in
 #                            https://www.mlflow.org/docs/latest/model-registry.html#fetching-an-mlflow-model-from-the-model-registry
 #                            This parameter is read as a task value
-#                            (https://learn.microsoft.com/azure/databricks/dev-tools/databricks-utils#get-command-dbutilsjobstaskvaluesget),
+#                            (https://learn.microsoft.com/azure/databricks/dev-tools/databricks-utils),
 #                            rather than as a notebook widget. That is, we assume a preceding task (the Train.py
 #                            notebook) has set a task value with key "model_uri".
 ##################################################################################
@@ -26,15 +26,6 @@
 #
 # Name of the current environment
 dbutils.widgets.dropdown("env", "None", ["None", "staging", "prod"], "Environment Name")
-
-# COMMAND ----------
-
-import os
-import sys
-notebook_path =  '/Workspace/' + os.path.dirname(dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get())
-%cd $notebook_path
-%cd ..
-sys.path.append("../..")
 
 # COMMAND ----------
 

@@ -5,6 +5,7 @@ import os
 import shlex
 import shutil
 import tempfile
+from urllib.parse import urlparse
 
 from dbt.cli.main import dbtRunner
 
@@ -25,11 +26,19 @@ if not dbt_commands:
 
 ctx = dbutils.notebook.entry_point.getDbutils().notebook().getContext()
 os.environ["DBT_ACCESS_TOKEN"] = ctx.apiToken().get()
-# dbt's host must be a bare hostname; apiUrl() includes the https:// scheme.
-os.environ["DBT_HOST"] = (
-    ctx.apiUrl().get().removeprefix("https://").removeprefix("http://")
-)
+# dbt's host must be a bare hostname, but apiUrl() returns a full URL (scheme + host, and
+# potentially a trailing slash or path). Parse it and keep only the netloc so a value like
+# "https://my-workspace.databricks.com/" yields "my-workspace.databricks.com".
+_api_url = ctx.apiUrl().get()
+_parsed = urlparse(_api_url)
+os.environ["DBT_HOST"] = _parsed.netloc or _parsed.path.strip("/")
 
+# chdir to the dbt project so dbt runs from inside it. Relative `project_directory` is
+# resolved against this notebook's own workspace location — the same anchor native
+# `dbt_task` uses. Auto-copy mode sends `.` (resolves to the notebook's dir, which is
+# project root by construction); user-pinned `--notebook-path` with relative
+# `--project-directory` resolves against wherever the user placed the notebook; absolute
+# `project_directory` is used as-is.
 if project_directory:
     notebook_dir = os.path.dirname("/Workspace" + ctx.notebookPath().get())
     target_dir = (
@@ -39,10 +48,15 @@ if project_directory:
     )
     os.chdir(target_dir)
 
+# Point dbt's artifact and log output at a private per-task dir so the parallel tasks of a job
+# don't contend on the shared workspace `target/`/`logs/`.
 local_dir = tempfile.mkdtemp(prefix="dbt_local_")
 os.environ["DBT_TARGET_PATH"] = local_dir
 os.environ["DBT_LOG_PATH"] = local_dir
 
+# If a pre-built msgpack sits next to the project, deserialize it into a manifest and inject it into
+# dbtRunner to skip dbt's parse phase (re-reading/hashing every file + DAG rebuild) on each task.
+# Falls back to a normal parse if the msgpack is absent or unusable.
 manifest = None
 prebuilt_manifest_path = os.path.join("target", "partial_parse.msgpack")
 if os.path.exists(prebuilt_manifest_path):
@@ -78,16 +92,21 @@ try:
             args.extend(["--profiles-dir", profiles_directory])
 
         print(f"Running: dbt {' '.join(args)}")
+        print("-" * 60)
 
         result = runner.invoke(args)
 
         if not result.success:
             detail = result.exception or result.result or "(no further details)"
             raise RuntimeError(f"dbt command failed: dbt {' '.join(args)}\n{detail}")
+
+        print(f"Completed successfully: dbt {' '.join(args)}")
 finally:
     os.environ.pop("DBT_ACCESS_TOKEN", None)
     os.environ.pop("DBT_HOST", None)
     os.environ.pop("DBT_TARGET_PATH", None)
     os.environ.pop("DBT_LOG_PATH", None)
+    # Remove the private per-task target/log dir; on reused (all-purpose) clusters these
+    # would otherwise accumulate under the system temp dir for the life of the cluster.
     if local_dir:
         shutil.rmtree(local_dir, ignore_errors=True)

@@ -54,6 +54,7 @@ local_dir = tempfile.mkdtemp(prefix="dbt_local_")
 os.environ["DBT_TARGET_PATH"] = local_dir
 os.environ["DBT_LOG_PATH"] = local_dir
 
+
 # If a pre-built msgpack sits next to the project, deserialize it into a manifest and inject it into
 # dbtRunner to skip dbt's parse phase (re-reading/hashing every file + DAG rebuild) on each task.
 # Falls back to a normal parse if the msgpack is absent or unusable.

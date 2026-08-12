@@ -79,8 +79,8 @@ def test_key_maps_disambiguate_bundled_test_key_against_task_keys():
     all_keys = list(task_keys.values()) + list(bundled.values())
     assert len(all_keys) == len(set(all_keys))
     assert task_keys["model.shop.orders"] == "orders_model"
-    assert task_keys["test.shop.orders"] == "shop_orders_test"
-    assert bundled["model.shop.orders"] == "shop_orders_test_2"
+    assert task_keys["test.shop.orders"] == "shop_orders_test_2"
+    assert bundled["model.shop.orders"] == "shop_orders_test"
 
 
 def test_key_maps_disambiguated_long_test_keys_keep_hash_within_limit():

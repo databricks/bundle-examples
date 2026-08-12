@@ -1,6 +1,10 @@
 import hashlib
 import json
+import re
 from collections.abc import Iterable
+
+# Databricks substitutes complete dynamic value references in task string fields before execution.
+DYNAMIC_VALUE_REFERENCE = re.compile(r"\{\{[^{}]+\}\}")
 
 # Databricks caps task keys at 100 characters (letters, numbers, underscores, hyphens).
 MAX_TASK_KEY_LENGTH = 100
@@ -127,12 +131,21 @@ def build_task_key_maps(
     task_keys: dict[str, str] = {}
     bundled_test_keys: dict[str, str] = {}
     taken: set[str] = set()
+    # Both passes walk their claims in sorted order rather than manifest order. `_reserve`'s
+    # numeric suffix is handed out first-come, so iterating in manifest order would let the
+    # *arrangement* of the manifest decide which of two colliding nodes keeps the readable key —
+    # adding or renaming an unrelated model could then silently swap two task keys, repointing
+    # per-task run history and task-level alerts at a different model. Sorting makes every
+    # assigned key a function of the node ids alone.
+    ordered_claims = sorted(
+        (key, sorted(claimants)) for key, claimants in claims.items()
+    )
     # Assign uncontested keys first so a contested claimant's fallback never steals a plain key.
-    for key, claimants in claims.items():
+    for key, claimants in ordered_claims:
         if len(claimants) == 1:
             uid, is_bundled = claimants[0]
             (bundled_test_keys if is_bundled else task_keys)[uid] = _reserve(key, taken)
-    for key, claimants in claims.items():
+    for key, claimants in ordered_claims:
         if len(claimants) == 1:
             continue
         for uid, is_bundled in claimants:
@@ -236,14 +249,21 @@ def read_dbt_manifest(path: str) -> dict:
 
     Raises:
         FileNotFoundError: If the file does not exist.
-        ValueError: If the file is not valid JSON.
+        ValueError: If the file is not valid JSON, or is valid JSON that is not an object. A non-object
+            (list, scalar, null) would parse here and only fail later as an AttributeError on
+            `manifest.get(...)`, which `main` does not catch — a traceback instead of a clean `error:`.
     """
     try:
         with open(path, "r", encoding="utf-8") as file:
-            return json.load(file)
+            manifest = json.load(file)
     except FileNotFoundError as e:
         raise FileNotFoundError(f"Manifest file not found: {path}. Details: {e}") from e
     except json.JSONDecodeError as e:
         raise ValueError(
             f"Error parsing JSON from manifest file: {path}. Details: {e}"
         ) from e
+    if not isinstance(manifest, dict):
+        raise ValueError(
+            f"Manifest file {path} must contain a JSON object, got {type(manifest).__name__}."
+        )
+    return manifest

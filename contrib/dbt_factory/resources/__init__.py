@@ -46,7 +46,10 @@ ENVIRONMENT_KEY = "Default"
 # README "DBT Tests handling" section for the trade-offs.
 BUNDLE_TESTS = False
 
-# Extra options appended to every generated dbt command (e.g. "--vars '{...}'"). Empty by default.
+# Extra options appended to every generated dbt command (e.g. "--full-refresh"). Empty by default.
+# Selection options (`--select`, `--exclude`, ...) and parse-context options (`--vars`, `--target`,
+# `--profiles-dir`, `--project-dir`) are rejected: the factory owns selection and the runtime parse
+# context must match the supplied manifest.
 EXTRA_DBT_COMMAND_OPTIONS = ""
 
 # Serverless base-environment file, generated at deploy time from the pinned

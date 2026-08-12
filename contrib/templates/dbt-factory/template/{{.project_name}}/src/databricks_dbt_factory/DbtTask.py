@@ -3,6 +3,11 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
+from databricks_dbt_factory.Utils import DYNAMIC_VALUE_REFERENCE
+
+
+_MAX_NOTEBOOK_BASE_PARAMETERS_BYTES = 1_000_000
+
 
 class TaskType(Enum):
     """Supported task types for generated Databricks tasks."""
@@ -133,13 +138,32 @@ class DbtTask:
         return spec
 
     def _to_notebook_dict(self) -> dict[str, Any]:
+        serialized_commands = json.dumps(self.commands)
+        if DYNAMIC_VALUE_REFERENCE.search(serialized_commands):
+            raise ValueError(
+                f"Notebook task {self.task_key!r} serialized dbt_commands forms a Databricks dynamic value "
+                f"reference; rename the selected resources or change the dbt command options."
+            )
         base_parameters: dict[str, str] = {
-            "dbt_commands": json.dumps(self.commands),
+            "dbt_commands": serialized_commands,
         }
         if self.options.project_directory:
             base_parameters["project_directory"] = self.options.project_directory
         if self.options.profiles_directory:
             base_parameters["profiles_directory"] = self.options.profiles_directory
+
+        serialized_size = len(
+            json.dumps(
+                base_parameters, ensure_ascii=False, separators=(",", ":")
+            ).encode("utf-8")
+        )
+        if serialized_size > _MAX_NOTEBOOK_BASE_PARAMETERS_BYTES:
+            raise ValueError(
+                f"Notebook task {self.task_key!r} serializes base_parameters to {serialized_size:,} bytes; "
+                f"Databricks allows at most {_MAX_NOTEBOOK_BASE_PARAMETERS_BYTES:,} bytes. Shorten its dbt "
+                f"commands or path options, reduce the tests in this bundle, or generate native dbt tasks "
+                f"with --task-type dbt."
+            )
 
         notebook_task: dict[str, Any] = {
             "notebook_path": self.options.notebook_path,

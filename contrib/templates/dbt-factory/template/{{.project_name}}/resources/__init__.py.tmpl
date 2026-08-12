@@ -46,7 +46,10 @@ ENVIRONMENT_KEY = "{{.environment_key}}"
 # README "DBT Tests handling" section for the trade-offs.
 BUNDLE_TESTS = {{if eq .bundle_tests "yes"}}True{{else}}False{{end}}
 
-# Extra options appended to every generated dbt command (e.g. "--vars '{...}'").
+# Extra options appended to every generated dbt command (e.g. "--full-refresh").
+# Selection options (`--select`, `--exclude`, ...) and parse-context options (`--vars`, `--target`,
+# `--profiles-dir`, `--project-dir`) are rejected: the factory owns selection and the runtime parse
+# context must match the supplied manifest.
 # `printf "%q"` renders a safely-quoted string literal so values containing quotes stay valid Python.
 EXTRA_DBT_COMMAND_OPTIONS = {{ printf "%q" .extra_dbt_command_options }}
 

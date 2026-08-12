@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from databricks_dbt_factory.Utils import read_dbt_manifest
 
 BASE_PATH = str(Path(__file__).resolve().parent)
@@ -98,7 +100,7 @@ def test_bundled_model_gates_on_tests_of_all_tested_upstreams(dbt_factory_bundle
     assert "customers_test" in by_key
     assert "products_test" in by_key
     assert _commands(by_key["customers_test"]) == [
-        "dbt test --select pkg.customers --indirect-selection cautious --target dev"
+        "dbt test --select fqn:pkg.unique_customers_id,package:pkg,resource_type:test --target dev --indirect-selection empty"
     ]
     assert by_key["customers_test"]["depends_on"] == [{"task_key": "customers_model"}]
 
@@ -123,7 +125,7 @@ def test_tests_on_seed_produce_task_and_gate_downstream(dbt_factory_bundled):
 
     assert "countries_test" in by_key
     assert _commands(by_key["countries_test"]) == [
-        "dbt test --select pkg.countries --indirect-selection cautious --target dev"
+        "dbt test --select fqn:pkg.unique_countries_code,package:pkg,resource_type:test --target dev --indirect-selection empty"
     ]
     assert by_key["countries_test"]["depends_on"] == [{"task_key": "countries_seed"}]
     assert by_key["enriched_model"]["depends_on"] == [{"task_key": "countries_test"}]
@@ -143,7 +145,7 @@ def test_tests_on_snapshot_produce_task_and_gate_downstream(dbt_factory_bundled)
 
     assert "orders_snap_test" in by_key
     assert _commands(by_key["orders_snap_test"]) == [
-        "dbt test --select pkg.orders_snap --indirect-selection cautious --target dev"
+        "dbt test --select fqn:pkg.not_null_orders_snap_id,package:pkg,resource_type:test --target dev --indirect-selection empty"
     ]
     assert by_key["orders_snap_test"]["depends_on"] == [
         {"task_key": "orders_snap_snapshot"}
@@ -166,7 +168,7 @@ def test_tests_on_source_produce_standalone_task(dbt_factory_bundled):
 
     assert "raw_customers_test" in by_key
     assert _commands(by_key["raw_customers_test"]) == [
-        "dbt test --select source:pkg.raw.customers --indirect-selection cautious --target dev"
+        "dbt test --select fqn:pkg.unique_raw_customers_id,package:pkg,resource_type:test --target dev --indirect-selection empty"
     ]
     assert by_key["raw_customers_test"]["depends_on"] == []
 
@@ -191,7 +193,7 @@ def test_flat_mode_emits_one_task_per_test_node_and_gates_downstream(dbt_factory
     assert "customers_test" not in by_key  # no bundling in per-test mode
 
     assert _commands(by_key["unique_customers_id_test"]) == [
-        "dbt test --select pkg.unique_customers_id --target dev"
+        "dbt test --select fqn:pkg.unique_customers_id,package:pkg,resource_type:test --target dev --indirect-selection empty"
     ]
     assert by_key["unique_customers_id_test"]["depends_on"] == [
         {"task_key": "customers_model"}
@@ -266,9 +268,9 @@ def test_flat_mode_transitive_cross_model_test_does_not_create_cycle(dbt_factory
     assert d_deps == {"c_model", "relationship_a_c_test"}
 
 
-def test_flat_mode_warn_severity_tests_do_not_gate_downstream(dbt_factory):
-    # Only error-severity tests gate downstream (matches `dbt build`: dbt exits 0 on warn
-    # so a gate wouldn't block anyway; we just keep the DAG cleaner).
+def test_flat_mode_tests_gate_downstream_regardless_of_severity(dbt_factory):
+    # Gating follows dbt's dependency graph, not a test's severity: a warn test can still fail the
+    # run under `--warn-error`, so both warn- and error-severity tests gate their downstream models.
     nodes = dict(
         [
             _model("pkg", "customers"),
@@ -288,13 +290,13 @@ def test_flat_mode_warn_severity_tests_do_not_gate_downstream(dbt_factory):
     tasks = dbt_factory.create_tasks({"nodes": nodes})
     by_key = {t["task_key"]: t for t in tasks}
 
-    # Both test tasks still exist (warn tests still run — they just don't gate anything)
     assert "unique_customers_id_test" in by_key
     assert "not_null_customers_id_test" in by_key
 
-    # orders gates on customers + the error-severity test, but NOT the warn-severity one
+    # orders gates on customers and both attached tests, warn and error alike
     assert {dep["task_key"] for dep in by_key["orders_model"]["depends_on"]} == {
         "customers_model",
+        "unique_customers_id_test",
         "not_null_customers_id_test",
     }
 
@@ -319,13 +321,15 @@ def test_bundled_task_factory_assembles_commands(dbt_factory_bundled):
     test_factory = dbt_factory_bundled.task_factories["test"]
     task = test_factory.create_bundled_task(
         task_key="customers_test",
-        select="pkg.customers",
+        selects_by_indirect_selection={
+            "cautious": ["fqn:pkg.unique_customers_id,package:pkg,resource_type:test"]
+        },
         deps_command_name="customers",
         depends_on=["customers_model"],
     )
     assert task.task_key == "customers_test"
     assert task.commands == [
-        "dbt test --select pkg.customers --indirect-selection cautious --target dev"
+        "dbt test --select fqn:pkg.unique_customers_id,package:pkg,resource_type:test --target dev --indirect-selection cautious"
     ]
     assert task.depends_on == ["customers_model"]
 
@@ -352,10 +356,10 @@ def test_cross_model_test_in_bundled_mode_is_emitted_as_standalone_task(
     tasks = dbt_factory_bundled.create_tasks({"nodes": nodes})
     by_key = {t["task_key"]: t for t in tasks}
 
-    # Single-model test → bundled with cautious selection (relationship test is excluded by dbt)
+    # Single-model test → its own bundled task addressing the exact test node
     assert "team_cities_test" in by_key
     assert _commands(by_key["team_cities_test"]) == [
-        "dbt test --select pkg.team_cities --indirect-selection cautious --target dev"
+        "dbt test --select fqn:pkg.not_null_team_cities_name,package:pkg,resource_type:test --target dev --indirect-selection empty"
     ]
 
     # Cross-model test → its own task, gated on BOTH referenced models
@@ -364,7 +368,7 @@ def test_cross_model_test_in_bundled_mode_is_emitted_as_standalone_task(
     )
     assert cross_test_key in by_key
     assert _commands(by_key[cross_test_key]) == [
-        "dbt test --select pkg.relationships_game_details_winner__team_city__ref_team_cities_ --target dev"
+        "dbt test --select fqn:pkg.relationships_game_details_winner__team_city__ref_team_cities_,package:pkg,resource_type:test --target dev --indirect-selection empty"
     ]
     assert {dep["task_key"] for dep in by_key[cross_test_key]["depends_on"]} == {
         "team_cities_model",
@@ -389,17 +393,16 @@ def test_single_package_bundled_test_uses_qualified_select(dbt_factory_bundled):
 
     assert "customers_test" in by_key
     assert _commands(by_key["customers_test"]) == [
-        "dbt test --select pkg_a.customers --indirect-selection cautious --target dev"
+        "dbt test --select fqn:pkg_a.unique_customers_id,package:pkg_a,resource_type:test --target dev --indirect-selection empty"
     ]
     assert by_key["orders_model"]["depends_on"] == [{"task_key": "customers_test"}]
 
 
-def test_flat_mode_same_named_tests_get_unique_keys_and_both_gate_downstream(
-    dbt_factory,
-):
-    # dbt allows the same custom test name on two different models, telling the nodes apart
-    # only via the unique_id hash. Both tests must keep distinct task keys AND both must gate
-    # the downstream model (a post-hoc rename could not fix the dep list, hence the key map).
+def test_flat_mode_two_tests_sharing_a_name_and_fqn_are_refused(dbt_factory):
+    # dbt lets the same custom test name land twice with the same fqn, telling the nodes apart only
+    # via the unique_id hash — which dbt exposes as no selector method. The factory cannot prove a
+    # selector addresses one without also running the other before its own dependencies are ready,
+    # so it refuses rather than emit a task that runs the wrong node.
     nodes = dict(
         [
             _model("pkg", "customers"),
@@ -409,16 +412,8 @@ def test_flat_mode_same_named_tests_get_unique_keys_and_both_gate_downstream(
         ]
     )
 
-    tasks = dbt_factory.create_tasks({"nodes": nodes})
-    by_key = {t["task_key"]: t for t in tasks}
-
-    assert "dup_check_6ea6b2ac82_test" in by_key
-    assert "dup_check_a9ab3a6e12_test" in by_key
-    assert {dep["task_key"] for dep in by_key["orders_model"]["depends_on"]} == {
-        "customers_model",
-        "dup_check_6ea6b2ac82_test",
-        "dup_check_a9ab3a6e12_test",
-    }
+    with pytest.raises(ValueError, match="also runs"):
+        dbt_factory.create_tasks({"nodes": nodes})
 
 
 def test_flat_mode_cross_package_models_get_package_prefixed_keys(dbt_factory):
@@ -467,10 +462,10 @@ def test_bundled_mode_singular_test_named_like_tested_model_keeps_keys_unique(
 
     assert len(keys) == len(set(keys))
     assert _commands(by_key["pkg_orders_test"]) == [
-        "dbt test --select pkg.orders --target dev"
+        "dbt test --select fqn:pkg.unique_orders_id,package:pkg,resource_type:test --target dev --indirect-selection empty"
     ]
     assert _commands(by_key["pkg_orders_test_2"]) == [
-        "dbt test --select pkg.orders --indirect-selection cautious --target dev"
+        "dbt test --select fqn:pkg.orders,package:pkg,resource_type:test --target dev --indirect-selection empty"
     ]
 
 

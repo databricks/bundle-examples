@@ -6,4 +6,5 @@ exclude = [
     "default_sql/*",
     "mlops_stacks/*",
     "lakeflow_pipelines_python/*",
+    "contrib/templates/dbt-factory/template/*",
 ]

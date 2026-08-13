@@ -1,0 +1,5 @@
+# Ruff config for the template's Python sources. It lives here — a sibling of the template
+# schema, OUTSIDE template/ — so `databricks bundle init` never renders it into a generated
+# project, yet the repo-root `ruff format --check` still discovers it (as the closest config)
+# for the sources under template/. Matches the line-length the generated pyproject.toml uses.
+line-length = 120

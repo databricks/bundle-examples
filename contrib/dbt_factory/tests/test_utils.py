@@ -6,14 +6,14 @@ from databricks_dbt_factory.Utils import (
 )
 
 
-def test_resource_keys_use_name_and_verb_suffix():
-    assert generate_task_key("model.shop.orders") == "orders_run"
+def test_resource_keys_use_name_and_type_suffix():
+    assert generate_task_key("model.shop.orders") == "orders_model"
     assert generate_task_key("seed.shop.countries") == "countries_seed"
     assert generate_task_key("snapshot.shop.orders_snap") == "orders_snap_snapshot"
 
 
 def test_versioned_model_keeps_version():
-    assert generate_task_key("model.shop.dim_customers.v2") == "dim_customers_v2_run"
+    assert generate_task_key("model.shop.dim_customers.v2") == "dim_customers_v2_model"
 
 
 def test_test_key_drops_package_and_hash():
@@ -42,7 +42,7 @@ def test_long_test_key_is_truncated_and_hash_disambiguated():
 def test_key_maps_keep_plain_keys_when_unique():
     task_keys, bundled = build_task_key_maps(["model.shop.orders", "test.shop.unique_orders_id.9a1b2c3d4e"])
     assert task_keys == {
-        "model.shop.orders": "orders_run",
+        "model.shop.orders": "orders_model",
         "test.shop.unique_orders_id.9a1b2c3d4e": "unique_orders_id_test",
     }
     assert bundled == {}
@@ -65,9 +65,9 @@ def test_key_maps_disambiguate_singular_vs_custom_named_test():
 
 def test_key_maps_disambiguate_cross_package_models_with_package_name():
     task_keys, _ = build_task_key_maps(["model.shop.a", "model.subpkg.a", "model.shop.b"])
-    assert task_keys["model.shop.a"] == "shop_a_run"
-    assert task_keys["model.subpkg.a"] == "subpkg_a_run"
-    assert task_keys["model.shop.b"] == "b_run"
+    assert task_keys["model.shop.a"] == "shop_a_model"
+    assert task_keys["model.subpkg.a"] == "subpkg_a_model"
+    assert task_keys["model.shop.b"] == "b_model"
 
 
 def test_key_maps_disambiguate_bundled_test_key_against_task_keys():
@@ -78,9 +78,9 @@ def test_key_maps_disambiguate_bundled_test_key_against_task_keys():
     )
     all_keys = list(task_keys.values()) + list(bundled.values())
     assert len(all_keys) == len(set(all_keys))
-    assert task_keys["model.shop.orders"] == "orders_run"
-    assert task_keys["test.shop.orders"] == "shop_orders_test"
-    assert bundled["model.shop.orders"] == "model_shop_orders_test"
+    assert task_keys["model.shop.orders"] == "orders_model"
+    assert task_keys["test.shop.orders"] == "shop_orders_test_2"
+    assert bundled["model.shop.orders"] == "shop_orders_test"
 
 
 def test_key_maps_disambiguated_long_test_keys_keep_hash_within_limit():

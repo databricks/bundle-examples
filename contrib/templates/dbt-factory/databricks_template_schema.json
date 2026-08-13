@@ -49,7 +49,7 @@
         "extra_dbt_command_options": {
             "type": "string",
             "default": "",
-            "description": "\nAdditional options appended to every generated dbt command (e.g. \"--vars '{...}'\"). Leave blank if unsure.\nextra_dbt_command_options",
+            "description": "\nAdditional options appended to every generated dbt command (e.g. \"--full-refresh\"). Selection and parse-context options (--select, --vars, --target, ...) are rejected. Leave blank if unsure.\nextra_dbt_command_options",
             "order": 7
         }
     },

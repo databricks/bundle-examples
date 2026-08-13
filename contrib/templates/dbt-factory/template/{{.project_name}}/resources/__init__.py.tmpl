@@ -6,9 +6,9 @@ reads the dbt manifest and expands it into a Databricks job with one task per db
 (model / seed / snapshot / test) using the vendored ``databricks_dbt_factory`` core. No
 per-model YAML is generated or checked in — the job graph is built on the fly from the manifest.
 
-This module is the only integration glue. The vendored core under ``src/databricks_dbt_factory``
-has been trimmed to the single path this project uses — serverless compute with notebook tasks —
-and returns a ``Resources`` object for PyDABs.
+This module is the only integration glue: it configures the vendored ``databricks_dbt_factory``
+core (under ``src/databricks_dbt_factory``) for serverless notebook tasks and returns a
+``Resources`` object for PyDABs.
 """
 
 import os
@@ -19,7 +19,7 @@ from databricks.bundles.core import Bundle, Resources
 from databricks.bundles.jobs import Job
 
 from databricks_dbt_factory.DbtFactory import DbtFactory
-from databricks_dbt_factory.DbtTask import DbtTaskOptions
+from databricks_dbt_factory.DbtTask import DbtTaskOptions, TaskType
 from databricks_dbt_factory.TaskFactory import (
     DbtDependencyResolver,
     ModelTaskFactory,
@@ -46,7 +46,10 @@ ENVIRONMENT_KEY = "{{.environment_key}}"
 # README "DBT Tests handling" section for the trade-offs.
 BUNDLE_TESTS = {{if eq .bundle_tests "yes"}}True{{else}}False{{end}}
 
-# Extra options appended to every generated dbt command (e.g. "--vars '{...}'").
+# Extra options appended to every generated dbt command (e.g. "--full-refresh").
+# Selection options (`--select`, `--exclude`, ...) and parse-context options (`--vars`, `--target`,
+# `--profiles-dir`, `--project-dir`) are rejected: the factory owns selection and the runtime parse
+# context must match the supplied manifest.
 # `printf "%q"` renders a safely-quoted string literal so values containing quotes stay valid Python.
 EXTRA_DBT_COMMAND_OPTIONS = {{ printf "%q" .extra_dbt_command_options }}
 
@@ -75,6 +78,7 @@ def _build_tasks(target: str) -> list[dict]:
         notebook_path=RUNNER_NOTEBOOK_PATH,
         project_directory=PROJECT_DIRECTORY,
         profiles_directory=PROFILES_DIRECTORY,
+        task_type=TaskType.NOTEBOOK,
     )
     dbt_options = f"--target {target} {EXTRA_DBT_COMMAND_OPTIONS}".strip()
 

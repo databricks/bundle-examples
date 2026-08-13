@@ -1,81 +1,81 @@
 [
   {
-    "task_key": "diamonds_list_colors_run",
+    "task_key": "diamonds_list_colors_model",
     "depends_on": [
       {
-        "task_key": "diamonds_four_cs_run"
+        "task_key": "diamonds_four_cs_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt run --select diamonds_list_colors --target dev\"]"
+        "dbt_commands": "[\"dbt run --select fqn:dbt_demo.sql_model1.diamonds_list_colors,package:dbt_demo,file:diamonds_list_colors.sql,resource_type:model --target dev\"]"
       }
     }
   },
   {
-    "task_key": "diamonds_prices_run",
+    "task_key": "diamonds_prices_model",
     "depends_on": [],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt run --select diamonds_prices --target dev\"]"
+        "dbt_commands": "[\"dbt run --select fqn:dbt_demo.sql_model1.diamonds_prices,package:dbt_demo,file:diamonds_prices.sql,resource_type:model --target dev\"]"
       }
     }
   },
   {
-    "task_key": "diamonds_four_cs_run",
+    "task_key": "diamonds_four_cs_model",
     "depends_on": [],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt run --select diamonds_four_cs --target dev\"]"
+        "dbt_commands": "[\"dbt run --select fqn:dbt_demo.sql_model1.diamonds_four_cs,package:dbt_demo,file:diamonds_four_cs.sql,resource_type:model --target dev\"]"
       }
     }
   },
   {
-    "task_key": "zzz_game_details_run",
+    "task_key": "zzz_game_details_model",
     "depends_on": [],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt run --select zzz_game_details --target dev\"]"
+        "dbt_commands": "[\"dbt run --select fqn:dbt_demo.sql_model1.zzz_game_details,package:dbt_demo,file:zzz_game_details.sql,resource_type:model --target dev\"]"
       }
     }
   },
   {
-    "task_key": "second_dbt_model_run",
+    "task_key": "second_dbt_model_model",
     "depends_on": [
       {
-        "task_key": "first_dbt_model_run"
-      },
-      {
-        "task_key": "unique_first_dbt_model_id_test"
+        "task_key": "first_dbt_model_model"
       },
       {
         "task_key": "not_null_first_dbt_model_id_test"
+      },
+      {
+        "task_key": "unique_first_dbt_model_id_test"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt run --select second_dbt_model --target dev\"]"
+        "dbt_commands": "[\"dbt run --select fqn:dbt_demo.sql_model2.second_dbt_model,package:dbt_demo,file:second_dbt_model.sql,resource_type:model --target dev\"]"
       }
     }
   },
   {
-    "task_key": "first_dbt_model_run",
+    "task_key": "first_dbt_model_model",
     "depends_on": [],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt run --select first_dbt_model --target dev\"]"
+        "dbt_commands": "[\"dbt run --select fqn:dbt_demo.sql_model2.first_dbt_model,package:dbt_demo,file:first_dbt_model.sql,resource_type:model --target dev\"]"
       }
     }
   },
@@ -83,14 +83,14 @@
     "task_key": "zzz_game_details_check_scores_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select zzz_game_details_check_scores --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.data_tests.zzz_game_details_check_scores,package:dbt_demo,file:zzz_game_details_check_scores.sql,resource_type:test --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -98,14 +98,14 @@
     "task_key": "zzz_game_details_check_dates_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select zzz_game_details_check_dates --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.data_tests.zzz_game_details_check_dates,package:dbt_demo,file:zzz_game_details_check_dates.sql,resource_type:test --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -113,14 +113,14 @@
     "task_key": "zzz_win_loss_records_check_records_test",
     "depends_on": [
       {
-        "task_key": "zzz_win_loss_records_run"
+        "task_key": "zzz_win_loss_records_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select zzz_win_loss_records_check_records --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.data_tests.zzz_win_loss_records_check_records,package:dbt_demo,file:zzz_win_loss_records_check_records.sql,resource_type:test --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -128,14 +128,14 @@
     "task_key": "diamonds_list_colors_test_test",
     "depends_on": [
       {
-        "task_key": "diamonds_list_colors_run"
+        "task_key": "diamonds_list_colors_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select diamonds_list_colors_test --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.data_tests.diamonds_list_colors_test,package:dbt_demo,file:diamonds_list_colors_test.sql,resource_type:test --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -146,7 +146,7 @@
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt seed --select country_codes --target dev\"]"
+        "dbt_commands": "[\"dbt seed --select fqn:dbt_demo.country_codes,package:dbt_demo,file:country_codes.csv,resource_type:seed --target dev\"]"
       }
     }
   },
@@ -154,14 +154,14 @@
     "task_key": "unique_zzz_game_details_game_id_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select unique_zzz_game_details_game_id --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.unique_zzz_game_details_game_id,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:unique --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -169,14 +169,14 @@
     "task_key": "not_null_zzz_game_details_game_id_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_game_id --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_game_details_game_id,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -184,14 +184,14 @@
     "task_key": "not_null_zzz_game_details_home_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_home --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_game_details_home,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -199,14 +199,14 @@
     "task_key": "accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:accepted_values --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -214,14 +214,14 @@
     "task_key": "not_null_zzz_game_details_visitor_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_visitor --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_game_details_visitor,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -229,14 +229,14 @@
     "task_key": "accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:accepted_values --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -244,14 +244,14 @@
     "task_key": "not_null_zzz_game_details_home_score_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_home_score --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_game_details_home_score,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -259,14 +259,14 @@
     "task_key": "not_null_zzz_game_details_visitor_score_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_visitor_score --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_game_details_visitor_score,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -274,14 +274,14 @@
     "task_key": "not_null_zzz_game_details_winner_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_winner --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_game_details_winner,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -289,14 +289,14 @@
     "task_key": "accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:accepted_values --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -304,14 +304,14 @@
     "task_key": "not_null_zzz_game_details_date_test",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
+        "task_key": "zzz_game_details_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_game_details_date --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_game_details_date,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -319,14 +319,14 @@
     "task_key": "unique_first_dbt_model_id_test",
     "depends_on": [
       {
-        "task_key": "first_dbt_model_run"
+        "task_key": "first_dbt_model_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select unique_first_dbt_model_id --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model2.unique_first_dbt_model_id,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:unique --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -334,14 +334,14 @@
     "task_key": "not_null_first_dbt_model_id_test",
     "depends_on": [
       {
-        "task_key": "first_dbt_model_run"
+        "task_key": "first_dbt_model_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_first_dbt_model_id --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model2.not_null_first_dbt_model_id,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -349,14 +349,14 @@
     "task_key": "unique_second_dbt_model_id_test",
     "depends_on": [
       {
-        "task_key": "second_dbt_model_run"
+        "task_key": "second_dbt_model_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select unique_second_dbt_model_id --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model2.unique_second_dbt_model_id,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:unique --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -364,14 +364,14 @@
     "task_key": "not_null_second_dbt_model_id_test",
     "depends_on": [
       {
-        "task_key": "second_dbt_model_run"
+        "task_key": "second_dbt_model_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_second_dbt_model_id --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model2.not_null_second_dbt_model_id,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -379,19 +379,19 @@
     "task_key": "not_null_second_dbt_model_amount_usd_test",
     "depends_on": [
       {
-        "task_key": "second_dbt_model_run"
+        "task_key": "second_dbt_model_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_second_dbt_model_amount_usd --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model2.not_null_second_dbt_model_amount_usd,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
   {
-    "task_key": "changed_country_run",
+    "task_key": "changed_country_model",
     "depends_on": [
       {
         "task_key": "country_snapshot_snapshot"
@@ -401,12 +401,12 @@
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt run --select changed_country --target dev\"]"
+        "dbt_commands": "[\"dbt run --select fqn:dbt_demo.sql_model1.changed_country,package:dbt_demo,file:changed_country.sql,resource_type:model --target dev\"]"
       }
     }
   },
   {
-    "task_key": "country_run",
+    "task_key": "country_model",
     "depends_on": [
       {
         "task_key": "country_codes_seed"
@@ -416,7 +416,7 @@
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt run --select country --target dev\"]"
+        "dbt_commands": "[\"dbt run --select fqn:dbt_demo.sql_model1.country,package:dbt_demo,file:country.sql,resource_type:model --target dev\"]"
       }
     }
   },
@@ -424,68 +424,68 @@
     "task_key": "country_snapshot_snapshot",
     "depends_on": [
       {
-        "task_key": "country_run"
+        "task_key": "country_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt snapshot --select country_snapshot --target dev\"]"
+        "dbt_commands": "[\"dbt snapshot --select fqn:dbt_demo.country_snapshot.country_snapshot,package:dbt_demo,file:country_snapshot.sql,resource_type:snapshot --target dev\"]"
       }
     }
   },
   {
-    "task_key": "zzz_win_loss_records_run",
+    "task_key": "zzz_win_loss_records_model",
     "depends_on": [
       {
-        "task_key": "zzz_game_details_run"
-      },
-      {
-        "task_key": "zzz_game_details_check_scores_test"
-      },
-      {
-        "task_key": "zzz_game_details_check_dates_test"
-      },
-      {
-        "task_key": "unique_zzz_game_details_game_id_test"
-      },
-      {
-        "task_key": "not_null_zzz_game_details_game_id_test"
-      },
-      {
-        "task_key": "not_null_zzz_game_details_home_test"
+        "task_key": "zzz_game_details_model"
       },
       {
         "task_key": "accepted_values_zzz_game_details_home__Amsterdam__San_Francisco__Seattle_test"
       },
       {
-        "task_key": "not_null_zzz_game_details_visitor_test"
-      },
-      {
         "task_key": "accepted_values_zzz_game_details_visitor__Amsterdam__San_Francisco__Seattle_test"
-      },
-      {
-        "task_key": "not_null_zzz_game_details_home_score_test"
-      },
-      {
-        "task_key": "not_null_zzz_game_details_visitor_score_test"
-      },
-      {
-        "task_key": "not_null_zzz_game_details_winner_test"
       },
       {
         "task_key": "accepted_values_zzz_game_details_winner__Amsterdam__San_Francisco__Seattle_test"
       },
       {
         "task_key": "not_null_zzz_game_details_date_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_game_id_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_home_score_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_home_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_visitor_score_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_visitor_test"
+      },
+      {
+        "task_key": "not_null_zzz_game_details_winner_test"
+      },
+      {
+        "task_key": "unique_zzz_game_details_game_id_test"
+      },
+      {
+        "task_key": "zzz_game_details_check_dates_test"
+      },
+      {
+        "task_key": "zzz_game_details_check_scores_test"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt run --select zzz_win_loss_records --target dev\"]"
+        "dbt_commands": "[\"dbt run --select fqn:dbt_demo.sql_model1.zzz_win_loss_records,package:dbt_demo,file:zzz_win_loss_records.sql,resource_type:model --target dev\"]"
       }
     }
   },
@@ -493,14 +493,14 @@
     "task_key": "unique_zzz_win_loss_records_team_test",
     "depends_on": [
       {
-        "task_key": "zzz_win_loss_records_run"
+        "task_key": "zzz_win_loss_records_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select unique_zzz_win_loss_records_team --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.unique_zzz_win_loss_records_team,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:unique --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -508,14 +508,14 @@
     "task_key": "not_null_zzz_win_loss_records_team_test",
     "depends_on": [
       {
-        "task_key": "zzz_win_loss_records_run"
+        "task_key": "zzz_win_loss_records_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_win_loss_records_team --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_win_loss_records_team,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -523,14 +523,14 @@
     "task_key": "not_null_zzz_win_loss_records_wins_test",
     "depends_on": [
       {
-        "task_key": "zzz_win_loss_records_run"
+        "task_key": "zzz_win_loss_records_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_win_loss_records_wins --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_win_loss_records_wins,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
       }
     }
   },
@@ -538,14 +538,29 @@
     "task_key": "not_null_zzz_win_loss_records_losses_test",
     "depends_on": [
       {
-        "task_key": "zzz_win_loss_records_run"
+        "task_key": "zzz_win_loss_records_model"
       }
     ],
     "environment_key": "Default",
     "notebook_task": {
       "notebook_path": "./notebooks/dbt_runner.py",
       "base_parameters": {
-        "dbt_commands": "[\"dbt test --select not_null_zzz_win_loss_records_losses --target dev\"]"
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.not_null_zzz_win_loss_records_losses,package:dbt_demo,file:schemas.yml,resource_type:test,test_name:not_null --target dev --indirect-selection empty\"]"
+      }
+    }
+  },
+  {
+    "task_key": "unit_test_dbt_demo_diamonds_list_colors_test_get_distinct_colors",
+    "depends_on": [
+      {
+        "task_key": "diamonds_list_colors_model"
+      }
+    ],
+    "environment_key": "Default",
+    "notebook_task": {
+      "notebook_path": "./notebooks/dbt_runner.py",
+      "base_parameters": {
+        "dbt_commands": "[\"dbt test --select fqn:dbt_demo.models.sql_model1.diamonds_list_colors.test_get_distinct_colors,package:dbt_demo,file:test_get_distinct_colors.yml,resource_type:unit_test --target dev --indirect-selection empty\"]"
       }
     }
   }

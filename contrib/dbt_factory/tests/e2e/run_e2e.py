@@ -9,11 +9,11 @@ is the check that a change to the factory won't break real dbt execution.
 Run it with ``make test-e2e`` from the example root. Required environment:
 
     DATABRICKS_CONFIG_PROFILE   CLI profile for your workspace (auth + host).
-    DBX_E2E_HTTP_PATH           SQL warehouse HTTP path, e.g. /sql/1.0/warehouses/<id>.
-    DBX_E2E_CATALOG             Catalog to create the throwaway schema + tables in (write access).
+    DBT_FACTORY_HTTP_PATH           SQL warehouse HTTP path, e.g. /sql/1.0/warehouses/<id>.
+    DBT_FACTORY_CATALOG             Catalog to create the throwaway schema + tables in (write access).
 
 Optional:
-    DBX_E2E_SCHEMA_PREFIX       Schema-name prefix (default: dbt_factory_e2e). A unique
+    DBT_FACTORY_SCHEMA_PREFIX       Schema-name prefix (default: dbt_factory_e2e). A unique
                                 <prefix>_<timestamp> schema is created and dropped per run.
 
 Nothing is left behind: the run destroys its bundle and drops its schema, pass or fail.
@@ -48,10 +48,10 @@ EXPECTED_TABLES = {
 class Config:
     def __init__(self) -> None:
         self.profile = _require("DATABRICKS_CONFIG_PROFILE")
-        self.http_path = _require("DBX_E2E_HTTP_PATH")
-        self.catalog = _require("DBX_E2E_CATALOG")
+        self.http_path = _require("DBT_FACTORY_HTTP_PATH")
+        self.catalog = _require("DBT_FACTORY_CATALOG")
         self.warehouse_id = self.http_path.rstrip("/").split("/")[-1]
-        self.prefix = os.environ.get("DBX_E2E_SCHEMA_PREFIX", "dbt_factory_e2e")
+        self.prefix = os.environ.get("DBT_FACTORY_SCHEMA_PREFIX", "dbt_factory_e2e")
 
 
 def _require(name: str) -> str:

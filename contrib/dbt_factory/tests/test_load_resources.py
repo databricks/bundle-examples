@@ -15,7 +15,7 @@ import yaml
 from databricks.bundles.core import Bundle
 
 import resources
-from databricks_dbt_factory.Utils import generate_task_key
+from databricks_dbt_factory.utils import generate_task_key
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 

@@ -1,6 +1,6 @@
 # dbt-factory template
 
-A [Databricks Asset Bundle](https://docs.databricks.com/dev-tools/bundles/index.html) template
+A [Declarative Automation Bundles](https://docs.databricks.com/dev-tools/bundles/index.html) template
 that generates a [dbt](https://docs.getdbt.com/) project whose Databricks Workflow is built
 **from the dbt manifest at deploy time** — one Databricks task per dbt object (model, seed,
 snapshot, test), running on serverless compute.

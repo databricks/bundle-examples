@@ -1,8 +1,8 @@
 import pytest
 
-from databricks_dbt_factory.DbtFactory import DbtFactory
-from databricks_dbt_factory.DbtTask import DbtTaskOptions
-from databricks_dbt_factory.TaskFactory import (
+from databricks_dbt_factory.dbt_factory import DbtFactory
+from databricks_dbt_factory.dbt_task import DbtTaskOptions
+from databricks_dbt_factory.task_factory import (
     ModelTaskFactory,
     SnapshotTaskFactory,
     SeedTaskFactory,

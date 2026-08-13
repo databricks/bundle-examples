@@ -14,7 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from conftest import create_dbt_factory  # noqa: E402
-from databricks_dbt_factory.Utils import read_dbt_manifest  # noqa: E402
+from databricks_dbt_factory.utils import read_dbt_manifest  # noqa: E402
 
 TEST_DATA = Path(__file__).resolve().parent / "test_data"
 

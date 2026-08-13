@@ -2,8 +2,8 @@ import shlex
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 
-from databricks_dbt_factory.DbtTask import DbtTask, DbtTaskOptions
-from databricks_dbt_factory.Utils import DYNAMIC_VALUE_REFERENCE
+from databricks_dbt_factory.dbt_task import DbtTask, DbtTaskOptions
+from databricks_dbt_factory.utils import DYNAMIC_VALUE_REFERENCE
 
 
 _RESERVED_DBT_SELECTION_OPTIONS = frozenset(

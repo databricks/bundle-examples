@@ -18,16 +18,16 @@ import yaml
 from databricks.bundles.core import Bundle, Resources
 from databricks.bundles.jobs import Job
 
-from databricks_dbt_factory.DbtFactory import DbtFactory
-from databricks_dbt_factory.DbtTask import DbtTaskOptions, TaskType
-from databricks_dbt_factory.TaskFactory import (
+from databricks_dbt_factory.dbt_factory import DbtFactory
+from databricks_dbt_factory.dbt_task import DbtTaskOptions, TaskType
+from databricks_dbt_factory.task_factory import (
     DbtDependencyResolver,
     ModelTaskFactory,
     SnapshotTaskFactory,
     SeedTaskFactory,
     TestTaskFactory,
 )
-from databricks_dbt_factory.Utils import read_dbt_manifest
+from databricks_dbt_factory.utils import read_dbt_manifest
 
 # --- Configuration -------------------------------------------------------------------------
 

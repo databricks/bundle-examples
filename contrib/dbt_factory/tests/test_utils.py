@@ -1,4 +1,4 @@
-from databricks_dbt_factory.Utils import (
+from databricks_dbt_factory.utils import (
     MAX_TASK_KEY_LENGTH,
     build_task_key_maps,
     bundled_test_key,

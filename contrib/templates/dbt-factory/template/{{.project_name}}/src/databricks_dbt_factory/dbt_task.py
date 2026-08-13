@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from databricks_dbt_factory.Utils import DYNAMIC_VALUE_REFERENCE
+from databricks_dbt_factory.utils import DYNAMIC_VALUE_REFERENCE
 
 
 _MAX_NOTEBOOK_BASE_PARAMETERS_BYTES = 1_000_000

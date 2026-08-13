@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from databricks_dbt_factory.Utils import read_dbt_manifest
+from databricks_dbt_factory.utils import read_dbt_manifest
 
 BASE_PATH = str(Path(__file__).resolve().parent)
 

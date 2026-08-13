@@ -1,6 +1,6 @@
 import json
 
-from databricks_dbt_factory.DbtTask import DbtTask, DbtTaskOptions
+from databricks_dbt_factory.dbt_task import DbtTask, DbtTaskOptions
 
 
 def test_renders_serverless_notebook_task():

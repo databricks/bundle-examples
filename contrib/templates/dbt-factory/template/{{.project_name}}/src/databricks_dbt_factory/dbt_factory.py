@@ -4,9 +4,9 @@ from dataclasses import dataclass, field, replace
 from pathlib import PurePosixPath, PureWindowsPath
 from typing import cast
 
-from databricks_dbt_factory.DbtTask import DbtTask
-from databricks_dbt_factory.TaskFactory import TaskFactory, TestTaskFactory
-from databricks_dbt_factory.Utils import DYNAMIC_VALUE_REFERENCE, build_task_key_maps
+from databricks_dbt_factory.dbt_task import DbtTask
+from databricks_dbt_factory.task_factory import TaskFactory, TestTaskFactory
+from databricks_dbt_factory.utils import DYNAMIC_VALUE_REFERENCE, build_task_key_maps
 
 # The `unique_id` prefixes of resources a test can be attached to.
 _DBT_TEST_TARGET_PREFIXES = ("model.", "seed.", "snapshot.", "source.")

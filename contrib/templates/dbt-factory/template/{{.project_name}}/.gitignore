@@ -3,7 +3,10 @@ __pycache__/
 *.pyc
 .databricks/
 logs/
-dbt_packages/
+# Ignore installed dbt packages but keep the directory (via .gitkeep) so the
+# `dbt_packages/**` sync.include in databricks.yml always matches at least one file.
+dbt_packages/*
+!dbt_packages/.gitkeep
 dbt_profiles/.user.yml
 uv.lock
 

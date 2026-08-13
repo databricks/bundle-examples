@@ -10,8 +10,8 @@ It does this by combining two pieces:
   library that reads a dbt `manifest.json` and expands it into Databricks job tasks, wiring up
   the dependencies between them. Its source is included under `src/databricks_dbt_factory/`
   (see [`NOTICE`](NOTICE) for attribution and license).
-* **[PyDABs](https://docs.databricks.com/dev-tools/bundles/python)** — the Databricks Asset
-  Bundle Python resources hook. At `databricks bundle deploy` time the Databricks CLI calls
+* **[PyDABs](https://docs.databricks.com/dev-tools/bundles/python)** — the Declarative Automation
+  Bundles Python resources hook. At `databricks bundle deploy` time the Databricks CLI calls
   `load_resources` in [`resources/__init__.py`](resources/__init__.py), which runs the factory
   against the manifest and returns the generated job.
 

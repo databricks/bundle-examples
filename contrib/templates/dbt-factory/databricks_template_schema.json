@@ -1,5 +1,5 @@
 {
-    "welcome_message": "\nWelcome to the dbt-factory template for Databricks Asset Bundles!\nThis generates a dbt project whose Databricks Workflow is built from the dbt manifest at deploy time — one task per dbt object (model, seed, snapshot, test), on serverless.",
+    "welcome_message": "\nWelcome to the dbt-factory template for Declarative Automation Bundles!\nThis generates a dbt project whose Databricks Workflow is built from the dbt manifest at deploy time — one task per dbt object (model, seed, snapshot, test), on serverless.",
     "properties": {
         "project_name": {
             "type": "string",

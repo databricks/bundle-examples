@@ -5,8 +5,11 @@ setup:
 	uv sync --dev
 
 # Install dbt package dependencies declared in packages.yml / dependencies.yml (if any).
+# `dbt deps` empties dbt_packages/, so restore the .gitkeep afterwards; it keeps the directory
+# present so the `dbt_packages/**` sync.include in databricks.yml always matches at least one file.
 deps:
 	uv run dbt deps
+	touch dbt_packages/.gitkeep
 
 # Regenerate the dbt manifest that resources/__init__.py reads at deploy time.
 # `dbt parse` does not connect to a warehouse; it only reads the project files.

@@ -1,0 +1,5 @@
+# Ruff can't discover the line-length from the generated project's pyproject.toml.tmpl, so this
+# config makes the repo's root `ruff format --check` use the same line-length=120 for the template
+# sources as the pyproject.toml.tmpl does for a generated project. It lives outside
+# {{.project_name}}/ so it is never stamped into a generated project.
+line-length = 120

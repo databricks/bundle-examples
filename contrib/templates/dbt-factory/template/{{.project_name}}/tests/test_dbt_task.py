@@ -28,9 +28,7 @@ def test_renders_serverless_notebook_task():
     assert notebook_task["notebook_path"] == "./notebooks/dbt_runner.py"
     assert notebook_task["base_parameters"]["project_directory"] == "/project"
     assert notebook_task["base_parameters"]["profiles_directory"] == "/profiles"
-    assert json.loads(notebook_task["base_parameters"]["dbt_commands"]) == [
-        "dbt run --select my_model --target dev"
-    ]
+    assert json.loads(notebook_task["base_parameters"]["dbt_commands"]) == ["dbt run --select my_model --target dev"]
 
 
 def test_defaults_and_optional_directories_are_omitted():

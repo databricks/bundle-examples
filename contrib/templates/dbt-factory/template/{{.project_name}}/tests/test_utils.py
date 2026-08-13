@@ -17,15 +17,9 @@ def test_versioned_model_keeps_version():
 
 
 def test_test_key_drops_package_and_hash():
-    assert (
-        generate_task_key("test.shop.unique_orders_id.9a1b2c3d4e")
-        == "unique_orders_id_test"
-    )
+    assert generate_task_key("test.shop.unique_orders_id.9a1b2c3d4e") == "unique_orders_id_test"
     # singular test (no trailing hash segment)
-    assert (
-        generate_task_key("test.shop.assert_positive_amount")
-        == "assert_positive_amount_test"
-    )
+    assert generate_task_key("test.shop.assert_positive_amount") == "assert_positive_amount_test"
 
 
 def test_source_key():
@@ -42,15 +36,11 @@ def test_long_test_key_is_truncated_and_hash_disambiguated():
     long_name = "accepted_values_" + "x" * 200
     key = generate_task_key(f"test.shop.{long_name}.9a1b2c3d4e")
     assert len(key) <= MAX_TASK_KEY_LENGTH
-    assert key.endswith(
-        "_9a1b2c3d4e_test"
-    )  # hash re-added so truncated names stay unique
+    assert key.endswith("_9a1b2c3d4e_test")  # hash re-added so truncated names stay unique
 
 
 def test_key_maps_keep_plain_keys_when_unique():
-    task_keys, bundled = build_task_key_maps(
-        ["model.shop.orders", "test.shop.unique_orders_id.9a1b2c3d4e"]
-    )
+    task_keys, bundled = build_task_key_maps(["model.shop.orders", "test.shop.unique_orders_id.9a1b2c3d4e"])
     assert task_keys == {
         "model.shop.orders": "orders_model",
         "test.shop.unique_orders_id.9a1b2c3d4e": "unique_orders_id_test",
@@ -60,9 +50,7 @@ def test_key_maps_keep_plain_keys_when_unique():
 
 def test_key_maps_disambiguate_same_named_tests_with_dbt_hash():
     # The same custom test name on two models: dbt keeps them apart only via the unique_id hash.
-    task_keys, _ = build_task_key_maps(
-        ["test.shop.dup_check.6ea6b2ac82", "test.shop.dup_check.a9ab3a6e12"]
-    )
+    task_keys, _ = build_task_key_maps(["test.shop.dup_check.6ea6b2ac82", "test.shop.dup_check.a9ab3a6e12"])
     assert task_keys["test.shop.dup_check.6ea6b2ac82"] == "dup_check_6ea6b2ac82_test"
     assert task_keys["test.shop.dup_check.a9ab3a6e12"] == "dup_check_a9ab3a6e12_test"
 
@@ -70,20 +58,13 @@ def test_key_maps_disambiguate_same_named_tests_with_dbt_hash():
 def test_key_maps_disambiguate_singular_vs_custom_named_test():
     # A singular test file and a custom-named generic test can share a name; the singular test
     # has no hash, so it gets the package folded in instead.
-    task_keys, _ = build_task_key_maps(
-        ["test.shop.raw_customers", "test.shop.raw_customers.e58cc24de2"]
-    )
+    task_keys, _ = build_task_key_maps(["test.shop.raw_customers", "test.shop.raw_customers.e58cc24de2"])
     assert task_keys["test.shop.raw_customers"] == "shop_raw_customers_test"
-    assert (
-        task_keys["test.shop.raw_customers.e58cc24de2"]
-        == "raw_customers_e58cc24de2_test"
-    )
+    assert task_keys["test.shop.raw_customers.e58cc24de2"] == "raw_customers_e58cc24de2_test"
 
 
 def test_key_maps_disambiguate_cross_package_models_with_package_name():
-    task_keys, _ = build_task_key_maps(
-        ["model.shop.a", "model.subpkg.a", "model.shop.b"]
-    )
+    task_keys, _ = build_task_key_maps(["model.shop.a", "model.subpkg.a", "model.shop.b"])
     assert task_keys["model.shop.a"] == "shop_a_model"
     assert task_keys["model.subpkg.a"] == "subpkg_a_model"
     assert task_keys["model.shop.b"] == "b_model"

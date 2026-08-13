@@ -49,9 +49,7 @@ def _split_unique_id(unique_id: str) -> list[str]:
     parts = unique_id.split(".")
     minimum = _MIN_SEGMENTS.get(parts[0])
     if minimum is not None and len(parts) < minimum:
-        raise ValueError(
-            f"Malformed dbt node id {unique_id!r}: expected at least {minimum} dot-separated segments."
-        )
+        raise ValueError(f"Malformed dbt node id {unique_id!r}: expected at least {minimum} dot-separated segments.")
     return parts
 
 
@@ -137,9 +135,7 @@ def build_task_key_maps(
     # adding or renaming an unrelated model could then silently swap two task keys, repointing
     # per-task run history and task-level alerts at a different model. Sorting makes every
     # assigned key a function of the node ids alone.
-    ordered_claims = sorted(
-        (key, sorted(claimants)) for key, claimants in claims.items()
-    )
+    ordered_claims = sorted((key, sorted(claimants)) for key, claimants in claims.items())
     # Assign uncontested keys first so a contested claimant's fallback never steals a plain key.
     for key, claimants in ordered_claims:
         if len(claimants) == 1:
@@ -149,14 +145,8 @@ def build_task_key_maps(
         if len(claimants) == 1:
             continue
         for uid, is_bundled in claimants:
-            candidate = (
-                _disambiguated_bundled_test_key(uid)
-                if is_bundled
-                else _disambiguated_task_key(uid)
-            )
-            (bundled_test_keys if is_bundled else task_keys)[uid] = _reserve(
-                candidate, taken
-            )
+            candidate = _disambiguated_bundled_test_key(uid) if is_bundled else _disambiguated_task_key(uid)
+            (bundled_test_keys if is_bundled else task_keys)[uid] = _reserve(candidate, taken)
     return task_keys, bundled_test_keys
 
 
@@ -259,11 +249,7 @@ def read_dbt_manifest(path: str) -> dict:
     except FileNotFoundError as e:
         raise FileNotFoundError(f"Manifest file not found: {path}. Details: {e}") from e
     except json.JSONDecodeError as e:
-        raise ValueError(
-            f"Error parsing JSON from manifest file: {path}. Details: {e}"
-        ) from e
+        raise ValueError(f"Error parsing JSON from manifest file: {path}. Details: {e}") from e
     if not isinstance(manifest, dict):
-        raise ValueError(
-            f"Manifest file {path} must contain a JSON object, got {type(manifest).__name__}."
-        )
+        raise ValueError(f"Manifest file {path} must contain a JSON object, got {type(manifest).__name__}.")
     return manifest

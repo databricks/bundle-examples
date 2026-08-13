@@ -221,18 +221,12 @@ class DbtFactory:
         # The `fqn:` prefix does *not* neutralise graph operators: `fqn:probe.orders+1` still selects
         # `orders` and its children, verified with `dbt ls` on dbt 1.12.0. The boundary check therefore
         # applies to the joined value; naming the method only bypasses the dispatch heuristic.
-        if (
-            fqn
-            and cls._is_usable_selector(".".join(fqn))
-            and all(cls._is_usable_component(part) for part in fqn)
-        ):
+        if fqn and cls._is_usable_selector(".".join(fqn)) and all(cls._is_usable_component(part) for part in fqn):
             # `fqn:` names the method explicitly so `/` and `.sql` remain literal fqn text instead of
             # dispatching to path or file matching. `fqn:probe.orders.sql` and
             # `fqn:probe.check/slash` each resolve to exactly their node on dbt 1.12.0.
             terms.append(f"fqn:{'.'.join(fqn)}")
-        elif cls._is_usable_component(
-            name := node_info.get("name") or ""
-        ) and cls._is_usable_selector(name):
+        elif cls._is_usable_component(name := node_info.get("name") or "") and cls._is_usable_selector(name):
             # The fqn is unusable, so fall back to the bare resource name, which dbt matches against
             # the fqn's leaf. It is the only term that tells apart two nodes sharing a package, a
             # file and a test type — two `not_null` tests in one `schema.yml`, say. Not used *with* a
@@ -327,9 +321,7 @@ class DbtFactory:
         parent_info = peers[parent_id]
         parent_select = cls._node_select(
             parent_info,
-            source_info=parent_info
-            if parent_info.get("resource_type") == "source"
-            else None,
+            source_info=parent_info if parent_info.get("resource_type") == "source" else None,
             peers=peers,
         )
         scoped_select = f"{parent_select},{select}"
@@ -367,8 +359,7 @@ class DbtFactory:
         return {
             full_name
             for full_name, info in peers.items()
-            if info.get("resource_type") in {"test", "unit_test"}
-            and cls._test_parent_ids(info) & parent_ids
+            if info.get("resource_type") in {"test", "unit_test"} and cls._test_parent_ids(info) & parent_ids
         }
 
     @classmethod
@@ -456,9 +447,7 @@ class DbtFactory:
         select = f"source:{package}.{source_name}.{table}"
         cls._assert_no_dynamic_reference(select, source_info)
         parts = (package, source_name, table)
-        if not all(
-            cls._is_usable_component(part) and "." not in part for part in parts
-        ):
+        if not all(cls._is_usable_component(part) and "." not in part for part in parts):
             raise cls._unaddressable(source_info)
         if not cls._is_usable_selector(select):
             raise cls._unaddressable(source_info)
@@ -487,10 +476,7 @@ class DbtFactory:
         the command. The check applies after selector components are joined so references spanning
         components are also rejected.
         """
-        return (
-            not value.rstrip("0123456789").endswith("+")
-            and DYNAMIC_VALUE_REFERENCE.search(value) is None
-        )
+        return not value.rstrip("0123456789").endswith("+") and DYNAMIC_VALUE_REFERENCE.search(value) is None
 
     @staticmethod
     def _flat_fqn(fqn: list[str]) -> list[str]:
@@ -528,13 +514,8 @@ class DbtFactory:
         # the field alone takes dbt's versioned branch for unit tests and so skips its plain
         # `fqn[-1] == term` match, making the mirror stricter than dbt and hiding a real collision on
         # such a node's bare-name selector.
-        is_versioned = (
-            node_info.get("resource_type") == "model"
-            and node_info.get("version") is not None
-        )
-        return cls._is_selected_node(fqn, term, is_versioned) or cls._is_selected_node(
-            fqn[1:], term, is_versioned
-        )
+        is_versioned = node_info.get("resource_type") == "model" and node_info.get("version") is not None
+        return cls._is_selected_node(fqn, term, is_versioned) or cls._is_selected_node(fqn[1:], term, is_versioned)
 
     @classmethod
     def _is_selected_node(cls, fqn: list[str], term: str, is_versioned: bool) -> bool:
@@ -553,9 +534,7 @@ class DbtFactory:
         return True
 
     @staticmethod
-    def _matches_fqn_leaf(
-        fqn: list[str], term: str, selector_parts: list[str], is_versioned: bool
-    ) -> bool:
+    def _matches_fqn_leaf(fqn: list[str], term: str, selector_parts: list[str], is_versioned: bool) -> bool:
         """
         Whether `term` matches the fqn's leaf, dbt's shortcut before the positional walk.
 
@@ -593,9 +572,7 @@ class DbtFactory:
             # matches a node declared in `a.yml.yml`. Mirroring only the name would let that collision
             # past `_assert_exact` — confirmed with `dbt ls` on dbt 1.12.0, where the `a.yml` task's
             # selector resolves to the `a.yml.yml` test as well.
-            for base in _candidate_file_names(
-                node_info.get("original_file_path") or ""
-            ):
+            for base in _candidate_file_names(node_info.get("original_file_path") or ""):
                 if value in (base, base.rsplit(".", 1)[0] if "." in base else base):
                     return True
             return False
@@ -626,11 +603,7 @@ class DbtFactory:
         still works, for the unit tests and library callers that pass one.
         """
         terms = select.split(",")
-        scan = (
-            candidates.narrow(terms)
-            if isinstance(candidates, _SelectorIndex)
-            else candidates
-        )
+        scan = candidates.narrow(terms) if isinstance(candidates, _SelectorIndex) else candidates
         matched: list[str] = []
         for full_name, info in scan.items():
             if all(cls._term_matches(term, info) for term in terms):
@@ -669,9 +642,7 @@ class DbtFactory:
         )
 
     @staticmethod
-    def _selects_nothing(
-        node_info: dict, select: str, missing: list[str]
-    ) -> ValueError:
+    def _selects_nothing(node_info: dict, select: str, missing: list[str]) -> ValueError:
         """
         Builds the error raised when a selector fails to reach what the task is meant to run.
 
@@ -729,9 +700,7 @@ class DbtFactory:
         bundled_tests: dict[str, list[tuple[str, dict]]] = {}
         standalone_tests: list[tuple[str, dict]] = []
         if bundle:
-            bundled_tests, standalone_tests = self._classify_tests(
-                dbt_nodes, dbt_sources, dbt_unit_tests
-            )
+            bundled_tests, standalone_tests = self._classify_tests(dbt_nodes, dbt_sources, dbt_unit_tests)
         standalone_test_ids = {full_name for full_name, _ in standalone_tests}
 
         # Unit tests live under the manifest `unit_tests` key, not `nodes`. In per-test mode each
@@ -748,23 +717,15 @@ class DbtFactory:
             if self._node_gets_own_task(full_name, info, bundle, standalone_test_ids):
                 task_ids.append(full_name)
         task_ids += unit_test_ids
-        task_keys, bundled_test_keys = build_task_key_maps(
-            task_ids, sorted(bundled_tests)
-        )
+        task_keys, bundled_test_keys = build_task_key_maps(task_ids, sorted(bundled_tests))
 
         gating = _Gating()
         if not bundle and "test" in self.task_factories:
-            indexed_tests = self._index_tests_by_resource(
-                dbt_nodes, dbt_sources, dbt_unit_tests, task_keys
-            )
+            indexed_tests = self._index_tests_by_resource(dbt_nodes, dbt_sources, dbt_unit_tests, task_keys)
             gating = _Gating(
                 tests=indexed_tests,
-                ancestors=self._compute_ancestors(dbt_nodes, dbt_sources)
-                if indexed_tests
-                else {},
-                resources_by_task_key={
-                    task_key: full_name for full_name, task_key in task_keys.items()
-                },
+                ancestors=self._compute_ancestors(dbt_nodes, dbt_sources) if indexed_tests else {},
+                resources_by_task_key={task_key: full_name for full_name, task_key in task_keys.items()},
             )
 
         tasks = self._build_resource_tasks(
@@ -787,9 +748,7 @@ class DbtFactory:
                     peers,
                 )
             )
-            tasks.extend(
-                self._build_standalone_test_tasks(standalone_tests, task_keys, peers)
-            )
+            tasks.extend(self._build_standalone_test_tasks(standalone_tests, task_keys, peers))
         elif "test" in self.task_factories:
             tasks.extend(self._build_unit_test_tasks(dbt_unit_tests, task_keys, peers))
 
@@ -814,13 +773,7 @@ class DbtFactory:
             if (info.get("config") or {}).get("enabled") is not False
         }
 
-    def _node_gets_own_task(
-        self,
-        full_name: str,
-        node_info: dict,
-        bundle: bool,
-        standalone_test_ids: set[str],
-    ) -> bool:
+    def _node_gets_own_task(self, full_name: str, node_info: dict, bundle: bool, standalone_test_ids: set[str]) -> bool:
         """
         Whether a `dbt_nodes` entry becomes its own task (and so receives a task key). True for any
         resource type with a factory, except single-resource test nodes in bundle mode — those fold
@@ -834,9 +787,7 @@ class DbtFactory:
             return False
         return True
 
-    def _emitted_unit_test_ids(
-        self, dbt_unit_tests: dict, dbt_nodes: dict
-    ) -> list[str]:
+    def _emitted_unit_test_ids(self, dbt_unit_tests: dict, dbt_nodes: dict) -> list[str]:
         """
         Full names of the unit tests that become their own task in per-test mode: those whose
         target model resolves and is present in the manifest. This is the emission decision for
@@ -852,9 +803,7 @@ class DbtFactory:
                 emitted.append(full_name)
         return emitted
 
-    def _compute_ancestors(
-        self, dbt_nodes: dict, dbt_sources: dict
-    ) -> dict[str, set[str]]:
+    def _compute_ancestors(self, dbt_nodes: dict, dbt_sources: dict) -> dict[str, set[str]]:
         """
         Maps each testable resource's full name to the set of resources it transitively depends
         on (not including itself). Used in per-test mode to decide whether a test can safely
@@ -868,21 +817,16 @@ class DbtFactory:
         dependents: dict[str, list[str]] = {full_name: [] for full_name in resources}
         for full_name, info in resources.items():
             direct_dependencies = {
-                dependency
-                for dependency in info.get("depends_on", {}).get("nodes", [])
-                if dependency in resources
+                dependency for dependency in info.get("depends_on", {}).get("nodes", []) if dependency in resources
             }
             dependencies[full_name] = direct_dependencies
             for dependency in direct_dependencies:
                 dependents[dependency].append(full_name)
 
         unresolved_counts = {
-            full_name: len(direct_dependencies)
-            for full_name, direct_dependencies in dependencies.items()
+            full_name: len(direct_dependencies) for full_name, direct_dependencies in dependencies.items()
         }
-        ready = [
-            full_name for full_name, count in unresolved_counts.items() if count == 0
-        ]
+        ready = [full_name for full_name, count in unresolved_counts.items() if count == 0]
         heapq.heapify(ready)
         ancestors: dict[str, set[str]] = {}
         while ready:
@@ -899,9 +843,7 @@ class DbtFactory:
                     heapq.heappush(ready, dependent)
 
         if len(ancestors) != len(resources):
-            unresolved = {
-                full_name for full_name, count in unresolved_counts.items() if count > 0
-            }
+            unresolved = {full_name for full_name, count in unresolved_counts.items() if count > 0}
             cycle = self._dependency_cycle(dependencies, unresolved)
             raise ValueError(
                 f"Cannot compute test gates because the manifest contains the dependency cycle "
@@ -910,9 +852,7 @@ class DbtFactory:
         return ancestors
 
     @staticmethod
-    def _dependency_cycle(
-        dependencies: dict[str, set[str]], candidates: set[str]
-    ) -> list[str]:
+    def _dependency_cycle(dependencies: dict[str, set[str]], candidates: set[str]) -> list[str]:
         """Returns one deterministic cycle from a graph that could not be topologically ordered."""
         active = 1
         complete = 2
@@ -924,9 +864,7 @@ class DbtFactory:
             path = [start]
             positions = {start: 0}
             state[start] = active
-            stack: list[tuple[str, Iterator[str]]] = [
-                (start, iter(sorted(dependencies[start] & candidates)))
-            ]
+            stack: list[tuple[str, Iterator[str]]] = [(start, iter(sorted(dependencies[start] & candidates)))]
             while stack:
                 full_name, direct_dependencies = stack[-1]
                 try:
@@ -943,25 +881,14 @@ class DbtFactory:
                     positions[dependency] = len(path)
                     path.append(dependency)
                     state[dependency] = active
-                    stack.append(
-                        (
-                            dependency,
-                            iter(sorted(dependencies[dependency] & candidates)),
-                        )
-                    )
+                    stack.append((dependency, iter(sorted(dependencies[dependency] & candidates))))
                 elif dependency_state == active:
                     return path[positions[dependency] :] + [dependency]
 
-        raise RuntimeError(
-            "A non-topological dependency graph did not contain a cycle."
-        )
+        raise RuntimeError("A non-topological dependency graph did not contain a cycle.")
 
     def _index_tests_by_resource(
-        self,
-        dbt_nodes: dict,
-        dbt_sources: dict,
-        dbt_unit_tests: dict,
-        task_keys: dict[str, str],
+        self, dbt_nodes: dict, dbt_sources: dict, dbt_unit_tests: dict, task_keys: dict[str, str]
     ) -> dict[str, list[tuple[str, frozenset[str]]]]:
         """
         Maps each testable resource's full name to a list of (test_task_key, test_refs) pairs
@@ -982,19 +909,11 @@ class DbtFactory:
             if node_info["resource_type"] != "test":
                 continue
             if node_full_name in task_keys:
-                self._index_test(
-                    index, task_keys[node_full_name], node_info, dbt_nodes, dbt_sources
-                )
+                self._index_test(index, task_keys[node_full_name], node_info, dbt_nodes, dbt_sources)
 
         for unit_test_full_name, unit_test_info in dbt_unit_tests.items():
             if unit_test_full_name in task_keys:
-                self._index_test(
-                    index,
-                    task_keys[unit_test_full_name],
-                    unit_test_info,
-                    dbt_nodes,
-                    dbt_sources,
-                )
+                self._index_test(index, task_keys[unit_test_full_name], unit_test_info, dbt_nodes, dbt_sources)
         return index
 
     def _index_test(
@@ -1010,15 +929,11 @@ class DbtFactory:
         for resource_full in refs:
             index.setdefault(resource_full, []).append((test_task_key, refs))
 
-    def _testable_refs(
-        self, test_info: dict, dbt_nodes: dict, dbt_sources: dict
-    ) -> frozenset[str]:
+    def _testable_refs(self, test_info: dict, dbt_nodes: dict, dbt_sources: dict) -> frozenset[str]:
         """Returns the models/seeds/snapshots/sources a test references, as present in the manifest."""
         refs: set[str] = set()
         for dep in test_info.get("depends_on", {}).get("nodes", []):
-            if dep.startswith(self._DBT_TEST_TARGET_PREFIXES) and (
-                dep in dbt_nodes or dep in dbt_sources
-            ):
+            if dep.startswith(self._DBT_TEST_TARGET_PREFIXES) and (dep in dbt_nodes or dep in dbt_sources):
                 refs.add(dep)
         return frozenset(refs)
 
@@ -1117,18 +1032,14 @@ class DbtFactory:
             testable_deps = self._testable_refs(node_info, dbt_nodes, dbt_sources)
             if len(testable_deps) == 1:
                 resource_id = next(iter(testable_deps))
-                bundled_tests.setdefault(resource_id, []).append(
-                    (node_full_name, node_info)
-                )
+                bundled_tests.setdefault(resource_id, []).append((node_full_name, node_info))
             else:
                 standalone_tests.append((node_full_name, node_info))
 
         for unit_test_full_name, unit_test_info in dbt_unit_tests.items():
             model_full_name = self._unit_test_model(unit_test_info)
             if model_full_name is not None and model_full_name in dbt_nodes:
-                bundled_tests.setdefault(model_full_name, []).append(
-                    (unit_test_full_name, unit_test_info)
-                )
+                bundled_tests.setdefault(model_full_name, []).append((unit_test_full_name, unit_test_info))
         return bundled_tests, standalone_tests
 
     def _build_resource_tasks(
@@ -1142,9 +1053,7 @@ class DbtFactory:
     ) -> list[DbtTask]:
         """Builds tasks for every non-test resource, plus per-test tasks when not bundling."""
         # A tested resource resolves to its bundle; sources gain a scheduled key only through this map.
-        dependency_task_keys = (
-            {**task_keys, **bundled_test_keys} if bundle else task_keys
-        )
+        dependency_task_keys = {**task_keys, **bundled_test_keys} if bundle else task_keys
         tasks: list[DbtTask] = []
         for node_full_name, node_info in dbt_nodes.items():
             if node_full_name not in task_keys:
@@ -1189,9 +1098,7 @@ class DbtFactory:
         """Adds per-test-mode gates at the first downstream frontier."""
         if not gating.tests:
             return task
-        deps = self._extend_deps_with_upstream_tests(
-            node_full_name, task.depends_on, gating
-        )
+        deps = self._extend_deps_with_upstream_tests(node_full_name, task.depends_on, gating)
         return replace(task, depends_on=deps)
 
     def _build_bundled_test_tasks(
@@ -1224,9 +1131,7 @@ class DbtFactory:
             tasks.append(
                 test_factory.create_bundled_task(
                     task_key=bundled_test_keys[full_name],
-                    selects_by_indirect_selection=self._bundled_selects_by_mode(
-                        tests, peers
-                    ),
+                    selects_by_indirect_selection=self._bundled_selects_by_mode(tests, peers),
                     deps_command_name=info["name"],
                     depends_on=[] if is_source else [task_keys[full_name]],
                 )
@@ -1234,9 +1139,7 @@ class DbtFactory:
         return tasks
 
     @classmethod
-    def _bundled_selects_by_mode(
-        cls, tests: list[tuple[str, dict]], peers: dict
-    ) -> dict[str, list[str]]:
+    def _bundled_selects_by_mode(cls, tests: list[tuple[str, dict]], peers: dict) -> dict[str, list[str]]:
         """Builds and validates the deterministic selector groups for one test bundle."""
         selects_by_mode: dict[str, list[str]] = {}
         test_info_by_mode: dict[str, dict] = {}
@@ -1245,9 +1148,7 @@ class DbtFactory:
             selects_by_mode.setdefault(plan.indirect_selection, []).append(plan.select)
             test_info_by_mode.setdefault(plan.indirect_selection, test_info)
         for mode, selects in selects_by_mode.items():
-            cls._assert_no_dynamic_reference(
-                " ".join(sorted(selects)), test_info_by_mode[mode]
-            )
+            cls._assert_no_dynamic_reference(" ".join(sorted(selects)), test_info_by_mode[mode])
         return selects_by_mode
 
     def _build_standalone_test_tasks(
@@ -1263,9 +1164,7 @@ class DbtFactory:
         """
         test_factory = cast(TestTaskFactory, self.task_factories["test"])
         tasks: list[DbtTask] = []
-        for test_full_name, test_info in sorted(
-            standalone_tests, key=lambda item: item[0]
-        ):
+        for test_full_name, test_info in sorted(standalone_tests, key=lambda item: item[0]):
             test_task_key = task_keys[test_full_name]
             plan = self._test_selection_plan(test_info, peers)
             tasks.append(
@@ -1355,15 +1254,11 @@ class _SelectorIndex(dict):
 
     def _add(self, full_name: str, info: dict) -> None:
         """Files one node under every key a selector term could reach it by."""
-        self._by_package.setdefault(info.get("package_name") or "", {})[full_name] = (
-            info
-        )
+        self._by_package.setdefault(info.get("package_name") or "", {})[full_name] = info
         # A path containing a backslash has both POSIX and Windows interpretations. Index every possible
         # base name and stem so narrowing cannot hide a collision under either runtime path flavour.
         for base in _candidate_file_names(info.get("original_file_path") or ""):
-            for key in dict.fromkeys(
-                (base, base.rsplit(".", 1)[0] if "." in base else base)
-            ):
+            for key in dict.fromkeys((base, base.rsplit(".", 1)[0] if "." in base else base)):
                 self._by_file.setdefault(key, {})[full_name] = info
         test_name = (info.get("test_metadata") or {}).get("name") or ""
         if test_name:
@@ -1399,11 +1294,7 @@ class _SelectorIndex(dict):
         for candidate in (fqn, fqn[1:]):
             flat = _flatten_fqn(candidate)
             terms.update(".".join(flat[:length]) for length in range(1, len(flat) + 1))
-        if (
-            info.get("resource_type") == "model"
-            and info.get("version") is not None
-            and len(fqn) >= 2
-        ):
+        if info.get("resource_type") == "model" and info.get("version") is not None and len(fqn) >= 2:
             terms.add(fqn[-2])
         else:
             terms.add(fqn[-1])
@@ -1413,11 +1304,7 @@ class _SelectorIndex(dict):
     def _version_suffix(info: dict) -> str:
         """The suffix used by dbt's versioned-model leaf shortcut, if this node has one."""
         fqn = info.get("fqn") or []
-        if (
-            info.get("resource_type") == "model"
-            and info.get("version") is not None
-            and len(fqn) >= 2
-        ):
+        if info.get("resource_type") == "model" and info.get("version") is not None and len(fqn) >= 2:
             return "_".join(fqn[-2:])
         return ""
 

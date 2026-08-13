@@ -19,9 +19,7 @@ _RESERVED_DBT_SELECTION_OPTIONS = frozenset(
         "--exclude-resource-types",
     }
 )
-_RESERVED_DBT_PARSE_CONTEXT_OPTIONS = frozenset(
-    {"--vars", "--profile", "--profiles-dir", "--project-dir"}
-)
+_RESERVED_DBT_PARSE_CONTEXT_OPTIONS = frozenset({"--vars", "--profile", "--profiles-dir", "--project-dir"})
 _RESERVED_DBT_SHORT_SELECTION_OPTIONS = frozenset({"-s", "-m"})
 _RESERVED_DBT_SHORT_TARGET_OPTIONS = frozenset({"-t"})
 _DBT_SHORT_OPTIONS_WITH_ATTACHED_VALUES = frozenset({"-r", "-t"})
@@ -88,11 +86,7 @@ def _raise_parse_context_error(option: str, reject_target: bool) -> None:
     """Raises the boundary-specific error for a runtime parse-context override."""
     if reject_target:
         dedicated_option = _EXTRA_DBT_PARSE_CONTEXT_REMEDIES.get(option)
-        remedy = (
-            f" Use the dedicated {dedicated_option} argument instead."
-            if dedicated_option
-            else ""
-        )
+        remedy = f" Use the dedicated {dedicated_option} argument instead." if dedicated_option else ""
         raise ValueError(
             f"--extra-dbt-command-options cannot include parse-context option {option!r}.{remedy} "
             "The runtime parse context must match the supplied manifest."
@@ -103,9 +97,7 @@ def _raise_parse_context_error(option: str, reject_target: bool) -> None:
     )
 
 
-def _validate_dbt_option_token(
-    token: str, token_index: int, reject_target: bool
-) -> bool:
+def _validate_dbt_option_token(token: str, token_index: int, reject_target: bool) -> bool:
     """Validates one option token and reports whether its next token is a target value."""
     reserved_option = _reserved_selection_option(token)
     if reserved_option is not None:
@@ -152,9 +144,7 @@ def _validate_dbt_options(dbt_options: str, reject_target: bool) -> None:
                 raise ValueError(_DBT_TARGET_VALUE_ERROR)
             option_value_expected = False
             continue
-        option_value_expected = _validate_dbt_option_token(
-            token, token_index, reject_target
-        )
+        option_value_expected = _validate_dbt_option_token(token, token_index, reject_target)
     if option_value_expected:
         raise ValueError(_DBT_TARGET_VALUE_ERROR)
 
@@ -194,12 +184,7 @@ class DbtDependencyResolver:
 class TaskFactory(ABC):
     """Abstract base class for creating tasks."""
 
-    def __init__(
-        self,
-        resolver: DbtDependencyResolver,
-        task_options: DbtTaskOptions,
-        dbt_options: str = "",
-    ):
+    def __init__(self, resolver: DbtDependencyResolver, task_options: DbtTaskOptions, dbt_options: str = ""):
         """
         Initializes the TaskFactory.
 
@@ -224,12 +209,7 @@ class TaskFactory(ABC):
 
     @abstractmethod
     def create_task(
-        self,
-        select: str,
-        deps_command_name: str,
-        dbt_node_info: dict,
-        task_key: str,
-        task_keys: dict[str, str],
+        self, select: str, deps_command_name: str, dbt_node_info: dict, task_key: str, task_keys: dict[str, str]
     ) -> DbtTask:
         """
         Abstract method to create a task.
@@ -254,8 +234,7 @@ class TaskFactory(ABC):
             dbt_task_name (str): Name of the DBT task.
         """
         if self.task_options.dbt_deps_enabled and (
-            not self.task_options.dbt_tasks_deps
-            or dbt_task_name in self.task_options.dbt_tasks_deps
+            not self.task_options.dbt_tasks_deps or dbt_task_name in self.task_options.dbt_tasks_deps
         ):
             return self._build_dbt_command("deps")
         return None
@@ -297,12 +276,7 @@ class ModelTaskFactory(TaskFactory):
     """Factory for creating model tasks."""
 
     def create_task(
-        self,
-        select: str,
-        deps_command_name: str,
-        dbt_node_info: dict,
-        task_key: str,
-        task_keys: dict[str, str],
+        self, select: str, deps_command_name: str, dbt_node_info: dict, task_key: str, task_keys: dict[str, str]
     ) -> DbtTask:
         """
         Creates a model task.
@@ -330,12 +304,7 @@ class SnapshotTaskFactory(TaskFactory):
     """Factory for creating snapshot tasks."""
 
     def create_task(
-        self,
-        select: str,
-        deps_command_name: str,
-        dbt_node_info: dict,
-        task_key: str,
-        task_keys: dict[str, str],
+        self, select: str, deps_command_name: str, dbt_node_info: dict, task_key: str, task_keys: dict[str, str]
     ) -> DbtTask:
         """
         Creates a snapshot task.
@@ -363,12 +332,7 @@ class SeedTaskFactory(TaskFactory):
     """Factory for creating seed tasks."""
 
     def create_task(
-        self,
-        select: str,
-        deps_command_name: str,
-        dbt_node_info: dict,
-        task_key: str,
-        task_keys: dict[str, str],
+        self, select: str, deps_command_name: str, dbt_node_info: dict, task_key: str, task_keys: dict[str, str]
     ) -> DbtTask:
         """
         Creates a seed task.
@@ -424,11 +388,7 @@ class TestTaskFactory(TaskFactory):
         commands = [dbt_deps] if dbt_deps else []
         # The plan's mode is appended after user options so the command cannot override the selector's
         # correctness contract. Direct test selectors use `empty`; parent-scoped selectors use `cautious`.
-        commands.append(
-            self._build_dbt_command(
-                "test", select=select, indirect_selection=indirect_selection
-            )
-        )
+        commands.append(self._build_dbt_command("test", select=select, indirect_selection=indirect_selection))
 
         return DbtTask(task_key, commands, self.task_options, depends_on)
 
@@ -460,17 +420,11 @@ class TestTaskFactory(TaskFactory):
         commands = [dbt_deps] if dbt_deps else []
         unsupported_modes = set(selects_by_indirect_selection) - {"empty", "cautious"}
         if unsupported_modes:
-            raise ValueError(
-                f"Unsupported dbt indirect-selection modes: {', '.join(sorted(unsupported_modes))}."
-            )
+            raise ValueError(f"Unsupported dbt indirect-selection modes: {', '.join(sorted(unsupported_modes))}.")
         for indirect_selection in ("empty", "cautious"):
             if indirect_selection not in selects_by_indirect_selection:
                 continue
             selects = sorted(selects_by_indirect_selection[indirect_selection])
-            commands.append(
-                self._build_dbt_command(
-                    "test", select=selects, indirect_selection=indirect_selection
-                )
-            )
+            commands.append(self._build_dbt_command("test", select=selects, indirect_selection=indirect_selection))
 
         return DbtTask(task_key, commands, self.task_options, depends_on)

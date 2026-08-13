@@ -67,13 +67,9 @@ if os.path.exists(prebuilt_manifest_path):
         with open(prebuilt_manifest_path, "rb") as f:
             manifest = Manifest.from_msgpack(f.read())
         manifest.build_flat_graph()
-        print(
-            f"[dbt-factory] injecting pre-built manifest from {prebuilt_manifest_path} (skipping dbt parse)"
-        )
+        print(f"[dbt-factory] injecting pre-built manifest from {prebuilt_manifest_path} (skipping dbt parse)")
     except Exception as e:
-        print(
-            f"[dbt-factory] manifest injection unavailable, falling back to dbt parse: {e}"
-        )
+        print(f"[dbt-factory] manifest injection unavailable, falling back to dbt parse: {e}")
         manifest = None
 
 try:

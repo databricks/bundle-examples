@@ -152,11 +152,7 @@ class DbtTask:
         if self.options.profiles_directory:
             base_parameters["profiles_directory"] = self.options.profiles_directory
 
-        serialized_size = len(
-            json.dumps(
-                base_parameters, ensure_ascii=False, separators=(",", ":")
-            ).encode("utf-8")
-        )
+        serialized_size = len(json.dumps(base_parameters, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
         if serialized_size > _MAX_NOTEBOOK_BASE_PARAMETERS_BYTES:
             raise ValueError(
                 f"Notebook task {self.task_key!r} serializes base_parameters to {serialized_size:,} bytes; "

@@ -2,7 +2,7 @@ This project includes code adapted from the "databricks-dbt-factory" library.
 
     Source:       https://github.com/mwojtyczka/databricks-dbt-factory
     Full history: https://github.com/mwojtyczka/databricks-dbt-factory/commits/main
-    Adapted from: commit ab27714add67d75d109133c80076e1f3362f66fc (v0.3.4)
+    Adapted from: commit 29866edb82de28c33fe888be67d451068d4d7f94 (v0.3.5)
     Location:     src/databricks_dbt_factory/
 
 The code under src/databricks_dbt_factory/ originates from that repository (trimmed to the

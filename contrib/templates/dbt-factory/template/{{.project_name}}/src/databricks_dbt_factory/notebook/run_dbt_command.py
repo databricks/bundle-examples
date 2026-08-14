@@ -7,6 +7,7 @@ import shutil
 import tempfile
 from urllib.parse import urlparse
 
+from databricks.sdk import WorkspaceClient
 from dbt.cli.main import dbtRunner
 
 # COMMAND ----------
@@ -24,13 +25,16 @@ if not dbt_commands:
 
 # COMMAND ----------
 
-ctx = dbutils.notebook.entry_point.getDbutils().notebook().getContext()
-os.environ["DBT_ACCESS_TOKEN"] = ctx.apiToken().get()
-# dbt's host must be a bare hostname, but apiUrl() returns a full URL (scheme + host, and
-# potentially a trailing slash or path). Parse it and keep only the netloc so a value like
+# Authenticate dbt with the notebook's own credentials via the Databricks SDK. The captured token
+# is short-lived (about an hour) and does not self-refresh, so a single task running longer than its
+# lifetime can fail mid-run.
+ws = WorkspaceClient()
+os.environ["DBT_ACCESS_TOKEN"] = ws.config.authenticate()["Authorization"].removeprefix("Bearer ").strip()
+
+# dbt's host must be a bare hostname, but `config.host` is a full URL (scheme + host, and potentially
+# a trailing slash or path). Parse it and keep only the netloc so a value like
 # "https://my-workspace.databricks.com/" yields "my-workspace.databricks.com".
-_api_url = ctx.apiUrl().get()
-_parsed = urlparse(_api_url)
+_parsed = urlparse(ws.config.host)
 os.environ["DBT_HOST"] = _parsed.netloc or _parsed.path.strip("/")
 
 # chdir to the dbt project so dbt runs from inside it. Relative `project_directory` is
@@ -40,6 +44,7 @@ os.environ["DBT_HOST"] = _parsed.netloc or _parsed.path.strip("/")
 # `--project-directory` resolves against wherever the user placed the notebook; absolute
 # `project_directory` is used as-is.
 if project_directory:
+    ctx = dbutils.notebook.entry_point.getDbutils().notebook().getContext()
     notebook_dir = os.path.dirname("/Workspace" + ctx.notebookPath().get())
     target_dir = (
         project_directory

@@ -125,7 +125,13 @@ def _dbt_databricks_dependency() -> str:
 
 def _serverless_environment_spec() -> dict:
     """Contents of the base-environment file: the environment version plus the pinned
-    dbt-databricks dependency."""
+    dbt-databricks dependency.
+
+    Only dbt-databricks is listed. The runner notebook (notebook/run_dbt_command.py) also imports
+    databricks-sdk, but that is a transitive dependency of dbt-databricks, so pinning
+    dbt-databricks pulls it into the serverless environment automatically — no separate entry
+    needed. If you ever build a task environment without dbt-databricks, add databricks-sdk here
+    too, or the runner fails at import."""
     return {"environment_version": "4", "dependencies": [_dbt_databricks_dependency()]}
 
 

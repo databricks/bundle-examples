@@ -1,0 +1,45 @@
+version: 2
+
+sources:
+  - name: samples_tpch
+    catalog: samples
+    schema: tpch
+    tables:
+      - name: orders
+        columns:
+          - name: o_orderkey
+            tests:
+              - not_null
+
+models:
+  - name: customers
+    description: "Base customers."
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
+  - name: orders
+    description: "Base orders."
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+      - name: customer_id
+        # Cross-model test (references two models) -> emitted as its own task.
+        tests:
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+      - name: amount
+        # warn severity -> the test still runs but does NOT gate downstream tasks.
+        tests:
+          - not_null:
+              config:
+                severity: warn
+  - name: customer_orders
+    description: "Customers joined with their orders (model -> model)."
+  - name: customers_with_country
+    description: "Customers joined with the countries seed (seed -> model)."
+  - name: tpch_orders_summary
+    description: "Summary over the samples.tpch source (source -> model)."

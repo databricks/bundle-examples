@@ -1,0 +1,36 @@
+# This file defines dbt profiles for deployed dbt jobs.
+# The generated Databricks job selects the target via `--target ${bundle.target}`,
+# so the dbt target names below (dev / prod) match the bundle targets in databricks.yml.
+dbt_factory:
+  target: dev # default target
+  outputs:
+
+    # Doing local development with the dbt CLI?
+    # Then you should create your own profile in your .dbt/profiles.yml using 'dbt init'
+    # (See README.md)
+
+    # The default target when deployed with the Databricks CLI
+    dev:
+      type: databricks
+      method: http
+      catalog: catalog
+      schema: default
+
+      http_path: /sql/1.0/warehouses/abcdef1234567890
+
+      # The workspace host / token are provided by the runner notebook at runtime
+      # (see src/databricks_dbt_factory/notebook/run_dbt_command.py).
+      host: "{{ env_var('DBT_HOST', '') }}"
+      token: "{{ env_var('DBT_ACCESS_TOKEN', '') }}"
+
+    # The production target when deployed with the Databricks CLI
+    prod:
+      type: databricks
+      method: http
+      catalog: catalog
+      schema: default
+
+      http_path: /sql/1.0/warehouses/abcdef1234567890
+
+      host: "{{ env_var('DBT_HOST', '') }}"
+      token: "{{ env_var('DBT_ACCESS_TOKEN', '') }}"

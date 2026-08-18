@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+.databricks/
+logs/
+# Ignore installed dbt packages but keep the directory (via .gitkeep) so the
+# `dbt_packages/**` sync.include in databricks.yml always matches at least one file.
+dbt_packages/*
+!dbt_packages/.gitkeep
+dbt_profiles/.user.yml
+uv.lock
+
+# dbt build artifacts, but keep the committed manifest that resources/__init__.py reads at
+# deploy time. Regenerate it with `make manifest`.
+target/*
+!target/manifest.json
+
+# Serverless base-environment file, regenerated on every `bundle deploy` by resources/__init__.py.
+dbt_serverless_env.yaml

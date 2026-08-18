@@ -1,0 +1,22 @@
+
+version: 2
+
+models:
+  - name: orders_raw
+    description: "Raw ingested orders"
+    columns:
+      - name: customer_name
+        description: "The name of a customer"
+        # customer_name repeats across orders, so only a not_null test applies here.
+        data_tests:
+          - not_null
+
+  - name: orders_daily
+    description: "Number of orders by day"
+    columns:
+      - name: order_date
+        description: "The date on which orders took place"
+        # orders_daily groups by order_date, so it is unique and not null.
+        data_tests:
+          - unique
+          - not_null

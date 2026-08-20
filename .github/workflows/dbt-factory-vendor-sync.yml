@@ -10,6 +10,10 @@ name: dbt-factory vendor sync
 on:
   pull_request:
     types: [opened, synchronize]
+    paths:
+      - 'contrib/dbt_factory/**'
+      - 'contrib/templates/dbt-factory/**'
+      - '.github/workflows/dbt-factory-vendor-sync.yml'
   merge_group:
     types: [checks_requested]
 

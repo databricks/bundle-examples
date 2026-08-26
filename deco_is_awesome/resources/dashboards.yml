@@ -1,0 +1,6 @@
+resources:
+  dashboards:
+    bookings_overview:
+      display_name: Bookings Overview
+      file_path: ../src/bookings_overview.lvdash.json
+      warehouse_id: ${var.warehouse_id}

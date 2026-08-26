@@ -1,0 +1,38 @@
+{
+  "datasets": [
+    {
+      "name": "summary",
+      "displayName": "summary",
+      "queryLines": ["SELECT 1 AS bookings, 2 AS revenue"]
+    }
+  ],
+  "pages": [
+    {
+      "name": "overview",
+      "displayName": "Overview",
+      "layout": [
+        {
+          "widget": {
+            "name": "bookings_counter",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "summary",
+                  "fields": [{"name": "bookings", "expression": "`bookings`"}],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {"value": {"fieldName": "bookings", "displayName": "bookings"}}
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 3, "height": 3}
+        }
+      ]
+    }
+  ]
+}

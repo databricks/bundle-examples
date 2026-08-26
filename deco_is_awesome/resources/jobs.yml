@@ -2,7 +2,7 @@ resources:
   jobs:
     daily_etl:
       name: Daily ETL
-      tags: {domain: deco, team: data-eng, etl_version: v3}
+      tags: {domain: deco, team: data-eng, etl_version: v4}
       trigger:
         periodic: {interval: 1, unit: DAYS}
       tasks:

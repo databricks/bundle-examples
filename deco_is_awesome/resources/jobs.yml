@@ -1,0 +1,24 @@
+resources:
+  jobs:
+    daily_etl:
+      name: Daily ETL
+      tags: {domain: deco, team: data-eng}
+      trigger:
+        periodic: {interval: 1, unit: DAYS}
+      tasks:
+        - task_key: extract
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/etl.py
+      environments:
+        - {environment_key: default, spec: {client: "1"}}
+    metrics_report:
+      name: Metrics report
+      tags: {domain: deco, team: analytics}
+      tasks:
+        - task_key: report
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/report.py
+      environments:
+        - {environment_key: default, spec: {client: "1"}}

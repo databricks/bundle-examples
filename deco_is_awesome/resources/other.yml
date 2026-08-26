@@ -1,0 +1,8 @@
+resources:
+  schemas:
+    analytics:
+      catalog_name: ${var.catalog}
+      name: ${var.schema}_analytics
+  experiments:
+    deco_exp:
+      name: /Users/${workspace.current_user.userName}/${bundle.target}-deco-exp

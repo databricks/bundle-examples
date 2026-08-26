@@ -1,0 +1,16 @@
+resources:
+  pipelines:
+    bookings_bronze:
+      name: Bookings bronze
+      catalog: ${var.catalog}
+      schema: ${var.schema}_bronze
+      serverless: true
+      libraries:
+        - glob: {include: ../src/bronze/**}
+    bookings_gold:
+      name: Bookings gold
+      catalog: ${var.catalog}
+      schema: ${var.schema}_gold
+      serverless: true
+      libraries:
+        - glob: {include: ../src/gold/**}

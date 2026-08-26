@@ -1,0 +1,32 @@
+# deco_is_awesome — DMS demo bundle (2 jobs, 2 pipelines, schema, experiment).
+bundle:
+  name: deco_is_awesome
+
+experimental:
+  record_deployment_history: true
+
+variables:
+  catalog:
+    description: UC catalog for pipelines and schemas.
+    default: dabs_demo
+  schema:
+    description: Base schema name.
+    default: deco
+  warehouse_id:
+    description: SQL warehouse id (per-workspace).
+    default: ""
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Shared/deco_is_awesome/${bundle.target}
+    permissions:
+      - group_name: users
+        level: CAN_MANAGE

@@ -2,7 +2,7 @@ resources:
   jobs:
     daily_etl:
       name: Daily ETL
-      tags: {domain: deco, team: data-eng}
+      tags: {domain: deco, team: data-eng, etl_version: v3}
       trigger:
         periodic: {interval: 1, unit: DAYS}
       tasks:
@@ -10,6 +10,7 @@ resources:
           environment_key: default
           spark_python_task:
             python_file: ../src/etl.py
+            parameters: ["--stage", "extract"]
       environments:
         - {environment_key: default, spec: {client: "1"}}
     metrics_report:

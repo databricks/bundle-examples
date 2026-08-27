@@ -2,17 +2,21 @@ resources:
   jobs:
     daily_etl:
       name: Daily ETL
-      tags: {domain: deco, team: data-eng, etl_version: v4}
+      tags: {domain: deco, team: data-eng, etl_version: v5}
       trigger:
         periodic: {interval: 1, unit: DAYS}
+      job_clusters:
+        - job_cluster_key: main
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: i3.xlarge
+            num_workers: 1
       tasks:
         - task_key: extract
-          environment_key: default
+          job_cluster_key: main
           spark_python_task:
             python_file: ../src/etl.py
             parameters: ["--stage", "extract"]
-      environments:
-        - {environment_key: default, spec: {client: "1"}}
     metrics_report:
       name: Metrics report
       tags: {domain: deco, team: analytics}

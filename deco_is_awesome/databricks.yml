@@ -27,6 +27,3 @@ targets:
     mode: production
     workspace:
       root_path: /Workspace/Shared/deco_is_awesome/${bundle.target}
-    permissions:
-      - group_name: users
-        level: CAN_MANAGE

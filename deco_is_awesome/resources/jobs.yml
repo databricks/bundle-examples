@@ -23,17 +23,3 @@ resources:
             python_file: ../src/report.py
       environments:
         - {environment_key: default, spec: {client: "1"}}
-    weekly_rollup:
-      name: Weekly rollup
-      tags: {domain: deco, team: data-eng}
-      job_clusters:
-        - job_cluster_key: main
-          new_cluster:
-            spark_version: 15.4.x-scala2.12
-            node_type_id: i3.xlarge
-            num_workers: 1
-      tasks:
-        - task_key: rollup
-          job_cluster_key: main
-          spark_python_task:
-            python_file: ../src/report.py

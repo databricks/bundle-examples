@@ -1,0 +1,79 @@
+# This is a Databricks asset bundle definition for my_project.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: dabs_bootstrap
+
+include:
+  - resources/jobs/*.yml
+  - resources/pipelines/*.yml
+
+# Define re-usable complex variables
+variables:
+  env:
+    description: Environment value for job name injection.
+    type: complex
+    default: dev
+  default_serverless_env_spec:
+      description: Default serverless environment configuration (example).
+      type: complex
+      default:
+        client: "1"
+        dependencies:
+          - -r "/Workspace${workspace.file_path}/environments/default-requirements.txt"
+          - ../../src/packages/get_taxis_data/dist/*.whl
+          - ../../src/packages/utils/dist/*.whl
+
+# Build artifacts using poetry, in this case we only have two
+artifacts:
+  utils_package:
+    type: whl
+    build: poetry build
+    path: src/packages/utils/
+  get_taxis_data_package:
+    type: whl
+    build: poetry build
+    path: src/packages/get_taxis_data/
+
+targets:
+  # The 'dev' target, for development purposes. This target is the default
+  dev:
+    # We use 'mode: development' to indicate this is a personal development copy:
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default
+    # - The 'development' mode is used for Delta Live Tables pipelines
+    mode: development
+    default: true
+    workspace:
+      host: https://company.databricks.com
+
+  # The 'staging' target, used for UAT deployment - we mimic production here
+  staging:
+    # We use 'mode: production' to indicate this is a production deployment
+    # Doing so enables strict verification of the settings below
+    mode: production
+    workspace:
+      host: https://company.databricks.com
+      # We always use /Shared/.bundle/${bundle.name} for all resources to make sure we only have a single copy
+      root_path: /Shared/.bundle/${bundle.name}
+    run_as:
+      # This runs as your service principle in staging
+      service_principal_name: {{ your_service_principle_id }}
+    # We can use a default env variable to dynamically inject "staging" into our resource names
+    variables:
+      env: staging
+
+  # The 'prod' target, used for production deployment
+  prod:
+    # We use 'mode: production' to indicate this is a production deployment
+    # Doing so enables strict verification of the settings below
+    mode: production
+    workspace:
+      host: https://company.databricks.com
+      # We always use /Shared/.bundle/${bundle.name} for all resources to make sure we only have a single copy
+      root_path: /Shared/.bundle/${bundle.name}
+    run_as:
+      # This runs as your service principle in staging
+      service_principal_name: {{ your_service_principle_id }}
+    # We can use a default env variable to dynamically inject "prod" into our resource names
+    variables:
+      env: prod

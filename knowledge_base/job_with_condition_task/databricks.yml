@@ -1,0 +1,38 @@
+bundle:
+  name: job_with_condition_task
+
+variables:
+  warehouse_id:
+    lookup:
+      warehouse: "Shared Warehouse"
+
+resources:
+  jobs:
+    example_job:
+      name: "Example job to demonstrate the use of a condition task"
+
+      tasks:
+        - task_key: condition
+          condition_task:
+            left: "{{ job.parameters.[run_sql_task] }}"
+            right: "true"
+            op: EQUAL_TO
+
+        - task_key: run_query
+          depends_on:
+            - task_key: condition
+              outcome: "true"
+
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ./query.sql
+
+      parameters:
+        - name: "run_sql_task"
+          default: "false"
+
+targets:
+  dev:
+    default: true
+    mode: development

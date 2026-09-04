@@ -11,7 +11,6 @@ The target workspace must support serverless Jobs compute.
 | Resource key | Failure type | Expected error |
 | --- | --- | --- |
 | `schema_drift_failure` | An upstream `amount` column changed from numeric to string | `Schema drift detected: expected amount to be numeric, found string` |
-| `data_quality_failure` | Duplicate IDs, a null customer, and a non-positive amount | `Data quality checks failed: duplicate_transaction_ids=1, null_customers=1, non_positive_amounts=1` |
 | `missing_input_failure` | A required table does not exist | Spark `TABLE_OR_VIEW_NOT_FOUND` |
 | `invalid_configuration_failure` | Invalid batch size and missing checkpoint path | `Invalid job configuration: batch_size must be greater than zero; checkpoint_path is required in incremental mode` |
 
@@ -28,7 +27,6 @@ Run each example separately:
 
 ```bash
 databricks bundle run schema_drift_failure
-databricks bundle run data_quality_failure
 databricks bundle run missing_input_failure
 databricks bundle run invalid_configuration_failure
 ```

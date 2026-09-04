@@ -20,7 +20,7 @@ The target workspace must support serverless Jobs compute.
 The default target uses development mode, so deployed job names are prefixed with your user name.
 
 ```bash
-databricks bundle validate --strict
+databricks bundle validate
 databricks bundle deploy
 ```
 

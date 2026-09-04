@@ -1,0 +1,14 @@
+resources:
+  jobs:
+    missing_input_failure:
+      name: failing_job_example_missing_input
+      description: Intentionally fails while reading an input table that does not exist.
+      tags:
+        example: intentional-failure
+        failure_type: missing-input
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: read_missing_input
+          max_retries: 0
+          notebook_task:
+            notebook_path: ../src/missing_input.py

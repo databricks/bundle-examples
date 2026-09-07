@@ -1,0 +1,10 @@
+bundle:
+  name: failing_job_examples
+
+include:
+  - resources/*.job.yml
+
+targets:
+  dev:
+    default: true
+    mode: development

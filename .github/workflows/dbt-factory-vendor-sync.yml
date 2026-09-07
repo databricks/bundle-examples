@@ -1,0 +1,156 @@
+name: dbt-factory vendor sync
+
+# Verifies the vendored copy of databricks-dbt-factory has not drifted:
+#   1. each vendored core file is byte-identical to the upstream release named in NOTICE;
+#   2. the example and template copies are byte-identical to each other;
+#   3. both NOTICE files cite the same upstream commit.
+# The upstream commit is read from contrib/dbt_factory/NOTICE, so bumping the vendored
+# version is a one-line NOTICE change and this check re-pins to it automatically.
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'contrib/dbt_factory/**'
+      - 'contrib/templates/dbt-factory/**'
+      - '.github/workflows/dbt-factory-vendor-sync.yml'
+  merge_group:
+    types: [checks_requested]
+
+jobs:
+  byte-identical:
+    runs-on:
+      group: databricks-protected-runner-group
+      labels: linux-ubuntu-latest
+
+    env:
+      UPSTREAM_REPO: https://github.com/mwojtyczka/databricks-dbt-factory
+      EXAMPLE_CORE: contrib/dbt_factory/src/databricks_dbt_factory
+      TEMPLATE_CORE: contrib/templates/dbt-factory/template/{{.project_name}}/src/databricks_dbt_factory
+      EXAMPLE_NOTICE: contrib/dbt_factory/NOTICE
+      TEMPLATE_NOTICE: contrib/templates/dbt-factory/template/{{.project_name}}/NOTICE
+      # Upstream core files intentionally NOT vendored (space-separated, paths
+      # relative to the core dir). The vendored set must equal upstream minus
+      # these, so dropping a vendored file — or upstream adding one — fails the
+      # check instead of passing silently.
+      VENDOR_EXCLUDE: file_io.py job_spec.py main.py
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Verify vendored core is byte-identical to upstream
+        shell: bash
+        run: |-
+          set -euo pipefail
+
+          # --- 1. Read the pinned upstream commit from the example NOTICE ---
+          # `|| true` keeps a no-match grep (or a missing file) from tripping `set -e`,
+          # so the empty-value guards below can report a clear error instead of the
+          # script dying on an opaque grep pipeline failure.
+          notice_sha() { grep -oE 'commit [0-9a-f]{40}' "$1" 2>/dev/null | head -1 | awk '{print $2}' || true; }
+          notice_version() { grep -oE '\(v[0-9]+\.[0-9]+\.[0-9]+\)' "$1" 2>/dev/null | head -1 | tr -d '()' || true; }
+          sha="$(notice_sha "$EXAMPLE_NOTICE")"
+          if [ -z "$sha" ]; then
+            echo "::error file=$EXAMPLE_NOTICE::could not find an 'Adapted from: commit <40-hex>' line"
+            exit 1
+          fi
+          version="$(notice_version "$EXAMPLE_NOTICE")"
+          echo "Vendored upstream commit: $sha (${version:-unknown version})"
+
+          # --- 2. Both NOTICE files must cite the same commit and version ---
+          tpl_sha="$(notice_sha "$TEMPLATE_NOTICE")"
+          if [ "$sha" != "$tpl_sha" ]; then
+            echo "::error::NOTICE files disagree on the upstream commit:"
+            echo "  $EXAMPLE_NOTICE  -> $sha"
+            echo "  $TEMPLATE_NOTICE -> ${tpl_sha:-<none>}"
+            exit 1
+          fi
+          tpl_version="$(notice_version "$TEMPLATE_NOTICE")"
+          if [ "$version" != "$tpl_version" ]; then
+            echo "::error::NOTICE files disagree on the upstream version:"
+            echo "  $EXAMPLE_NOTICE  -> ${version:-<none>}"
+            echo "  $TEMPLATE_NOTICE -> ${tpl_version:-<none>}"
+            exit 1
+          fi
+
+          # --- 3. Fetch upstream at exactly that commit ---
+          up="$(mktemp -d)"
+          git init --quiet "$up"
+          git -C "$up" remote add origin "$UPSTREAM_REPO"
+          git -C "$up" fetch --quiet --depth 1 origin "$sha"
+          git -C "$up" checkout --quiet FETCH_HEAD
+          up_core="$up/src/databricks_dbt_factory"
+
+          # The upstream layout must still exist at this commit; otherwise every
+          # per-file check below would fail with a misleading 'not in upstream'
+          # error instead of naming the real cause (upstream package moved).
+          if [ ! -d "$up_core" ] || [ -z "$(find "$up_core" -type f -print -quit)" ]; then
+            echo "::error::upstream $sha has no files under src/databricks_dbt_factory — the upstream layout may have changed"
+            exit 1
+          fi
+
+          fail=0
+
+          # --- 4. The vendored copy must be non-empty, otherwise the per-file loop
+          #         below iterates zero files and the job passes vacuously ---
+          ex_file_count="$(cd "$EXAMPLE_CORE" 2>/dev/null && find . -type f | wc -l | tr -d ' ' || echo 0)"
+          if [ "$ex_file_count" -eq 0 ]; then
+            echo "::error::no vendored files found under $EXAMPLE_CORE — the vendored copy is empty or the path is wrong"
+            exit 1
+          fi
+
+          # --- 5. The vendored set must equal the upstream set minus VENDOR_EXCLUDE.
+          #         Catches a file deleted from BOTH copies (which the per-file loop,
+          #         driven by the example's own file list, would otherwise miss) and
+          #         upstream files newly added since the pin. ---
+          expected="$(cd "$up_core" && find . -type f | sed 's|^\./||' | sort)"
+          for x in $VENDOR_EXCLUDE; do
+            expected="$(printf '%s\n' "$expected" | grep -vxF "$x" || true)"
+          done
+          actual="$(cd "$EXAMPLE_CORE" && find . -type f | sed 's|^\./||' | sort)"
+          if ! diff <(printf '%s\n' "$expected") <(printf '%s\n' "$actual") >/dev/null; then
+            echo "::error::vendored file set does not match upstream $sha minus VENDOR_EXCLUDE ('<' expected, '>' vendored):"
+            diff <(printf '%s\n' "$expected") <(printf '%s\n' "$actual") || true
+            echo "Re-vendor the missing/extra files, or update VENDOR_EXCLUDE if the upstream layout changed intentionally."
+            fail=1
+          fi
+
+          # --- 6. The two vendored copies must contain the same set of files ---
+          if ! diff <(cd "$EXAMPLE_CORE" && find . -type f | sort) \
+                    <(cd "$TEMPLATE_CORE" && find . -type f | sort) >/dev/null; then
+            echo "::error::example and template vendored copies contain different files:"
+            diff <(cd "$EXAMPLE_CORE" && find . -type f | sort) \
+                 <(cd "$TEMPLATE_CORE" && find . -type f | sort) || true
+            fail=1
+          fi
+
+          # --- 7. Every vendored file: identical to upstream, and identical across copies ---
+          while IFS= read -r rel; do
+            ex="$EXAMPLE_CORE/$rel"
+            tpl="$TEMPLATE_CORE/$rel"
+            upf="$up_core/$rel"
+
+            if [ ! -f "$upf" ]; then
+              echo "::error file=$ex::vendored file '$rel' does not exist in upstream $sha"
+              fail=1
+              continue
+            fi
+            if ! cmp -s "$ex" "$upf"; then
+              echo "::error file=$ex::'$rel' differs from upstream $sha"
+              diff -u "$upf" "$ex" | head -40 || true
+              fail=1
+            fi
+            if ! cmp -s "$ex" "$tpl"; then
+              echo "::error file=$tpl::template copy of '$rel' differs from the example copy"
+              diff -u "$ex" "$tpl" | head -40 || true
+              fail=1
+            fi
+          done < <(cd "$EXAMPLE_CORE" && find . -type f | sed 's|^\./||' | sort)
+
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::vendored databricks-dbt-factory has drifted from upstream $sha."
+            echo "Re-vendor from upstream at that commit (or update NOTICE if the version changed) so the copies match."
+            exit 1
+          fi
+          echo "OK: both vendored copies are byte-identical to upstream $sha and to each other."

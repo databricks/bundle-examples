@@ -67,7 +67,7 @@ sample_job = Job.from_dict(
             {
                 "environment_key": "default",
                 "spec": {
-                    "environment_version": "4",
+                    "environment_version": "5",
                     "dependencies": [
                         # By default we just include the .whl file generated for the pydabs package.
                         # See https://docs.databricks.com/dev-tools/bundles/library-dependencies.html

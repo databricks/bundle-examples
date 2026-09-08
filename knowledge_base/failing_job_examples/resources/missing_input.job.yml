@@ -2,11 +2,14 @@ resources:
   jobs:
     missing_input_failure:
       name: failing_job_example_missing_input
-      description: Intentionally fails while reading an input table that does not exist.
+      description: Intentionally fails because the configured input_view job parameter is misspelled.
       tags:
         example: intentional-failure
         failure_type: missing-input
       max_concurrent_runs: 1
+      parameters:
+        - name: input_view
+          default: "__failing_job_examples_order_input_7f3f2a9c__"
       tasks:
         - task_key: read_missing_input
           max_retries: 0

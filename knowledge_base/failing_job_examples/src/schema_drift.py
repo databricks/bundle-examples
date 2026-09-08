@@ -1,17 +1,18 @@
 # Databricks notebook source
-from pyspark.sql.types import StringType, StructField, StructType
+from pyspark.sql.types import NumericType, StringType, StructField, StructType
 
 
-schema = StructType(
+observed_source_schema = StructType(
     [
         StructField("transaction_id", StringType(), False),
         StructField("amount", StringType(), False),
     ]
 )
-amount_type = schema["amount"].dataType.simpleString()
-numeric_types = {"byte", "short", "int", "bigint", "float", "double"}
+amount_type = observed_source_schema["amount"].dataType
 
-if amount_type not in numeric_types and not amount_type.startswith("decimal"):
+if not isinstance(amount_type, NumericType):
     raise TypeError(
-        f"Schema drift detected: expected amount to be numeric, found {amount_type}"
+        "Schema contract violation in simulated source schema (no source table): "
+        f"expected amount to be numeric, found {amount_type.simpleString()}; "
+        f"observed schema {observed_source_schema.simpleString()}"
     )

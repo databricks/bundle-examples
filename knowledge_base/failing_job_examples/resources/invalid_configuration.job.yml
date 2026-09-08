@@ -2,11 +2,14 @@ resources:
   jobs:
     invalid_configuration_failure:
       name: failing_job_example_invalid_configuration
-      description: Intentionally fails because required application settings are invalid.
+      description: Intentionally fails because the configured batch size is non-positive.
       tags:
         example: intentional-failure
         failure_type: invalid-configuration
       max_concurrent_runs: 1
+      parameters:
+        - name: batch_size
+          default: "0"
       tasks:
         - task_key: validate_configuration
           max_retries: 0

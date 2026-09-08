@@ -1,15 +1,14 @@
 # Databricks notebook source
-config = {
-    "batch_size": 0,
-    "checkpoint_path": "",
-    "mode": "incremental",
-}
+batch_size_value = dbutils.widgets.get("batch_size")
 
-errors = []
-if config["batch_size"] <= 0:
-    errors.append("batch_size must be greater than zero")
-if config["mode"] == "incremental" and not config["checkpoint_path"]:
-    errors.append("checkpoint_path is required in incremental mode")
+try:
+    batch_size = int(batch_size_value)
+except ValueError:
+    raise ValueError(
+        f"Invalid job configuration: batch_size must be an integer, found {batch_size_value!r}"
+    ) from None
 
-if errors:
-    raise ValueError(f"Invalid job configuration: {'; '.join(errors)}")
+if batch_size <= 0:
+    raise ValueError(
+        f"Invalid job configuration: batch_size must be greater than zero, found {batch_size}"
+    )

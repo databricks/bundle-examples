@@ -2,7 +2,7 @@ resources:
   jobs:
     schema_drift_failure:
       name: failing_job_example_schema_drift
-      description: Intentionally fails when an upstream column changes from numeric to string.
+      description: Simulates schema drift with an observed source schema whose amount is a string instead of a number; no table is read.
       tags:
         example: intentional-failure
         failure_type: schema-drift

@@ -1,0 +1,52 @@
+bundle:
+  name: postgres-autoscaling-example
+
+resources:
+  # Top-level project container for Lakebase Autoscaling.
+  # Creating a project automatically provisions:
+  #   - A default branch named "production"
+  #   - A primary READ_WRITE endpoint on the default branch
+  #   - A database with the name "databricks_postgres"
+  postgres_projects:
+    my_project:
+      project_id: my-autoscaling-project
+      display_name: "My Autoscaling Project"
+      pg_version: 17
+      default_endpoint_settings:
+        # Newly created endpoints inherit these settings unless overridden
+        #   at the endpoint level (see "prod_read_replica" below).
+        #   Changing these will not affect existing endpoints.
+        autoscaling_limit_min_cu: 1
+        autoscaling_limit_max_cu: 4
+        suspend_timeout_duration: "300s" # Scale-to-zero after 5 minutes
+
+  # (Optional) Read replica on the default (production) branch.
+  postgres_endpoints:
+    prod_read_replica:
+      parent: ${resources.postgres_projects.my_project.id}/branches/production
+      endpoint_id: ep-production-read-replica
+      endpoint_type: ENDPOINT_TYPE_READ_ONLY
+      # Note: The below two options override the ones set in
+      #   "default_endpoint_settings" above
+      autoscaling_limit_min_cu: 0.5
+      autoscaling_limit_max_cu: 2
+
+  # (Optional) Non-default branch for development/testing.
+  # Note: A READ_WRITE endpoint is currently created by default
+  #   when provisioning a new branch
+  postgres_branches:
+    dev:
+      parent: ${resources.postgres_projects.my_project.id}
+      branch_id: development  # The name for the branch
+      no_expiry: true
+
+# Targets allow you to deploy the same bundle to different Databricks workspaces.
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      host: https://my-dev-workspace.cloud.databricks.com
+  prod:
+    workspace:
+      host: https://my-prod-workspace.cloud.databricks.com

@@ -1,0 +1,76 @@
+resources:
+  jobs:
+    ai_parse_document_workflow:
+      name: ai_parse_document_workflow
+
+      # Optional: Add a schedule
+      # schedule:
+      #   quartz_cron_expression: "0 0 * * * ?"
+      #   timezone_id: "UTC"
+
+      # Job-level parameters shared across all tasks
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+
+      environments:
+        - environment_key: serverless_env
+          spec:
+            client: "3"
+            dependencies:
+              - "databricks-vectorsearch"
+
+      tasks:
+        - task_key: parse_documents
+          environment_key: serverless_env
+          notebook_task:
+            notebook_path: ../src/transformations/01_parse_documents.py
+            base_parameters:
+              source_volume_path: ${var.source_volume_path}
+              output_volume_path: ${var.output_volume_path}
+              checkpoint_location: ${var.checkpoint_base_path}/01_parse_documents
+              table_name: ${var.raw_table_name}
+
+        - task_key: extract_text
+          depends_on:
+            - task_key: parse_documents
+          environment_key: serverless_env
+          notebook_task:
+            notebook_path: ../src/transformations/02_extract_text.py
+            base_parameters:
+              checkpoint_location: ${var.checkpoint_base_path}/02_extract_text
+              source_table_name: ${var.raw_table_name}
+              table_name: ${var.text_table_name}
+
+        - task_key: chunk_text
+          depends_on:
+            - task_key: extract_text
+          environment_key: serverless_env
+          notebook_task:
+            notebook_path: ../src/transformations/03_chunk_text.py
+            base_parameters:
+              checkpoint_location: ${var.checkpoint_base_path}/03_chunk_text
+              chunking_cache_location: ${var.checkpoint_base_path}/03_chunk_text_cache
+              source_table_name: ${var.text_table_name}
+              table_name: ${var.chunk_table_name}
+              embedding_model_endpoint: ${var.embedding_model_endpoint}
+              chunk_size_tokens: ${var.chunk_size_tokens}
+              chunk_overlap_tokens: ${var.chunk_overlap_tokens}
+
+        - task_key: create_vector_search_index
+          depends_on:
+            - task_key: chunk_text
+          environment_key: serverless_env
+          notebook_task:
+            notebook_path: ../src/transformations/04_vector_search_index.py
+            base_parameters:
+              source_table_name: ${var.chunk_table_name}
+              endpoint_name: ${var.vector_search_endpoint_name}
+              index_name: ${var.vector_search_index_name}
+              primary_key: ${var.vector_search_primary_key}
+              embedding_source_column: ${var.vector_search_embedding_source_column}
+              embedding_model_endpoint: ${var.embedding_model_endpoint}
+
+      max_concurrent_runs: 1

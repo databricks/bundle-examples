@@ -1,0 +1,32 @@
+resources:
+  jobs:
+    model_build_evaluation:
+      name: model_build_evaluation
+      queue:
+        enabled: true
+
+      parameters:
+        - name: "catalog_name"
+          default: "${var.catalog_name}"
+        - name: "schema_name"
+          default: "${resources.schemas.sentiment_schema.name}"    
+        - name: "model_name"
+          default: "${resources.registered_models.sentiment_model.name}"
+        - name: "experiment_name"
+          default: "${resources.experiments.experiment.name}"
+          
+      tasks:
+        - task_key: model_build
+          notebook_task:
+            notebook_path: "../notebooks/model_build.ipynb"
+              
+        - task_key: model_evaluation
+          depends_on:
+            - task_key: model_build
+          notebook_task:
+            notebook_path: "../notebooks/model_evaluation.ipynb"
+            base_parameters:
+              logged_run_id: "{{tasks.model_build.values.logged_run_id}}"         
+      tags:
+        Project: "${bundle.name}"
+

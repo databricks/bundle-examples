@@ -1,0 +1,21 @@
+resources:
+  jobs:
+    model_preprocessing:
+      name: model_preprocessing
+      queue:
+        enabled: true
+
+      parameters:
+        - name: "catalog_name"
+          default: "${var.catalog_name}"
+        - name: "schema_name"
+          default: "${resources.schemas.sentiment_schema.name}"
+
+      tasks:
+        - task_key: model_preprocessing
+          notebook_task:
+            notebook_path: "../notebooks/model_preprocessing.ipynb"
+  
+      tags:
+        Project: "${bundle.name}"
+

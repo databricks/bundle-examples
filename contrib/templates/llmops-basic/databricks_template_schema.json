@@ -1,0 +1,35 @@
+{
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "default": "llmops_basic",
+      "description": "Name of the LLMOps project (use underscores, no hyphens)",
+      "order": 1
+    },
+    "catalog_name_dev": {
+      "type": "string",
+      "default": "dev_catalog",
+      "description": "Name of the Unity Catalog for development environment",
+      "order": 2
+    },
+    "catalog_name_prod": {
+      "type": "string",
+      "default": "prod_catalog",
+      "description": "Name of the Unity Catalog for production environment",
+      "order": 3
+    },
+    "workspace_host_dev": {
+      "type": "string",
+      "default": "https://your-workspace.azuredatabricks.net/",
+      "description": "Databricks workspace URL for development",
+      "order": 4
+    },
+    "workspace_host_prod": {
+      "type": "string",
+      "default": "https://your-workspace.azuredatabricks.net/",
+      "description": "Databricks workspace URL for production",
+      "order": 5
+    }
+  }
+}
+

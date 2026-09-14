@@ -1,0 +1,20 @@
+bundle:
+  name: job_with_custom_sys_path
+
+include:
+  - ./resources/*.job.yml
+
+workspace:
+  host: https://e2-dogfood.staging.cloud.databricks.com
+
+targets:
+  dev:
+    default: true
+    mode: development
+
+  prod:
+    mode: production
+
+    # Production mode requires explicit configuration of the identity to use to run the job.
+    run_as:
+      user_name: "${workspace.current_user.userName}"

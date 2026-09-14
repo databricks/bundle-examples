@@ -1,0 +1,41 @@
+# The main job for my_project.
+resources:
+  jobs:
+    my_workflow:
+      name: my_workflow_${var.env}
+
+      schedule:
+        # Run every day at 8 AM
+        quartz_cron_expression: '0 0 8 * * ?'
+        timezone_id: Europe/London
+
+      email_notifications:
+        on_failure:
+          - {{ your_email_address }}
+
+      tasks:
+        - task_key: standard_job_task
+          job_cluster_key: job_cluster
+          notebook_task:
+            notebook_path: ../../src/notebooks/notebook.ipynb
+          libraries:
+            # We include both wheel files from our packages.
+            # See https://docs.databricks.com/dev-tools/bundles/library-dependencies.html
+            # for more information on how to add other libraries.
+            - whl: ../../src/packages/get_taxis_data/dist/*.whl
+            - whl: ../../src/packages/utils/dist/*.whl
+
+        - task_key: dlt_pipeline_task
+          depends_on:
+            - task_key: standard_job_task
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.my_dlt_pipeline.id}
+
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: i3.xlarge
+            autoscale:
+                min_workers: 1
+                max_workers: 4

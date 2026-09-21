@@ -1,10 +1,11 @@
 """
 End-to-end test for the dbt-factory example.
 
-It generates a fresh project from the ``dbt-factory`` template with the factory's default options,
-points it at YOUR workspace, drops in the fixture dbt project next to this file, then **deploys the
-factory-generated job, runs it, and verifies it succeeded** — before tearing everything down. This
-is the check that a change to the factory won't break real dbt execution.
+It generates a fresh project from the ``dbt-factory`` template, points it at YOUR workspace, drops
+in the fixture dbt project next to this file, then **deploys the factory-generated job, runs it, and
+verifies it succeeded** — before tearing everything down. It runs the whole flow once per **compute
+mode** (serverless and a job cluster), so a change to the factory is exercised end-to-end on both.
+This is the check that a change to the factory won't break real dbt execution.
 
 Run it with ``make test-e2e`` from the example root. Required environment:
 
@@ -108,18 +109,19 @@ def _sql(cfg: Config, statement: str, schema: str | None = None) -> list[list]:
     return payload.get("result", {}).get("data_array", []) or []
 
 
-def _init_project(cfg: Config, out_dir: Path, schema: str) -> Path:
-    # Set only the values that point the project at this workspace. Everything else (test bundling,
-    # environment key, extra dbt options) is left at the template's defaults — the factory's
-    # out-of-the-box behavior, which is exactly what we want the e2e to exercise.
+def _init_project(cfg: Config, out_dir: Path, schema: str, use_serverless: str, project_name: str) -> Path:
+    # Set the values that point the project at this workspace, plus the compute mode under test
+    # (use_serverless). Everything else (test bundling, environment key, extra dbt options) is left
+    # at the template's defaults — the factory's out-of-the-box behavior, which is what we exercise.
     config_file = out_dir / "init-config.json"
     config_file.write_text(
         json.dumps(
             {
-                "project_name": PROJECT_NAME,
+                "project_name": project_name,
                 "default_catalog": cfg.catalog,
                 "dev_schema": schema,
                 "http_path": cfg.http_path,
+                "use_serverless": use_serverless,
             }
         )
     )
@@ -138,7 +140,7 @@ def _init_project(cfg: Config, out_dir: Path, schema: str) -> Path:
         ],
         cwd=out_dir,
     )
-    return out_dir / PROJECT_NAME
+    return out_dir / project_name
 
 
 def _fill_fixture(project: Path) -> None:
@@ -200,17 +202,20 @@ def _verify_output(cfg: Config, schema: str) -> list[str]:
     return failures
 
 
-def run(cfg: Config) -> bool:
-    schema = f"{cfg.prefix}_{time.strftime('%Y%m%d_%H%M%S')}"
-    job = f"{PROJECT_NAME}_job"
+def run(cfg: Config, label: str, use_serverless: str) -> bool:
+    schema = f"{cfg.prefix}_{label}_{time.strftime('%Y%m%d_%H%M%S')}"
+    # Each mode gets its own project (and therefore its own bundle path + job name), so the two runs
+    # are fully isolated — a silently-failed teardown of one can't collide with the other's deploy.
+    project_name = f"{PROJECT_NAME}_{label}"
+    job = f"{project_name}_job"
     work = Path(tempfile.mkdtemp(prefix="dbtfactory_e2e_"))
     project = None
-    print(f"\n===== dbt-factory e2e — schema {cfg.catalog}.{schema} =====")
+    print(f"\n===== dbt-factory e2e [{label}] — schema {cfg.catalog}.{schema} =====")
     try:
         print("  [1/6] create throwaway schema")
         _sql(cfg, f"CREATE SCHEMA IF NOT EXISTS {cfg.catalog}.{schema}")
         print("  [2/6] init project from template + drop in fixture")
-        project = _init_project(cfg, work, schema)
+        project = _init_project(cfg, work, schema, use_serverless, project_name)
         _fill_fixture(project)
         print("  [3/6] install deps + generate dbt manifest")
         _run(["uv", "sync", "--dev"], cwd=project)
@@ -248,9 +253,17 @@ def run(cfg: Config) -> bool:
 
 
 def main() -> None:
-    passed = run(Config())
-    print(f"\n===== e2e {'PASS' if passed else 'FAIL'} =====")
-    if not passed:
+    cfg = Config()
+    # Run the whole flow once per compute mode so both the serverless and the job-cluster
+    # rendering of the template are deployed and executed for real.
+    results = {
+        label: run(cfg, label, use_serverless)
+        for label, use_serverless in (("serverless", "yes"), ("job_cluster", "no"))
+    }
+    print("\n===== e2e summary =====")
+    for label, ok in results.items():
+        print(f"  {label:12} {'PASS' if ok else 'FAIL'}")
+    if not all(results.values()):
         sys.exit(1)
 
 

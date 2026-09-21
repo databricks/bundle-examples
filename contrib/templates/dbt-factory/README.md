@@ -1,9 +1,9 @@
 # dbt-factory template
 
 A [Declarative Automation Bundles](https://docs.databricks.com/dev-tools/bundles/index.html) template
-that generates a [dbt](https://docs.getdbt.com/) project whose Databricks Workflow is built
+that generates a [dbt](https://docs.getdbt.com/) project whose Databricks Lakeflow Job is built
 **from the dbt manifest at deploy time** — one Databricks task per dbt object (model, seed,
-snapshot, test), running on serverless compute.
+snapshot, test), running on serverless compute by default (or on a job cluster).
 
 It wires together two pieces:
 
@@ -27,10 +27,26 @@ Instead of running the whole dbt project as one opaque task, you get:
 For a pre-initialized, ready-to-read version of what this template produces, see the
 [`contrib/dbt_factory`](../../dbt_factory) example.
 
+## Do developers switch to Jobs, or stay in dbt?
+
+Developers continue working natively in dbt — the factory operates on the deployment side. Lakeflow
+Jobs still runs the dbt project directly; instead of executing it as an opaque black box, the
+factory decomposes the run into discrete, observable task nodes with per-model retries and logs.
+
+## Are dbt Jinja and templating converted to dynamic parameters?
+
+No — there are no dynamic Databricks parameters. The manifest is pre-compiled (`make manifest`), so
+dbt Jinja (`ref()`, `source()`, `var()`) is resolved before deploy into static commands
+(`dbt run --select my_model`). To vary behavior, use dbt's own mechanisms:
+
+- **`vars:` in `dbt_project.yml`** — baked into the manifest ahead of time, for deterministic runs.
+- **`profiles.yml` targets** — selected per deploy target (dev/prod) for per-environment differences.
+- **`env_var()`** — for runtime values that do not alter the graph topology.
+
 ## How it works
 
 `databricks bundle init` scaffolds a self-contained project; each `databricks bundle deploy` then
-regenerates the Workflow from your current dbt manifest, so adding or removing a model just works
+regenerates the job from your current dbt manifest, so adding or removing a model just works
 on the next deploy — no per-model YAML to maintain.
 
 ```mermaid
@@ -45,7 +61,7 @@ flowchart TD
       E --> F["PyDABs load_resources reads the<br/>manifest and generates the job"]
     end
     subgraph runtime["At run time — serverless"]
-      G["Databricks Workflow:<br/>one task per model / seed / snapshot / test"] --> H["Each task triggers dbt<br/>via the runner notebook"]
+      G["Databricks Lakeflow Job:<br/>one task per model / seed / snapshot / test"] --> H["Each task triggers dbt<br/>via the runner notebook"]
       H --> I[("SQL warehouse")]
     end
     B --> C
@@ -81,8 +97,23 @@ $ databricks bundle run <project_name>_job
 | `dev_schema` | Schema for the `dev` target (`prod` uses `default`). |
 | `http_path` | HTTP path of the SQL warehouse dbt connects to. |
 | `bundle_tests` | Bundle single-model tests per resource into one task (performance boost). |
-| `environment_key` | Key of the serverless environment used by the generated job. |
+| `use_serverless` | Run the job on serverless compute (default). Choose `no` to run on a job cluster (classic compute) defined in `resources/__init__.py`, which you can size to your workload. |
+| `environment_key` | Key of the serverless environment used by the generated job (serverless only). |
 | `extra_dbt_command_options` | Extra options appended to every generated dbt command. |
+
+### Compute
+
+The generated job supports two compute types, chosen by the `use_serverless` prompt:
+
+- **Serverless (default)** — no cluster to manage.
+- **Job cluster (classic)** — a single job cluster, created once per run and **shared by all
+  tasks**, then torn down when the run finishes. It only orchestrates (queries run on your SQL
+  warehouse), and it ships with default settings (autoscale 1–4), so you may need to **size it
+  yourself**: edit the `job_clusters` block in the
+  generated `resources/__init__.py` before deploying (see the generated project's README, "Sizing
+  the job cluster").
+
+Running on an existing (all-purpose) cluster is **not supported**.
 
 ## Already have a dbt project?
 

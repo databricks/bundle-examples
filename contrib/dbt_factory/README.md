@@ -1,7 +1,7 @@
 # dbt_factory
 
 This example runs a [dbt](https://docs.getdbt.com/) project on Databricks as a
-**Databricks Workflow with one task per dbt object** (model, seed, snapshot, test) instead of
+**Databricks Lakeflow Job with one task per dbt object** (model, seed, snapshot, test) instead of
 running the whole project as a single opaque task.
 
 It does this by combining two pieces:
@@ -20,13 +20,13 @@ the dbt manifest each time you deploy.
 
 ## Why one task per dbt object?
 
-By default dbt's integration with Databricks Workflows treats the whole project as a single
+By default dbt's integration with Databricks Lakeflow Jobs treats the whole project as a single
 task — a black box. Expanding it into one task per object gives:
 
 * **Faster execution** — independent models run in parallel, and the notebook task type runs dbt
   from a pre-built serverless base environment, avoiding a dependency install on every task.
 * **Visibility & simplified troubleshooting** — pinpoint and fix issues at the model level right
-  in the Databricks Workflows UI.
+  in the Databricks Lakeflow Jobs UI.
 * **Enhanced logging & notifications** — per-task logs and precise, model-level error alerts.
 * **Improved retriability** — retry only the failed model tasks without rerunning the whole project.
 * **Seamless testing** — dbt data tests run as their own tasks right after each model finishes,
@@ -37,10 +37,26 @@ through a small runner notebook using the `dbtRunner` Python API) for the fastes
 times. See the [databricks-dbt-factory README](https://github.com/mwojtyczka/databricks-dbt-factory#benefits)
 for more.
 
+## Do developers switch to Jobs, or stay in dbt?
+
+Developers continue working natively in dbt — the factory operates on the deployment side. Lakeflow
+Jobs still runs the dbt project directly; instead of executing it as an opaque black box, the
+factory decomposes the run into discrete, observable task nodes with per-model retries and logs.
+
+## Are dbt Jinja and templating converted to dynamic parameters?
+
+No — there are no dynamic Databricks parameters. The manifest is pre-compiled (`make manifest`), so
+dbt Jinja (`ref()`, `source()`, `var()`) is resolved before deploy into static commands
+(`dbt run --select my_model`). To vary behavior, use dbt's own mechanisms:
+
+- **`vars:` in `dbt_project.yml`** — baked into the manifest ahead of time, for deterministic runs.
+- **`profiles.yml` targets** — selected per deploy target (dev/prod) for per-environment differences.
+- **`env_var()`** — for runtime values that do not alter the graph topology.
+
 ## How it works
 
 The [`dbt-factory` template](../templates/dbt-factory) scaffolds a self-contained project.
-From then on, each `databricks bundle deploy` regenerates the Workflow from your current dbt
+From then on, each `databricks bundle deploy` regenerates the job from your current dbt
 manifest — add or remove a model and the task graph follows on the next deploy, with no per-model
 YAML to maintain.
 
@@ -56,7 +72,7 @@ flowchart TD
       E --> F["PyDABs load_resources reads the<br/>manifest and generates the job"]
     end
     subgraph runtime["At run time — serverless"]
-      G["Databricks Workflow:<br/>one task per model / seed / snapshot / test"] --> H["Each task triggers dbt<br/>via the runner notebook"]
+      G["Databricks Lakeflow Job:<br/>one task per model / seed / snapshot / test"] --> H["Each task triggers dbt<br/>via the runner notebook"]
       H --> I[("SQL warehouse")]
     end
     B --> C

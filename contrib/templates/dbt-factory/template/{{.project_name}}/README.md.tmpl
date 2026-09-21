@@ -2,7 +2,7 @@
 
 The '{{.project_name}}' project was generated using the **dbt-factory** template for
 Declarative Automation Bundles. It runs a [dbt](https://docs.getdbt.com/) project on Databricks as a
-Databricks Workflow with **one task per dbt object** (model, seed, snapshot, test), instead of
+Databricks Lakeflow Job with **one task per dbt object** (model, seed, snapshot, test), instead of
 running the whole project as a single opaque task.
 
 It combines two pieces:
@@ -15,8 +15,31 @@ It combines two pieces:
   which runs the factory against the manifest and returns the generated job. **No per-model job
   YAML is checked in** — the task graph is generated on the fly from the manifest.
 
+{{ if eq .use_serverless "no" -}}
+This project runs on a **job cluster** (classic compute) using the **notebook task type**. A single
+job cluster is created once per run and **shared by every task**, then torn down when the run
+finishes. It is defined in `resources/__init__.py` (the `job_clusters` block in `build_job`) — see
+[Sizing the job cluster](#sizing-the-job-cluster) below.
+{{- else -}}
 This project uses **serverless compute** and the **notebook task type** for the fastest task
 start times.
+{{- end}}
+
+## Do developers switch to Jobs, or stay in dbt?
+
+Developers continue working natively in dbt — the factory operates on the deployment side. Lakeflow
+Jobs still runs the dbt project directly; instead of executing it as an opaque black box, the
+factory decomposes the run into discrete, observable task nodes with per-model retries and logs.
+
+## Are dbt Jinja and templating converted to dynamic parameters?
+
+No — there are no dynamic Databricks parameters. The manifest is pre-compiled (`make manifest`), so
+dbt Jinja (`ref()`, `source()`, `var()`) is resolved before deploy into static commands
+(`dbt run --select my_model`). To vary behavior, use dbt's own mechanisms:
+
+- **`vars:` in `dbt_project.yml`** — baked into the manifest ahead of time, for deterministic runs.
+- **`profiles.yml` targets** — selected per deploy target (dev/prod) for per-environment differences.
+- **`env_var()`** — for runtime values that do not alter the graph topology.
 
 ## Setup
 
@@ -68,6 +91,45 @@ Open the run URL the CLI prints to watch the generated per-model task graph exec
 
 ## Configuring the generated job
 
+{{ if eq .use_serverless "no" -}}
+The knobs you chose at init are constants at the top of `resources/__init__.py`
+(`BUNDLE_TESTS`, `JOB_CLUSTER_KEY`, `EXTRA_DBT_COMMAND_OPTIONS`); edit them there to change
+behavior. The dbt target, warehouse, catalog, and schema live in `dbt_profiles/profiles.yml` and
+are selected per bundle target via `--target ${bundle.target}`.
+
+### Sizing the job cluster
+
+**You must size the cluster yourself by editing a file — there is no `bundle init` prompt for it.**
+The job cluster ships with default settings; to change them, open
+[`resources/__init__.py`](resources/__init__.py) and edit the `job_clusters` block inside
+`build_job`:
+
+```python
+"new_cluster": {
+    "spark_version": "18.x-scala2.13",          # Databricks Runtime version
+    "node_type_id": "...",                       # instance type
+    "autoscale": {"min_workers": 1, "max_workers": 4},
+},
+```
+
+This job cluster only **orchestrates**: each task runs the runner notebook, which sends your models
+as SQL to the **SQL warehouse** set by `http_path` in `dbt_profiles/profiles.yml`. That warehouse —
+not this cluster — executes the queries, so keep the cluster lightweight. Size it for how many
+notebook tasks run in parallel (the autoscale `min_workers`/`max_workers`), and size the **SQL
+warehouse** for your query load. All tasks share this one cluster for the whole run. The defaults
+are a starting point, not a tuned configuration.
+
+**When to do this:** the cluster is created from this block at `databricks bundle deploy` time (not
+at `bundle init`). So edit it **before your first deploy** (`make deploy` / `databricks bundle
+deploy`), and after any later change **redeploy** for the new size to take effect — nothing changes
+the running job until you redeploy.
+
+The runtime dbt-databricks version is not a knob: a job cluster has no serverless base environment,
+so at deploy time `resources/__init__.py` installs the exact `dbt-databricks` from your `.venv` (the
+version that generated the manifest) on the cluster as a task library. `pyproject.toml` is the
+single source of truth: change the version there, re-run `make setup`, and the next deploy uses
+it — so what runs in Databricks matches what you tested with.
+{{- else -}}
 The knobs you chose at init are constants at the top of `resources/__init__.py`
 (`BUNDLE_TESTS`, `ENVIRONMENT_KEY`, `EXTRA_DBT_COMMAND_OPTIONS`); edit them there to change
 behavior. The dbt target, warehouse, catalog, and schema live in `dbt_profiles/profiles.yml` and
@@ -79,6 +141,7 @@ generated the manifest), shipped as a `dbt_serverless_env.yaml` [base environmen
 the bundle generates and syncs each deploy. `pyproject.toml` is the single source of truth: change
 the version there, re-run `make setup`, and the next deploy uses it — so what runs in Databricks
 matches what you tested with.
+{{- end}}
 
 ## Tests
 

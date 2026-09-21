@@ -1,0 +1,27 @@
+resources:
+  jobs:
+    example_job:
+      name: "Example running a Scala JAR built with sbt"
+
+      tasks:
+        - task_key: task
+
+          spark_jar_task:
+            main_class_name: SparkApp
+
+          libraries:
+            - jar: ../target/scala-2.12/sbt-example*.jar
+
+          new_cluster:
+            node_type_id: i3.xlarge
+            spark_version: 15.4.x-scala2.12
+            num_workers: 0
+            spark_conf:
+                "spark.databricks.cluster.profile": "singleNode"
+                "spark.master": "local[*, 4]"
+            custom_tags:
+                "ResourceClass": "SingleNode"
+
+            # The cluster must run in single user isolation mode.
+            # This means it is compatible with Unity Catalog and can access Unity Catalog Volumes.
+            data_security_mode: SINGLE_USER

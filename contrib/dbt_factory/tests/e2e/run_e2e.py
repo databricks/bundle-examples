@@ -13,6 +13,10 @@ Run it with ``make test-e2e`` from the example root. Required environment:
     DBT_FACTORY_HTTP_PATH           SQL warehouse HTTP path, e.g. /sql/1.0/warehouses/<id>.
     DBT_FACTORY_CATALOG             Catalog to create the throwaway schema + tables in (write access).
 
+The job-cluster mode additionally needs permission to create clusters (the cluster-create
+entitlement) — the serverless mode does not. Without it, the serverless half passes and the
+job-cluster half fails at deploy/run with a PERMISSION_DENIED cluster-creation error.
+
 Optional:
     DBT_FACTORY_SCHEMA_PREFIX       Schema-name prefix (default: dbt_factory_e2e). A unique
                                 <prefix>_<timestamp> schema is created and dropped per run.

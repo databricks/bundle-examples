@@ -15,6 +15,10 @@ it's not a CI gate; run it locally before merging a change to the factory.
 
 - A Databricks CLI profile for your workspace: `databricks auth login --host <your-workspace-url>`.
 - A SQL warehouse, and a catalog you can create schemas/tables in.
+- Permission to **create clusters** (the cluster-create entitlement) — the job-cluster mode
+  provisions a single-node job cluster. The serverless mode doesn't need this; without the
+  entitlement the serverless half passes and the job-cluster half fails with a `PERMISSION_DENIED`
+  cluster-creation error.
 
 ## Run it
 

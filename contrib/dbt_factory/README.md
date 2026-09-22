@@ -1,7 +1,7 @@
 # dbt_factory
 
 This example runs a [dbt](https://docs.getdbt.com/) project on Databricks as a
-**Databricks Workflow with one task per dbt object** (model, seed, snapshot, test) instead of
+**Databricks Lakeflow Job with one task per dbt object** (model, seed, snapshot, test) instead of
 running the whole project as a single opaque task.
 
 It does this by combining two pieces:
@@ -20,13 +20,13 @@ the dbt manifest each time you deploy.
 
 ## Why one task per dbt object?
 
-By default dbt's integration with Databricks Workflows treats the whole project as a single
+By default dbt's integration with Databricks Lakeflow Jobs treats the whole project as a single
 task — a black box. Expanding it into one task per object gives:
 
 * **Faster execution** — independent models run in parallel, and the notebook task type runs dbt
   from a pre-built serverless base environment, avoiding a dependency install on every task.
 * **Visibility & simplified troubleshooting** — pinpoint and fix issues at the model level right
-  in the Databricks Workflows UI.
+  in the Databricks Lakeflow Jobs UI.
 * **Enhanced logging & notifications** — per-task logs and precise, model-level error alerts.
 * **Improved retriability** — retry only the failed model tasks without rerunning the whole project.
 * **Seamless testing** — dbt data tests run as their own tasks right after each model finishes,
@@ -40,7 +40,7 @@ for more.
 ## How it works
 
 The [`dbt-factory` template](../templates/dbt-factory) scaffolds a self-contained project.
-From then on, each `databricks bundle deploy` regenerates the Workflow from your current dbt
+From then on, each `databricks bundle deploy` regenerates the job from your current dbt
 manifest — add or remove a model and the task graph follows on the next deploy, with no per-model
 YAML to maintain.
 
@@ -56,7 +56,7 @@ flowchart TD
       E --> F["PyDABs load_resources reads the<br/>manifest and generates the job"]
     end
     subgraph runtime["At run time — serverless"]
-      G["Databricks Workflow:<br/>one task per model / seed / snapshot / test"] --> H["Each task triggers dbt<br/>via the runner notebook"]
+      G["Databricks Lakeflow Job:<br/>one task per model / seed / snapshot / test"] --> H["Each task triggers dbt<br/>via the runner notebook"]
       H --> I[("SQL warehouse")]
     end
     B --> C
@@ -168,55 +168,6 @@ This guarantees the version running in Databricks matches the one you tested wit
 The version is shipped as a small `dbt_serverless_env.yaml` [base environment](https://docs.databricks.com/aws/en/compute/serverless/dependencies)
 that the bundle generates and syncs on every deploy (git-ignored), so Databricks pre-builds the
 environment once instead of installing dbt on every task.
-
-## Migrating an existing dbt project
-
-Bring your own dbt project by **generating a fresh project from the template and moving your dbt
-files into it.** You don't touch dependencies, the vendored factory, or any paths — the generated
-project already ships all of that.
-
-1. Generate a new project (or copy this `dbt_factory` example):
-
-   ```
-   $ databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/dbt-factory
-   ```
-
-2. Remove the starter models and copy your dbt sources into the matching `src/` subdirectories:
-
-   ```
-   $ rm -r src/models/example
-   # Copy whichever of these your project has (skip the ones you don't use):
-   $ cp -R /path/to/your/dbt/models/*     src/models/
-   $ cp -R /path/to/your/dbt/seeds/*      src/seeds/
-   $ cp -R /path/to/your/dbt/snapshots/*  src/snapshots/
-   $ cp -R /path/to/your/dbt/macros/*     src/macros/
-   $ cp -R /path/to/your/dbt/tests/*      src/tests/
-   ```
-
-   The generated `dbt_project.yml` already points `model-paths`, `seed-paths`, etc. at these
-   `src/` folders, so your files are picked up as-is. Merge any model/seed configuration from your
-   own `dbt_project.yml` into the generated one (keep the generated `name`/`profile`), and remove
-   the leftover `models: dbt_factory: example:` block that referenced the deleted starter models —
-   otherwise `dbt parse` warns that those config paths don't apply to any resource. If you use dbt
-   packages, copy your `packages.yml` to the project root too: `make manifest` installs them
-   (`dbt deps`) and the bundle syncs the resulting `dbt_packages/` to the workspace, so the job
-   never installs packages at runtime.
-
-3. Point `dbt_profiles/profiles.yml` at your warehouse (`http_path`, `catalog`, `schema`). Leave
-   the `host`/`token` lines as they are — the runner notebook sets those at runtime.
-
-4. Generate the manifest and deploy:
-
-   ```
-   $ make setup
-   $ make manifest      # dbt parse -> target/manifest.json
-   $ databricks bundle deploy --target dev
-   ```
-
-That's the whole migration: no dependency wrangling and no path edits, because your project keeps
-the generated layout (dbt project at the bundle root, factory under `src/`). If you'd rather keep
-your project's existing directory structure instead of `src/`, edit the `*-paths` in
-`dbt_project.yml` to point at your folders — nothing else changes.
 
 ## Tests
 

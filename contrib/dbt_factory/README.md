@@ -37,22 +37,6 @@ through a small runner notebook using the `dbtRunner` Python API) for the fastes
 times. See the [databricks-dbt-factory README](https://github.com/mwojtyczka/databricks-dbt-factory#benefits)
 for more.
 
-## Do developers switch to Jobs, or stay in dbt?
-
-Developers continue working natively in dbt — the factory operates on the deployment side. Lakeflow
-Jobs still runs the dbt project directly; instead of executing it as an opaque black box, the
-factory decomposes the run into discrete, observable task nodes with per-model retries and logs.
-
-## Are dbt Jinja and templating converted to dynamic parameters?
-
-No — there are no dynamic Databricks parameters. The manifest is pre-compiled (`make manifest`), so
-dbt Jinja (`ref()`, `source()`, `var()`) is resolved before deploy into static commands
-(`dbt run --select my_model`). To vary behavior, use dbt's own mechanisms:
-
-- **`vars:` in `dbt_project.yml`** — baked into the manifest ahead of time, for deterministic runs.
-- **`profiles.yml` targets** — selected per deploy target (dev/prod) for per-environment differences.
-- **`env_var()`** — for runtime values that do not alter the graph topology.
-
 ## How it works
 
 The [`dbt-factory` template](../templates/dbt-factory) scaffolds a self-contained project.
@@ -184,55 +168,6 @@ This guarantees the version running in Databricks matches the one you tested wit
 The version is shipped as a small `dbt_serverless_env.yaml` [base environment](https://docs.databricks.com/aws/en/compute/serverless/dependencies)
 that the bundle generates and syncs on every deploy (git-ignored), so Databricks pre-builds the
 environment once instead of installing dbt on every task.
-
-## Migrating an existing dbt project
-
-Bring your own dbt project by **generating a fresh project from the template and moving your dbt
-files into it.** You don't touch dependencies, the vendored factory, or any paths — the generated
-project already ships all of that.
-
-1. Generate a new project (or copy this `dbt_factory` example):
-
-   ```
-   $ databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/dbt-factory
-   ```
-
-2. Remove the starter models and copy your dbt sources into the matching `src/` subdirectories:
-
-   ```
-   $ rm -r src/models/example
-   # Copy whichever of these your project has (skip the ones you don't use):
-   $ cp -R /path/to/your/dbt/models/*     src/models/
-   $ cp -R /path/to/your/dbt/seeds/*      src/seeds/
-   $ cp -R /path/to/your/dbt/snapshots/*  src/snapshots/
-   $ cp -R /path/to/your/dbt/macros/*     src/macros/
-   $ cp -R /path/to/your/dbt/tests/*      src/tests/
-   ```
-
-   The generated `dbt_project.yml` already points `model-paths`, `seed-paths`, etc. at these
-   `src/` folders, so your files are picked up as-is. Merge any model/seed configuration from your
-   own `dbt_project.yml` into the generated one (keep the generated `name`/`profile`), and remove
-   the leftover `models: dbt_factory: example:` block that referenced the deleted starter models —
-   otherwise `dbt parse` warns that those config paths don't apply to any resource. If you use dbt
-   packages, copy your `packages.yml` to the project root too: `make manifest` installs them
-   (`dbt deps`) and the bundle syncs the resulting `dbt_packages/` to the workspace, so the job
-   never installs packages at runtime.
-
-3. Point `dbt_profiles/profiles.yml` at your warehouse (`http_path`, `catalog`, `schema`). Leave
-   the `host`/`token` lines as they are — the runner notebook sets those at runtime.
-
-4. Generate the manifest and deploy:
-
-   ```
-   $ make setup
-   $ make manifest      # dbt parse -> target/manifest.json
-   $ databricks bundle deploy --target dev
-   ```
-
-That's the whole migration: no dependency wrangling and no path edits, because your project keeps
-the generated layout (dbt project at the bundle root, factory under `src/`). If you'd rather keep
-your project's existing directory structure instead of `src/`, edit the `*-paths` in
-`dbt_project.yml` to point at your folders — nothing else changes.
 
 ## Tests
 

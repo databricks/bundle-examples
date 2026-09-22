@@ -27,22 +27,6 @@ Instead of running the whole dbt project as one opaque task, you get:
 For a pre-initialized, ready-to-read version of what this template produces, see the
 [`contrib/dbt_factory`](../../dbt_factory) example.
 
-## Do developers switch to Jobs, or stay in dbt?
-
-Developers continue working natively in dbt — the factory operates on the deployment side. Lakeflow
-Jobs still runs the dbt project directly; instead of executing it as an opaque black box, the
-factory decomposes the run into discrete, observable task nodes with per-model retries and logs.
-
-## Are dbt Jinja and templating converted to dynamic parameters?
-
-No — there are no dynamic Databricks parameters. The manifest is pre-compiled (`make manifest`), so
-dbt Jinja (`ref()`, `source()`, `var()`) is resolved before deploy into static commands
-(`dbt run --select my_model`). To vary behavior, use dbt's own mechanisms:
-
-- **`vars:` in `dbt_project.yml`** — baked into the manifest ahead of time, for deterministic runs.
-- **`profiles.yml` targets** — selected per deploy target (dev/prod) for per-environment differences.
-- **`env_var()`** — for runtime values that do not alter the graph topology.
-
 ## How it works
 
 `databricks bundle init` scaffolds a self-contained project; each `databricks bundle deploy` then
@@ -72,6 +56,10 @@ flowchart TD
 ```
 
 ## Usage
+
+This scaffolds a **new** project preloaded with the template's default example — a couple of starter
+models you replace with your own. (Already have a dbt project? See
+[Already have a dbt project?](#already-have-a-dbt-project) below.)
 
 ```
 $ databricks bundle init https://github.com/databricks/bundle-examples --template-dir contrib/templates/dbt-factory
@@ -116,10 +104,63 @@ Running on an existing (all-purpose) cluster is **not supported**.
 
 ## Already have a dbt project?
 
-This template scaffolds a new project. To reuse an **existing** dbt project, generate a project
-from this template and move your dbt files into it — see the
-["Migrating an existing dbt project"](../../dbt_factory/README.md#migrating-an-existing-dbt-project)
-guide in the example. You won't need to bring any dependencies or edit paths.
+Bring your own dbt project by generating a fresh project (as in [Usage](#usage) above) and moving
+your dbt files into it. You don't touch dependencies, the vendored factory, or any paths — the
+generated project already ships all of that.
+
+1. Remove the starter models and copy your dbt sources into the matching `src/` subdirectories:
+
+   ```
+   $ rm -r src/models/example
+   # Copy whichever of these your project has (skip the ones you don't use):
+   $ cp -R /path/to/your/dbt/models/*     src/models/
+   $ cp -R /path/to/your/dbt/seeds/*      src/seeds/
+   $ cp -R /path/to/your/dbt/snapshots/*  src/snapshots/
+   $ cp -R /path/to/your/dbt/macros/*     src/macros/
+   $ cp -R /path/to/your/dbt/tests/*      src/tests/
+   ```
+
+   The generated `dbt_project.yml` already points `model-paths`, `seed-paths`, etc. at these `src/`
+   folders, so your files are picked up as-is. Merge any model/seed configuration from your own
+   `dbt_project.yml` into the generated one (keep the generated `name`/`profile`), and remove the
+   leftover `models:` block that referenced the deleted starter models — otherwise `dbt parse` warns
+   that those config paths don't apply to any resource. If you use dbt packages, copy your
+   `packages.yml` to the project root too: `make manifest` installs them (`dbt deps`) and the bundle
+   syncs the resulting `dbt_packages/` to the workspace, so the job never installs packages at
+   runtime.
+
+2. Point `dbt_profiles/profiles.yml` at your warehouse (`http_path`, `catalog`, `schema`). Leave the
+   `host`/`token` lines as they are — the runner notebook sets those at runtime.
+
+3. Generate the manifest, deploy, and run:
+
+   ```
+   $ make setup
+   $ make manifest      # dbt parse -> target/manifest.json
+   $ databricks bundle deploy --target dev
+   $ databricks bundle run <project_name>_job
+   ```
+
+That's the whole migration: no dependency wrangling and no path edits, because your project keeps the
+generated layout (dbt project at the bundle root, factory under `src/`). To keep your existing
+directory structure instead of `src/`, edit the `*-paths` in `dbt_project.yml` to point at your
+folders — nothing else changes.
+
+## Do developers switch to Jobs, or stay in dbt?
+
+Developers continue working natively in dbt — the factory operates on the deployment side. Lakeflow
+Jobs still runs the dbt project directly; instead of executing it as an opaque black box, the
+factory decomposes the run into discrete, observable task nodes with per-model retries and logs.
+
+## Are dbt Jinja and templating converted to dynamic parameters?
+
+No — there are no dynamic Databricks parameters. The manifest is pre-compiled (`make manifest`), so
+dbt Jinja (`ref()`, `source()`, `var()`) is resolved before deploy into static commands
+(`dbt run --select my_model`). To vary behavior, use dbt's own mechanisms:
+
+- **`vars:` in `dbt_project.yml`** — baked into the manifest ahead of time, for deterministic runs.
+- **`profiles.yml` targets** — selected per deploy target (dev/prod) for per-environment differences.
+- **`env_var()`** — for runtime values that do not alter the graph topology.
 
 See https://github.com/databricks/bundle-examples/blob/main/contrib/README.md for more about
 community contributions.

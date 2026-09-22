@@ -25,22 +25,6 @@ This project uses **serverless compute** and the **notebook task type** for the 
 start times.
 {{- end}}
 
-## Do developers switch to Jobs, or stay in dbt?
-
-Developers continue working natively in dbt — the factory operates on the deployment side. Lakeflow
-Jobs still runs the dbt project directly; instead of executing it as an opaque black box, the
-factory decomposes the run into discrete, observable task nodes with per-model retries and logs.
-
-## Are dbt Jinja and templating converted to dynamic parameters?
-
-No — there are no dynamic Databricks parameters. The manifest is pre-compiled (`make manifest`), so
-dbt Jinja (`ref()`, `source()`, `var()`) is resolved before deploy into static commands
-(`dbt run --select my_model`). To vary behavior, use dbt's own mechanisms:
-
-- **`vars:` in `dbt_project.yml`** — baked into the manifest ahead of time, for deterministic runs.
-- **`profiles.yml` targets** — selected per deploy target (dev/prod) for per-environment differences.
-- **`env_var()`** — for runtime values that do not alter the graph topology.
-
 ## Setup
 
 1. Install the [Databricks CLI](https://docs.databricks.com/dev-tools/cli/databricks-cli.html)
@@ -163,6 +147,12 @@ folders (`src/models`, `src/seeds`, …) in place of the starter models, then ru
 If you use dbt packages, copy your `packages.yml` to the project root too: `make manifest`
 installs them (`dbt deps`) and the bundle syncs the resulting `dbt_packages/` to the workspace,
 so the job never installs packages at runtime.
-See the
-[Migrating an existing dbt project](https://github.com/databricks/bundle-examples/blob/main/contrib/dbt_factory/README.md#migrating-an-existing-dbt-project)
-guide for the full steps.
+
+## Local development with dbt
+
+`dbt parse` (via `make manifest`) makes no warehouse connection, so it works as-is. To run models
+locally (`dbt run`, `dbt test`), dbt needs `DBT_HOST` (workspace URL) and `DBT_ACCESS_TOKEN`: the
+deployed job's runner notebook sets both at runtime — that's what the `env_var(...)` host/token
+lines in `dbt_profiles/profiles.yml` read, so you configure nothing there. For local runs, export
+those two variables yourself, or create your own profile with `dbt init` (see
+[`profile_template.yml`](profile_template.yml)).

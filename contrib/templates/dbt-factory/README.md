@@ -108,10 +108,9 @@ The generated job supports two compute types, chosen by the `use_serverless` pro
 - **Serverless (default)** — no cluster to manage.
 - **Job cluster (classic)** — a single job cluster, created once per run and **shared by all
   tasks**, then torn down when the run finishes. It only orchestrates (queries run on your SQL
-  warehouse), and it ships with default settings (autoscale 1–4), so you may need to **size it
-  yourself**: edit the `job_clusters` block in the
-  generated `resources/__init__.py` before deploying (see the generated project's README, "Sizing
-  the job cluster").
+  warehouse), so it defaults to a **single node** (extra workers don't speed dbt up). You can size
+  it by editing the `job_clusters` block in the generated `resources/__init__.py` before deploying
+  (see the generated project's README, "Sizing the job cluster").
 
 Running on an existing (all-purpose) cluster is **not supported**.
 

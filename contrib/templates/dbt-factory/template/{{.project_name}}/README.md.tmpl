@@ -108,16 +108,18 @@ The job cluster ships with default settings; to change them, open
 "new_cluster": {
     "spark_version": "18.x-scala2.13",          # Databricks Runtime version
     "node_type_id": "...",                       # instance type
-    "autoscale": {"min_workers": 1, "max_workers": 4},
+    "num_workers": 0,                            # single node (see below)
+    "spark_conf": {"spark.databricks.cluster.profile": "singleNode", "spark.master": "local[*]"},
+    "custom_tags": {"ResourceClass": "SingleNode"},
 },
 ```
 
-This job cluster only **orchestrates**: each task runs the runner notebook, which sends your models
-as SQL to the **SQL warehouse** set by `http_path` in `dbt_profiles/profiles.yml`. That warehouse —
-not this cluster — executes the queries, so keep the cluster lightweight. Size it for how many
-notebook tasks run in parallel (the autoscale `min_workers`/`max_workers`), and size the **SQL
-warehouse** for your query load. All tasks share this one cluster for the whole run. The defaults
-are a starting point, not a tuned configuration.
+This job cluster only **orchestrates**: each task runs the runner notebook, which submits your
+models as SQL to the **SQL warehouse** set by `http_path` in `dbt_profiles/profiles.yml`. That
+warehouse — not this cluster — executes the queries. Because the tasks are I/O-bound (submit SQL,
+wait), the default is a **single-node** cluster: adding workers does **not** speed dbt up. Bump
+`node_type_id` only if orchestration itself needs more headroom, and size the **SQL warehouse** for
+your query load. All tasks share this one cluster for the whole run.
 
 **When to do this:** the cluster is created from this block at `databricks bundle deploy` time (not
 at `bundle init`). So edit it **before your first deploy** (`make deploy` / `databricks bundle

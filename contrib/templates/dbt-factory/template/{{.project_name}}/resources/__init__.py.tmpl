@@ -199,10 +199,11 @@ def build_job(target: str) -> Job:
             },
             "tasks": _build_tasks(target),
             # The job cluster every task runs on. It only orchestrates — each task runs the runner
-            # notebook, which sends SQL to the warehouse in dbt_profiles/profiles.yml — so keep it
-            # lightweight: size node_type_id and the autoscale min/max_workers for how many tasks
-            # run in parallel, not for query load (that runs on the warehouse). These defaults
-            # (autoscale 1-4) are a starting point. Changes take effect on the next `bundle deploy`.
+            # notebook, which submits SQL to the warehouse in dbt_profiles/profiles.yml and waits —
+            # so it is a single-node cluster by default: extra workers do not speed dbt up (the
+            # warehouse runs the queries). Bump node_type_id if orchestration itself needs more
+            # headroom, and scale the SQL warehouse for query load. Changes take effect on the next
+            # `databricks bundle deploy`.
             "job_clusters": [
                 {
                     "job_cluster_key": JOB_CLUSTER_KEY,
@@ -212,7 +213,14 @@ def build_job(target: str) -> Job:
                         # specific release (e.g. "18.2.x-scala2.13") only if you want to pin it.
                         "spark_version": "18.x-scala2.13",
                         "node_type_id": "{{smallest_node_type}}",
-                        "autoscale": {"min_workers": 1, "max_workers": 4},
+                        # Single node (driver only): no workers, since the tasks are I/O-bound
+                        # orchestration, not Spark compute.
+                        "num_workers": 0,
+                        "spark_conf": {
+                            "spark.databricks.cluster.profile": "singleNode",
+                            "spark.master": "local[*]",
+                        },
+                        "custom_tags": {"ResourceClass": "SingleNode"},
                     },
                 }
             ],

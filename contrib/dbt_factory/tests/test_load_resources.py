@@ -94,8 +94,8 @@ def test_load_resources_registers_the_job():
 
 
 def test_dependency_pin_rejects_non_pypi_versions(monkeypatch):
-    # A local or dev build cannot be pip-installed from PyPI when Databricks builds the
-    # serverless environment, so the deploy must fail early with a clear message.
+    # A local or dev build cannot be pip-installed from PyPI, so the deploy must fail early
+    # with a clear message.
     for installed in ("1.9.0+custom", "1.13.0.dev0", "not-a-version"):
         monkeypatch.setattr(resources, "version", lambda name, v=installed: v)
         with pytest.raises(RuntimeError, match="PyPI"):

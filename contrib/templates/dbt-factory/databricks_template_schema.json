@@ -1,5 +1,5 @@
 {
-    "welcome_message": "\nWelcome to the dbt-factory template for Declarative Automation Bundles!\nThis generates a dbt project whose Databricks Workflow is built from the dbt manifest at deploy time — one task per dbt object (model, seed, snapshot, test), on serverless.",
+    "welcome_message": "\nWelcome to the dbt-factory template for Declarative Automation Bundles!\nThis generates a dbt project whose Databricks Lakeflow Job is built from the dbt manifest at deploy time — one task per dbt object (model, seed, snapshot, test), on serverless compute (the default) or a job cluster.",
     "properties": {
         "project_name": {
             "type": "string",
@@ -38,19 +38,33 @@
             "description": "\nBundle single-model tests per resource into one dbt test task? This is a performance boost for projects with many tests (fewer Databricks task startups), at the cost of per-test visibility in the UI.\nbundle_tests",
             "order": 5
         },
+        "use_serverless": {
+            "type": "string",
+            "default": "yes",
+            "enum": ["yes", "no"],
+            "description": "\nRun the generated job on serverless compute? Choose 'no' to run on a job cluster (classic compute) defined in resources/__init__.py, which you can then size to your workload.\nuse_serverless",
+            "order": 6
+        },
         "environment_key": {
             "type": "string",
             "default": "Default",
             "pattern": "^\\w+$",
             "pattern_match_failure_message": "Invalid environment key.",
+            "skip_prompt_if": {
+                "properties": {
+                    "use_serverless": {
+                        "const": "no"
+                    }
+                }
+            },
             "description": "\nKey of the serverless environment used by the generated job.\nenvironment_key",
-            "order": 6
+            "order": 7
         },
         "extra_dbt_command_options": {
             "type": "string",
             "default": "",
             "description": "\nAdditional options appended to every generated dbt command (e.g. \"--full-refresh\"). Selection and parse-context options (--select, --vars, --target, ...) are rejected. Leave blank if unsure.\nextra_dbt_command_options",
-            "order": 7
+            "order": 8
         }
     },
     "success_message": "\n\nYour new project has been created in the '{{.project_name}}' directory!\n\nNext steps:\n\n  $ cd {{.project_name}}\n  $ make setup       # install dependencies into .venv\n  $ make manifest    # generate the dbt manifest (dbt parse) — required before the first deploy\n  $ databricks bundle deploy --target dev\n\nRefer to the README.md file for full instructions."

@@ -1,11 +1,12 @@
 # End-to-end test
 
 `make test-e2e` (from the example root) is the check that a change to the factory won't break real dbt
-execution. It generates a fresh project from the [`dbt-factory` template](../../../templates/dbt-factory)
-with the factory's default options, points it at **your** Databricks workspace, drops in the fixture
-dbt project in this directory, then **deploys the factory-generated job, runs it, verifies the
-output, and tears everything down**. Every run destroys its bundle and drops its schema, pass or
-fail, so nothing is left behind.
+execution. It generates a fresh project from the [`dbt-factory` template](../../../templates/dbt-factory),
+points it at **your** Databricks workspace, drops in the fixture dbt project in this directory, then
+**deploys the factory-generated job, runs it, verifies the output, and tears everything down**. It
+does this once for **each compute mode** — serverless and a job cluster — so both renderings of the
+template are deployed and executed for real. Every run destroys its bundle and drops its schema, pass
+or fail, so nothing is left behind.
 
 Unlike `make test` (fast, offline unit tests), this one deploys and runs on a real workspace — so
 it's not a CI gate; run it locally before merging a change to the factory.
@@ -14,6 +15,10 @@ it's not a CI gate; run it locally before merging a change to the factory.
 
 - A Databricks CLI profile for your workspace: `databricks auth login --host <your-workspace-url>`.
 - A SQL warehouse, and a catalog you can create schemas/tables in.
+- Permission to **create clusters** (the cluster-create entitlement) — the job-cluster mode
+  provisions a single-node job cluster. The serverless mode doesn't need this; without the
+  entitlement the serverless half passes and the job-cluster half fails with a `PERMISSION_DENIED`
+  cluster-creation error.
 
 ## Run it
 

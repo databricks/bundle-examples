@@ -11,7 +11,9 @@ from importlib.metadata import version
 from pathlib import Path
 
 import pytest
+{{- if eq .use_serverless "yes"}}
 import yaml
+{{- end}}
 from databricks.bundles.core import Bundle
 
 import resources
@@ -51,6 +53,42 @@ def test_build_tasks_covers_every_buildable_node():
     assert expected_keys <= task_keys
 
 
+{{ if eq .use_serverless "no" -}}
+def test_generated_tasks_are_job_cluster_notebook_tasks():
+    tasks = resources._build_tasks("dev")
+
+    for task in tasks:
+        assert "notebook_task" in task, task
+        assert task["job_cluster_key"] == resources.JOB_CLUSTER_KEY
+        assert "environment_key" not in task  # job cluster, not serverless
+        notebook_task = task["notebook_task"]
+        assert notebook_task["notebook_path"] == resources.RUNNER_NOTEBOOK_PATH
+        # The dbt target is injected into every command.
+        assert "--target dev" in notebook_task["base_parameters"]["dbt_commands"]
+
+
+def test_tasks_pin_dbt_databricks_as_a_library():
+    # A job cluster has no serverless base environment, so every task installs dbt-databricks
+    # (pinned to the version in the bundle venv) as a cluster library.
+    pin = f"dbt-databricks=={version('dbt-databricks')}"
+    tasks = resources._build_tasks("dev")
+
+    for task in tasks:
+        assert task["libraries"] == [{"pypi": {"package": pin}}]
+
+
+def test_job_cluster_is_defined_on_the_job():
+    job = resources.build_job("dev")
+    assert len(job.job_clusters) == 1
+    assert job.job_clusters[0].job_cluster_key == resources.JOB_CLUSTER_KEY
+
+
+def test_load_resources_registers_the_job():
+    result = resources.load_resources(Bundle(target="dev"))
+    assert resources.JOB_NAME in result.jobs
+    job = result.jobs[resources.JOB_NAME]
+    assert job.job_clusters[0].job_cluster_key == resources.JOB_CLUSTER_KEY
+{{- else -}}
 def test_generated_tasks_are_serverless_notebook_tasks():
     tasks = resources._build_tasks("dev")
 
@@ -91,15 +129,17 @@ def test_load_resources_registers_the_job():
         assert content["dependencies"] == [pin]
     finally:
         (PROJECT_ROOT / resources.SERVERLESS_ENV_FILE).unlink(missing_ok=True)
+{{- end}}
 
 
 def test_dependency_pin_rejects_non_pypi_versions(monkeypatch):
-    # A local or dev build cannot be pip-installed from PyPI when Databricks builds the
-    # serverless environment, so the deploy must fail early with a clear message.
+    # A local or dev build cannot be pip-installed from PyPI, so the deploy must fail early
+    # with a clear message.
     for installed in ("1.9.0+custom", "1.13.0.dev0", "not-a-version"):
         monkeypatch.setattr(resources, "version", lambda name, v=installed: v)
         with pytest.raises(RuntimeError, match="PyPI"):
             resources._dbt_databricks_dependency()
+{{- if eq .use_serverless "yes"}}
 
 
 def test_environment_file_write_is_idempotent():
@@ -119,3 +159,4 @@ def test_environment_file_write_is_idempotent():
         if env_file.exists():
             env_file.chmod(0o644)
             env_file.unlink()
+{{- end}}

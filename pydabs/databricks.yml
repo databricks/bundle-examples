@@ -1,4 +1,4 @@
-# This is a Databricks asset bundle definition for pydabs.
+# This is a Declarative Automation Bundle definition for pydabs.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 bundle:
   name: pydabs

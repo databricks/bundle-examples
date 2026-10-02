@@ -1,0 +1,25 @@
+[
+  {
+    "name": "{{.table_1_name}}",
+    "format": "{{.table_1_format}}",
+    "format_options": {
+{{- if eq .table_1_format "csv"}}
+      "header": "{{.table_1_csv_header}}",
+      "delimiter": "{{if eq .table_1_csv_delimiter "\t"}}\\t{{else}}{{.table_1_csv_delimiter}}{{end}}",
+      "escape": "{{if eq .table_1_csv_escape "\""}}\"{{else if eq .table_1_csv_escape "\\"}}\\{{else}}{{.table_1_csv_escape}}{{end}}",
+      "multiLine": "{{.table_1_csv_multiline}}",
+{{- else if eq .table_1_format "json"}}
+      "allowComments": "{{.table_1_json_allow_comments}}",
+      "allowSingleQuotes": "{{.table_1_json_allow_single_quotes}}",
+      "inferTimestamp": "{{.table_1_json_infer_timestamp}}",
+      "multiLine": "{{.table_1_json_multiline}}",
+{{- end}}
+      "cloudFiles.schemaEvolutionMode": "{{.table_1_schema_evolution_mode}}"
+    }{{if .table_1_schema_hints}},
+    "schema_hints": "{{.table_1_schema_hints}}"{{end}}
+  }
+]
+
+
+
+

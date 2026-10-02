@@ -1,0 +1,25 @@
+resources:
+  jobs:
+    model_deploy:
+      name: model_endpoint_deploy
+      queue:
+        enabled: true
+
+      parameters:
+        - name: "catalog_name"
+          default: "${var.catalog_name}"
+        - name: "schema_name"
+          default: "${resources.schemas.sentiment_schema.name}"    
+        - name: "model_name"
+          default: "${resources.registered_models.sentiment_model.name}"
+        - name: "experiment_name"
+          default: "${resources.experiments.experiment.name}"
+
+      tasks:
+        - task_key: model_endpoint_deploy
+          notebook_task:
+            notebook_path: "../notebooks/model_endpoint_deploy.ipynb"
+
+      tags:
+        Project: "${bundle.name}"
+

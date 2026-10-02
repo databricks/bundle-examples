@@ -1,0 +1,16 @@
+resources:
+  pipelines:
+    ai_parse_document_pipeline:
+      name: ai_parse_document_pipeline
+      libraries:
+        - file:
+            path: ../src/transformations/ai_parse_document_variant.sql
+        - file:
+            path: ../src/transformations/ai_parse_document_text.sql
+        - file:
+            path: ../src/transformations/ai_query_extraction.sql
+      catalog: ${var.catalog}
+      channel: CURRENT
+      photon: true
+      schema: ${var.schema}
+      serverless: true

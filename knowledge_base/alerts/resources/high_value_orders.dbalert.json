@@ -1,0 +1,43 @@
+{
+  "custom_summary": "Alert when high-value urgent orders are detected",
+  "custom_description_lines": [
+    "This alert monitors urgent orders (priority 1-URGENT) in the TPC-H dataset",
+    "and triggers when the total order value exceeds a threshold.",
+    "Use this to track potentially important customer orders that need immediate attention."
+  ],
+  "evaluation": {
+    "comparison_operator": "GREATER_THAN",
+    "notification": {
+      "notify_on_ok": false,
+      "retrigger_seconds": 7200
+    },
+    "source": {
+      "aggregation": "MAX",
+      "display": "total_urgent_value",
+      "name": "total_urgent_value"
+    },
+    "threshold": {
+      "value": {
+        "double_value": 500000.0
+      }
+    }
+  },
+  "query_lines": [
+    "SELECT",
+    "  o_orderpriority,",
+    "  COUNT(*) as order_count,",
+    "  SUM(o_totalprice) as total_urgent_value",
+    "FROM",
+    "  samples.tpch.orders",
+    "WHERE",
+    "  o_orderpriority = '1-URGENT'",
+    "  AND o_orderdate >= CURRENT_DATE() - INTERVAL 7 DAYS",
+    "GROUP BY",
+    "  o_orderpriority"
+  ],
+  "schedule": {
+    "pause_status": "UNPAUSED",
+    "quartz_cron_schedule": "0 0 */6 * * ?",
+    "timezone_id": "UTC"
+  }
+}

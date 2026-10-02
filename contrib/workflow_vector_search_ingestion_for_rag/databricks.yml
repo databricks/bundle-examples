@@ -1,0 +1,73 @@
+# This is a Databricks asset bundle definition for ai_parse_document_workflow.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: ai_parse_document_workflow
+
+variables:
+  catalog:
+    description: The catalog name for the workflow
+    default: main
+  schema:
+    description: The schema name for the workflow
+    default: rag
+  source_volume_path:
+    description: Source volume path for PDF files
+    default: /Volumes/main/rag/documents
+  output_volume_path:
+    description: Output volume path for processed images
+    default: /Volumes/main/rag/temp/parsed_output
+  checkpoint_base_path:
+    description: Base path for Structured Streaming checkpoints
+    default: /Volumes/main/rag/temp/checkpoints/ai_parse_workflow
+  raw_table_name:
+    description: Table name for raw parsed documents
+    default: parsed_documents_raw
+  text_table_name:
+    description: Table name for extracted text
+    default: parsed_documents_text
+  chunk_table_name:
+    description: Table name for chunked text
+    default: parsed_documents_text_chunked
+  embedding_model_endpoint:
+    description: Embedding model endpoint for chunking and vector search
+    default: databricks-gte-large-en
+  chunk_size_tokens:
+    description: Chunk size in tokens
+    default: 1024
+  chunk_overlap_tokens:
+    description: Chunk overlap in tokens
+    default: 256
+  vector_search_endpoint_name:
+    description: Vector Search endpoint name
+    default: vector-search-shared-endpoint
+  vector_search_index_name:
+    description: Vector Search index name
+    default: parsed_documents_vector_index
+  vector_search_primary_key:
+    description: Primary key column for vector search
+    default: chunk_id
+  vector_search_embedding_source_column:
+    description: Text column for embeddings in vector search
+    default: chunked_text
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://e2-demo-field-eng.cloud.databricks.com/
+
+  prod:
+    mode: production
+    workspace:
+      host: https://e2-demo-field-eng.cloud.databricks.com/
+    permissions:
+      - group_name: users
+        level: CAN_VIEW

@@ -1,11 +1,11 @@
 # Databricks notebook source
-from pyspark.sql.types import NumericType, StringType, StructField, StructType
+from pyspark.sql.types import DecimalType, NumericType, StringType, StructField, StructType
 
 
 observed_source_schema = StructType(
     [
         StructField("transaction_id", StringType(), False),
-        StructField("amount", StringType(), False),
+        StructField("amount", DecimalType(12, 2), False),
     ]
 )
 amount_type = observed_source_schema["amount"].dataType

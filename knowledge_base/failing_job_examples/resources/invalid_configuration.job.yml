@@ -9,7 +9,7 @@ resources:
       max_concurrent_runs: 1
       parameters:
         - name: batch_size
-          default: "0"
+          default: "100"
       tasks:
         - task_key: validate_configuration
           max_retries: 0

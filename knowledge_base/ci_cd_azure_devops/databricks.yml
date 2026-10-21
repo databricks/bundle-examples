@@ -1,6 +1,6 @@
 bundle:
   name: ci_cd_azure_devops
-  databricks_cli_version: ">= 0.272.0"
+  databricks_cli_version: ">= 1.20.0"
 
 include:
   - resources/*.job.yml

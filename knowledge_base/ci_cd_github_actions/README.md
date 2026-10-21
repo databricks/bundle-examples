@@ -7,7 +7,7 @@ See [GitHub Actions authentication](https://docs.databricks.com/aws/en/dev-tools
 
 - A Databricks workspace that supports serverless jobs.
 - Permission to manage Databricks service principals and GitHub environments.
-- Databricks CLI `0.272.0` or newer for local tests.
+- Databricks CLI v1.20.0 or above.
 
 ## Usage
 
@@ -35,4 +35,4 @@ See [GitHub Actions authentication](https://docs.databricks.com/aws/en/dev-tools
 - Do not create or store personal access tokens.
 - Fork pull requests receive no OIDC token. Validate them from a trusted branch.
 - Concurrency groups serialize each target. Required reviewers gate production.
-- The bundle accepts CLI `>= 0.272.0`. CI pins `0.272.0` for repeatable runs.
+- The bundle accepts CLI `>= 1.20.0`. CI pins `1.20.0` for repeatable runs.

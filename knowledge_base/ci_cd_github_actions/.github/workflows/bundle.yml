@@ -27,7 +27,7 @@ jobs:
       DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-      - uses: databricks/setup-cli@79467332e7a1a336e5bc86d8a412fdceda7cd62a # v0.272.0
+      - uses: databricks/setup-cli@9b64c94a6d2b2e830592d80e9f14c26d32b42ad7 # v1.20.0
       - run: databricks bundle validate -t dev
 
   staging:
@@ -43,7 +43,7 @@ jobs:
       DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-      - uses: databricks/setup-cli@79467332e7a1a336e5bc86d8a412fdceda7cd62a # v0.272.0
+      - uses: databricks/setup-cli@9b64c94a6d2b2e830592d80e9f14c26d32b42ad7 # v1.20.0
       - run: databricks bundle deploy -t staging
 
   prod:
@@ -60,5 +60,5 @@ jobs:
       DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-      - uses: databricks/setup-cli@79467332e7a1a336e5bc86d8a412fdceda7cd62a # v0.272.0
+      - uses: databricks/setup-cli@9b64c94a6d2b2e830592d80e9f14c26d32b42ad7 # v1.20.0
       - run: databricks bundle deploy -t prod

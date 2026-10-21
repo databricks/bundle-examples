@@ -7,7 +7,7 @@ See [Azure DevOps authentication](https://docs.databricks.com/aws/en/dev-tools/a
 
 - A Databricks workspace that supports serverless jobs.
 - Permission to manage Databricks service principals and Azure DevOps environments.
-- Databricks CLI `0.272.0` or newer for local tests.
+- Databricks CLI v1.20.0 or above.
 
 ## Usage
 
@@ -34,4 +34,4 @@ See [Azure DevOps authentication](https://docs.databricks.com/aws/en/dev-tools/a
 - Do not create or store personal access tokens.
 - Fork pull requests receive no OIDC token. Validate them from a trusted branch.
 - Environment locks serialize deployments. The `prod` approval check gates production.
-- The bundle accepts CLI `>= 0.272.0`. CI pins `0.272.0` for repeatable runs.
+- The bundle accepts CLI `>= 1.20.0`. CI pins `1.20.0` for repeatable runs.

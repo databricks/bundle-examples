@@ -6,7 +6,7 @@ For more information, see the [deployment modes documentation](https://docs.data
 
 ## Prerequisites
 
-* Databricks CLI v0.236.0 or above
+* Databricks CLI v1.20.0 or above
 * Three workspaces, or one workspace for a dry run
 * Profiles in `~/.databrickscfg` when you set `profile`
 

@@ -9,7 +9,9 @@ This example validates and deploys a serverless job with Azure DevOps OIDC and D
 - Use a Databricks workspace that supports serverless jobs.
 - Get permission to create a Databricks service principal and federation policy.
 - Get permission to manage Azure DevOps pipelines and environments.
-- Install Databricks CLI `0.272.0` for local tests.
+- Install Databricks CLI `0.272.0` or newer for local tests.
+
+The bundle accepts compatible newer CLI versions. The pipeline pins `0.272.0` for repeatable CI runs.
 
 ## Set up identity
 
@@ -63,7 +65,7 @@ Create these Azure DevOps variables.
 - Fork pull requests do not receive an OIDC token. Run validation from a trusted branch.
 - Azure DevOps environment exclusive locks prevent concurrent deployments. Configure the lock behavior for each environment.
 - A wrong subject claim causes an identity federation match error. Check all three names and their letter case.
-- CLI version drift causes bundle version errors. Keep the pipeline and bundle versions equal.
+- A CLI older than `0.272.0` causes bundle version errors. Update the local CLI or the pipeline pin.
 - An interrupted deployment can leave a deployment lock. Retry after the active deployment ends.
 - Serverless availability, storage URIs, identities, and regions differ by cloud. This example does not validate classic compute.
 - Bundle deployment is idempotent. Retry the same target after a safe interruption.

@@ -1,6 +1,6 @@
 bundle:
   name: ci_cd_azure_devops
-  databricks_cli_version: "0.272.0"
+  databricks_cli_version: ">= 0.272.0"
 
 include:
   - resources/*.job.yml
@@ -11,5 +11,9 @@ targets:
     mode: development
   staging:
     mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
   prod:
     mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}

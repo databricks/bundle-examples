@@ -11,7 +11,9 @@ Copy `.github/workflows/bundle.yml` from this example to your repository root.
 - Use a Databricks workspace that supports serverless jobs.
 - Get permission to create a Databricks service principal and federation policies.
 - Get permission to manage GitHub environments and repository variables.
-- Install Databricks CLI `0.272.0` for local tests.
+- Install Databricks CLI `0.272.0` or newer for local tests.
+
+The bundle accepts compatible newer CLI versions. The workflow pins `0.272.0` for repeatable CI runs.
 
 ## Set up identity
 
@@ -66,7 +68,7 @@ Create these GitHub repository or environment variables.
 - Fork pull requests do not receive an OIDC token. Run validation from a trusted branch.
 - The concurrency groups prevent two deployments to the same target.
 - A wrong subject claim causes an identity federation match error. Check the exact environment name.
-- CLI version drift causes bundle version errors. Keep both pinned versions equal.
+- A CLI older than `0.272.0` causes bundle version errors. Update the local CLI or the workflow pin.
 - An interrupted deployment can leave a deployment lock. Retry after the active deployment ends.
 - Serverless availability, storage URIs, identities, and regions differ by cloud. This example does not validate classic compute.
 - Bundle deployment is idempotent. Retry the same target after a safe interruption.

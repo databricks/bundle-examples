@@ -17,7 +17,7 @@ See [GitHub Actions authentication](https://docs.databricks.com/aws/en/dev-tools
 4. Use subject `repo:<owner>/<repository>:environment:dev` for dev.
 5. Use subject `repo:<owner>/<repository>:environment:staging` for staging.
 6. Use subject `repo:<owner>/<repository>:environment:prod` for prod.
-7. Set the audience to your Databricks account ID.
+7. Set the audience to your [Databricks account ID](https://docs.databricks.com/aws/en/dev-tools/auth/provider-github).
 8. Create `dev`, `staging`, and `prod` GitHub environments.
 9. Set `DATABRICKS_HOST` and `DATABRICKS_CLIENT_ID` in each environment.
 10. Add required reviewers to the `prod` environment.
@@ -32,8 +32,8 @@ See [GitHub Actions authentication](https://docs.databricks.com/aws/en/dev-tools
 
 ## Notes
 
-- Do not create or store personal access tokens.
-- PR validation needs workspace authentication. Fork pull requests receive no OIDC token.
+- Do not use personal access tokens. PR validation needs workspace authentication. Fork pull requests receive no OIDC token.
 - Concurrency groups serialize each target. Required reviewers gate production.
 - `databricks/setup-cli` pins CLI `1.20.0`. The bundle accepts CLI `>= 1.20.0`.
 - After copying the workflow, set `working-directory` to your bundle path.
+- Deploy `staging` and `prod` only from CI as the service principal.

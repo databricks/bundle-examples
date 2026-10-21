@@ -31,8 +31,8 @@ See [Azure DevOps authentication](https://docs.databricks.com/aws/en/dev-tools/a
 
 ## Notes
 
-- Do not create or store personal access tokens.
-- PR validation needs workspace authentication. Fork pull requests receive no OIDC token.
+- Do not use personal access tokens. PR validation needs workspace authentication. Fork pull requests receive no OIDC token.
 - Environment locks serialize deployments. The `prod` approval check gates production.
 - The setup-cli SHA fixes CLI `1.20.0`. The bundle accepts CLI `>= 1.20.0`.
 - After copying the pipeline, set `bundleDirectory` to your bundle path.
+- Deploy `staging` and `prod` only from CI as the service principal.

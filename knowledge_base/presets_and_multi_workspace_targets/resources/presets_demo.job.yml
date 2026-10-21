@@ -3,7 +3,7 @@ resources:
     presets_demo:
       name: presets_demo
 
-      # Quartz schedule. Presets (and mode: development) control pause_status.
+      # Quartz schedule. Presets set pause_status unless the job sets its own value.
       schedule:
         quartz_cron_expression: "0 0 9 * * ?"
         timezone_id: UTC

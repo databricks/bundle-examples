@@ -9,7 +9,7 @@ include:
 
 targets:
   # Development target. mode: development applies defaults; presets override most of them.
-  # Exception: in development mode, schedules and triggers stay PAUSED.
+  # Exception: mode: development rejects presets.trigger_pause_status: UNPAUSED.
   dev:
     default: true
     mode: development
@@ -25,8 +25,9 @@ targets:
         team: examples
       trigger_pause_status: PAUSED
       jobs_max_concurrent_runs: 4
+      # Only affects pipelines. This bundle has none; kept to show the preset key.
       pipelines_development: true
-      # Dev only. Applies to workspace UI deploys; CLI deploy ignores this preset.
+      # Dev only. Workspace UI can link to source. The CLI warns and deploys file copies.
       source_linked_deployment: true
 
   staging:
@@ -44,7 +45,7 @@ targets:
     resources:
       jobs:
         presets_demo:
-          # (c) Staging-only job parameter change.
+          # (c) Staging-only job parameter change (parameters merge by name).
           parameters:
             - name: batch_size
               default: "50"
@@ -72,8 +73,8 @@ targets:
       jobs:
         presets_demo:
           # (a) Override a task by task_key.
-          # (b) Point the task at a different environment (environments list does not
-          #     key-merge; job_clusters merge by job_cluster_key instead).
+          # (b) Point the task at another environment. Environment lists append on
+          #     override; job clusters merge by job_cluster_key instead.
           tasks:
             - task_key: process
               timeout_seconds: 3600

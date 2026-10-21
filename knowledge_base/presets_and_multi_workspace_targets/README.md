@@ -31,8 +31,8 @@ databricks bundle validate -t dev -o json | jq -r '.resources.jobs.presets_demo.
 
 ## Notes
 
-* `mode: development` adds its own defaults. Presets override most of them. Schedules stay paused in development mode.
-* Tasks merge by `task_key`. Job clusters merge by `job_cluster_key`.
-* Environment lists append on override. Select another base environment with `environment_key` on a task.
-* You cannot unset a field with an empty override. Omit the key, or set a new value.
-* `source_linked_deployment` applies only to workspace UI deploys. The CLI ignores it.
+* `mode: development` rejects `presets.trigger_pause_status: UNPAUSED`. A job may still set `schedule.pause_status: UNPAUSED`. Development mode also adds a `dev=<your_short_name>` tag beside `env` and `team`.
+* Tasks merge by `task_key`. Job clusters merge by `job_cluster_key`. Job parameters merge by `name`.
+* Environment lists append on override. Select another base environment with `environment_key` on a task. You cannot unset a field with an empty override.
+* `source_linked_deployment` works in the workspace UI. The CLI warns that it is available only there and deploys file copies.
+* `pipelines_development` only affects pipelines. This bundle has none.

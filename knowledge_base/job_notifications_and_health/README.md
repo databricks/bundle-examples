@@ -57,4 +57,3 @@ For configuration details, see the [job notifications documentation](https://doc
 - The `prod` target adds `notification_email` and `notification_destination_id` recipients.
 - `max_retries: 1` starts one retry after a failed attempt. The final failure notification follows that retry.
 - The streaming backlog rule needs a streaming task and is Public Preview.
-- Create `/Workspace/bundle-examples` and limit who can manage it. Or, change `root_path` in `databricks.yml`.

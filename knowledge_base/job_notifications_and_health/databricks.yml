@@ -16,11 +16,13 @@ targets:
   dev:
     default: true
     mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
 
   prod:
     mode: production
     workspace:
-      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
     resources:
       jobs:
         notification_health_job:

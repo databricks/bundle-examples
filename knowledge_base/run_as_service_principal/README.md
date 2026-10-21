@@ -23,14 +23,10 @@ Select the workspace with `--profile <profile>` or the `DATABRICKS_HOST` environ
 1. Deploy the bundle to dev: `databricks bundle deploy -t dev`
 2. Run the job in dev: `databricks bundle run -t dev whoami`
 3. In CI, authenticate as the service principal. See the Notes.
-4. In CI, deploy the bundle to prod:
-
-   ```sh
-   databricks bundle deploy -t prod --var service_principal_application_id=<application-id>
-   ```
-
-5. In CI, run the job in prod: `databricks bundle run -t prod whoami`
-6. Read the job output to see which identity ran the job.
+4. In CI, set the variable once: `export BUNDLE_VAR_service_principal_application_id=<application-id>`
+5. In CI, deploy the bundle to prod: `databricks bundle deploy -t prod`
+6. In CI, run the job in prod: `databricks bundle run -t prod whoami`
+7. Read the job output to see which identity ran the job.
 
 Expected output in prod (in dev, the lines show your user name):
 
@@ -49,6 +45,7 @@ SDK display_name:      <service principal display name>
 
 * Do not set `run_as` in dev. The CLI accepts it, but each developer then needs the `Service Principal: User` role.
 * Deploy `prod` only as the service principal, from CI. Use OAuth M2M: set `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID`, and `DATABRICKS_CLIENT_SECRET`. Do not use personal access tokens. The `root_path` then resolves to the home folder of the service principal, so one prod copy exists. A deploy by a person makes a separate copy in the home folder of that person.
-* A new deploy to the same target updates the same resources. `databricks bundle destroy -t prod` removes only the job of this bundle.
+* A new deploy to the same target updates the same resources. With the same variable, `databricks bundle destroy -t prod` removes only the job of this bundle.
 * If the deployer is not in the deployer group, `validate -t prod` shows a recommendation. It asks you to add the deployment identity to `permissions`. Add that identity to the deployer group.
 * `validate -t prod` can show the warning `workspace folder has permissions not configured in bundle`. The deployer owns its home folder. The deploy continues.
+* The bundle works on AWS, Azure, and GCP with serverless compute. We did not test classic compute. The bundle contains no secrets: the OAuth M2M secret stays in the CI secret store. The job has no schedule.

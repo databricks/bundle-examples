@@ -36,9 +36,10 @@ targets:
   prod:
     mode: production
     workspace:
-      # Deploy to a single, explicit location. When CI deploys as the service
-      # principal, current_user is the service principal, so this resolves to
-      # its home folder and there is exactly one copy of the prod deployment.
+      # Deploy prod only as the service principal (from CI). Then current_user is
+      # the service principal, this resolves to its home folder, and there is
+      # exactly one prod copy. A deploy by a person creates a separate copy under
+      # that person's home folder.
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
     run_as:
       service_principal_name: ${var.service_principal_application_id}

@@ -34,7 +34,6 @@ targets:
       service_principal_application_id: not-used-in-dev
     workspace:
       # Each developer gets a separate dev copy under the shared example folder.
-      # Change root_path to deploy somewhere else.
       root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
 
   prod:
@@ -42,8 +41,7 @@ targets:
     workspace:
       # One stable prod copy. Deploy it from one identity (CI as the service
       # principal): a different identity that is not a workspace admin cannot
-      # take over ownership of the job. The deploying identity needs CAN_MANAGE
-      # on /Workspace/bundle-examples. Change root_path to deploy somewhere else.
+      # take over ownership of the job.
       root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
     run_as:
       service_principal_name: ${var.service_principal_application_id}

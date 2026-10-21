@@ -16,17 +16,6 @@ targets:
   dev:
     default: true
     mode: development
-    resources:
-      jobs:
-        notification_health_job:
-          email_notifications:
-            on_failure: []
-            on_duration_warning_threshold_exceeded: []
-            on_streaming_backlog_exceeded: []
-          webhook_notifications:
-            on_failure: []
-            on_duration_warning_threshold_exceeded: []
-            on_streaming_backlog_exceeded: []
 
   prod:
     mode: production

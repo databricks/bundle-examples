@@ -12,8 +12,8 @@ targets:
   staging:
     mode: production
     workspace:
-      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
   prod:
     mode: production
     workspace:
-      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}

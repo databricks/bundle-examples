@@ -16,7 +16,7 @@ See [Azure DevOps authentication](https://docs.databricks.com/aws/en/dev-tools/a
 3. Create a federation policy for the service principal.
 4. Set the issuer to `https://vstoken.dev.azure.com/<organization-id>`.
 5. Set the subject to `p://<organization-name>/<project-name>/<pipeline-name>`.
-6. Set the audience to your Databricks account ID.
+6. Set the audience to [`api://AzureADTokenExchange`](https://docs.databricks.com/aws/en/dev-tools/auth/provider-azure-devops).
 7. Set pipeline variables `DATABRICKS_HOST` and `DATABRICKS_CLIENT_ID`.
 8. Create `staging` and `prod` Azure DevOps environments.
 9. Add an approval check to the `prod` environment.
@@ -32,6 +32,7 @@ See [Azure DevOps authentication](https://docs.databricks.com/aws/en/dev-tools/a
 ## Notes
 
 - Do not create or store personal access tokens.
-- Fork pull requests receive no OIDC token. Validate them from a trusted branch.
+- PR validation needs workspace authentication. Fork pull requests receive no OIDC token.
 - Environment locks serialize deployments. The `prod` approval check gates production.
-- The bundle accepts CLI `>= 1.20.0`. CI pins `1.20.0` for repeatable runs.
+- The setup-cli SHA fixes CLI `1.20.0`. The bundle accepts CLI `>= 1.20.0`.
+- After copying the pipeline, set `bundleDirectory` to your bundle path.

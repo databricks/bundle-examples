@@ -33,6 +33,7 @@ See [GitHub Actions authentication](https://docs.databricks.com/aws/en/dev-tools
 ## Notes
 
 - Do not create or store personal access tokens.
-- Fork pull requests receive no OIDC token. Validate them from a trusted branch.
+- PR validation needs workspace authentication. Fork pull requests receive no OIDC token.
 - Concurrency groups serialize each target. Required reviewers gate production.
-- The bundle accepts CLI `>= 1.20.0`. CI pins `1.20.0` for repeatable runs.
+- `databricks/setup-cli` pins CLI `1.20.0`. The bundle accepts CLI `>= 1.20.0`.
+- After copying the workflow, set `working-directory` to your bundle path.

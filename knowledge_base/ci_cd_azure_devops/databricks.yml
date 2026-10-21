@@ -1,0 +1,15 @@
+bundle:
+  name: ci_cd_azure_devops
+  databricks_cli_version: "0.272.0"
+
+include:
+  - resources/*.job.yml
+
+targets:
+  dev:
+    default: true
+    mode: development
+  staging:
+    mode: production
+  prod:
+    mode: production

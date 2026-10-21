@@ -1,0 +1,13 @@
+resources:
+  jobs:
+    serverless_job:
+      name: ci-cd-azure-devops-${bundle.target}
+      tasks:
+        - task_key: hello
+          spark_python_task:
+            python_file: ../src/main.py
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

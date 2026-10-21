@@ -32,6 +32,5 @@ databricks bundle validate -t dev -o json | jq -r '.resources.jobs.presets_demo.
 
 ## Notes
 
-* The bundle deploys under `/Workspace/bundle-examples`. Create that folder and limit who can manage it, or change `root_path`.
 * Environment lists append on override. Select another base environment with `environment_key` on a task.
 * The CLI profile must point to the same host as that target's `workspace.host`.

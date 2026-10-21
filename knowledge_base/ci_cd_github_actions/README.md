@@ -21,7 +21,7 @@ See [GitHub Actions authentication](https://docs.databricks.com/aws/en/dev-tools
 8. Create `dev`, `staging`, and `prod` GitHub environments.
 9. Set `DATABRICKS_HOST` and `DATABRICKS_CLIENT_ID` in each environment.
 10. Add required reviewers to the `prod` environment.
-11. Copy `.github/workflows/bundle.yml` to your repository root.
+11. Copy `.github/workflows/bundle.yml` to your repository root. Set `working-directory` to your bundle path.
 12. Open a pull request to run validation.
 
 | Trigger | Command and target |
@@ -29,11 +29,3 @@ See [GitHub Actions authentication](https://docs.databricks.com/aws/en/dev-tools
 | Pull request | `databricks bundle validate -t dev` |
 | Push to `main` | `databricks bundle deploy -t staging` |
 | Production approval | `databricks bundle deploy -t prod` |
-
-## Notes
-
-- Do not use personal access tokens. PR validation needs workspace authentication. Fork pull requests receive no OIDC token.
-- Concurrency groups serialize each target. Required reviewers gate production.
-- `databricks/setup-cli` pins CLI `1.20.0`. The bundle accepts CLI `>= 1.20.0`.
-- After copying the workflow, set `working-directory` to your bundle path.
-- Deploy `staging` and `prod` only from CI as the service principal.

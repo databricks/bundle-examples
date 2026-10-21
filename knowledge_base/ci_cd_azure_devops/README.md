@@ -20,7 +20,7 @@ See [Azure DevOps authentication](https://docs.databricks.com/aws/en/dev-tools/a
 7. Set pipeline variables `DATABRICKS_HOST` and `DATABRICKS_CLIENT_ID`.
 8. Create `staging` and `prod` Azure DevOps environments.
 9. Add an approval check to the `prod` environment.
-10. Copy `azure-pipelines.yml` to your repository root.
+10. Copy `azure-pipelines.yml` to your repository root. Set `bundleDirectory` to your bundle path.
 11. Open a pull request to run validation.
 
 | Trigger | Command and target |
@@ -28,11 +28,3 @@ See [Azure DevOps authentication](https://docs.databricks.com/aws/en/dev-tools/a
 | Pull request | `databricks bundle validate -t dev` |
 | Push to `main` | `databricks bundle deploy -t staging` |
 | Production approval | `databricks bundle deploy -t prod` |
-
-## Notes
-
-- Do not use personal access tokens. PR validation needs workspace authentication. Fork pull requests receive no OIDC token.
-- Environment locks serialize deployments. The `prod` approval check gates production.
-- The setup-cli SHA pins CLI `1.20.0`. The bundle accepts CLI `>= 1.20.0`.
-- After copying the pipeline, set `bundleDirectory` to your bundle path.
-- Deploy `staging` and `prod` only from CI as the service principal.

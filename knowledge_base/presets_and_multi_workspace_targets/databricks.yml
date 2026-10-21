@@ -17,6 +17,7 @@ targets:
       host: https://dev-workspace.cloud.databricks.com
       # Optional. Must match a section name in ~/.databrickscfg.
       # profile: my-dev
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
     presets:
       # Development mode requires the username (or ${workspace.current_user.short_name}) in the prefix.
       name_prefix: "[dev presets ${workspace.current_user.short_name}] "
@@ -34,6 +35,7 @@ targets:
     workspace:
       host: https://staging-workspace.cloud.databricks.com
       # profile: my-staging
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
     presets:
       name_prefix: "[staging] "
       tags:
@@ -59,8 +61,7 @@ targets:
     workspace:
       host: https://prod-workspace.cloud.databricks.com
       # profile: my-prod
-      # Required for mode: production. Replace the user path before you deploy.
-      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
     presets:
       name_prefix: "[prod] "
       tags:

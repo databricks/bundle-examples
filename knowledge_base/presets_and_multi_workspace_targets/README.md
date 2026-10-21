@@ -15,11 +15,10 @@ For more information, see the [deployment modes documentation](https://docs.data
 ## Usage
 
 1. Set each target `workspace.host` in `databricks.yml`. Uncomment `profile` if needed.
-2. Set `workspace.root_path` under `prod` to a path you own.
-3. Validate: `databricks bundle validate -t dev`
-4. Deploy: `databricks bundle deploy -t dev`
-5. Repeat steps 3–4 with `-t staging` and `-t prod`.
-6. Check prefixed names:
+2. Validate: `databricks bundle validate -t dev`
+3. Deploy: `databricks bundle deploy -t dev`
+4. Repeat steps 2–3 with `-t staging` and `-t prod`.
+5. Check prefixed names:
 
 ```bash
 databricks bundle validate -t dev -o json | jq -r '.resources.jobs.presets_demo.name'
@@ -33,6 +32,7 @@ databricks bundle validate -t dev -o json | jq -r '.resources.jobs.presets_demo.
 
 ## Notes
 
+* The bundle deploys under `/Workspace/bundle-examples`. Create that folder and limit who can manage it, or change `root_path`.
 * `mode: development` rejects `presets.trigger_pause_status: UNPAUSED`. A job may still set `schedule.pause_status: UNPAUSED`. Development mode also adds a `dev=<your_short_name>` tag beside `env` and `team`.
 * Tasks merge by `task_key`. Job clusters merge by `job_cluster_key`. Job parameters merge by `name`.
 * Environment lists append on override. Select another base environment with `environment_key` on a task. You cannot unset a field with an empty override.

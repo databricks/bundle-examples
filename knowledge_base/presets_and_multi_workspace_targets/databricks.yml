@@ -1,0 +1,80 @@
+# Presets and multi-workspace targets example.
+# Replace each workspace.host (and optional profile) before you deploy.
+# Placeholder hosts match other knowledge_base examples (for example development_cluster).
+bundle:
+  name: presets_and_multi_workspace_targets
+
+include:
+  - resources/*.yml
+
+targets:
+  # Development target. mode: development applies defaults; presets override most of them.
+  # Exception: in development mode, schedules and triggers stay PAUSED.
+  dev:
+    default: true
+    mode: development
+    workspace:
+      host: https://dev-workspace.cloud.databricks.com
+      # Optional. Must match a section name in ~/.databrickscfg.
+      # profile: my-dev
+    presets:
+      # Development mode requires the username (or ${workspace.current_user.short_name}) in the prefix.
+      name_prefix: "[dev presets ${workspace.current_user.short_name}] "
+      tags:
+        env: dev
+        team: examples
+      trigger_pause_status: PAUSED
+      jobs_max_concurrent_runs: 4
+      pipelines_development: true
+      # Dev only. Applies to workspace UI deploys; CLI deploy ignores this preset.
+      source_linked_deployment: true
+
+  staging:
+    workspace:
+      host: https://staging-workspace.cloud.databricks.com
+      # profile: my-staging
+    presets:
+      name_prefix: "[staging] "
+      tags:
+        env: staging
+        team: examples
+      trigger_pause_status: PAUSED
+      jobs_max_concurrent_runs: 2
+      pipelines_development: false
+    resources:
+      jobs:
+        presets_demo:
+          # (c) Staging-only job parameter change.
+          parameters:
+            - name: batch_size
+              default: "50"
+          # (a) Override a task by task_key (list merge).
+          tasks:
+            - task_key: process
+              timeout_seconds: 1800
+
+  prod:
+    mode: production
+    workspace:
+      host: https://prod-workspace.cloud.databricks.com
+      # profile: my-prod
+      # Required for mode: production. Replace the user path before you deploy.
+      root_path: /Workspace/Users/user@company.com/.bundle/${bundle.name}/${bundle.target}
+    presets:
+      name_prefix: "[prod] "
+      tags:
+        env: prod
+        team: examples
+      trigger_pause_status: UNPAUSED
+      jobs_max_concurrent_runs: 1
+      pipelines_development: false
+    resources:
+      jobs:
+        presets_demo:
+          # (a) Override a task by task_key.
+          # (b) Point the task at a different environment (environments list does not
+          #     key-merge; job_clusters merge by job_cluster_key instead).
+          tasks:
+            - task_key: process
+              timeout_seconds: 3600
+              environment_key: heavy

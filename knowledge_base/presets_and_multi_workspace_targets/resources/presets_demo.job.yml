@@ -1,0 +1,40 @@
+resources:
+  jobs:
+    presets_demo:
+      name: presets_demo
+
+      # Quartz schedule. Presets (and mode: development) control pause_status.
+      schedule:
+        quartz_cron_expression: "0 0 9 * * ?"
+        timezone_id: UTC
+
+      parameters:
+        - name: batch_size
+          default: "100"
+
+      tasks:
+        - task_key: prepare
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/prepare.py
+            parameters:
+              - "{{job.parameters.batch_size}}"
+
+        - task_key: process
+          depends_on:
+            - task_key: prepare
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/process.py
+            parameters:
+              - "{{job.parameters.batch_size}}"
+
+      # Serverless environments. Prefer environment_version over deprecated client.
+      # Job clusters merge by job_cluster_key the same way tasks merge by task_key.
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+        - environment_key: heavy
+          spec:
+            environment_version: "5"

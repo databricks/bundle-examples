@@ -51,6 +51,16 @@ Thus, the first deploy has two deploy phases: steps 1 and 4.
 
    The response has one class number for each record, for example `{"predictions": [0]}`.
 
+6. Remove the resources. `bundle destroy` keeps the registered model while it has versions, so delete the versions and the model:
+
+   ```sh
+   databricks bundle destroy
+   databricks model-versions delete <catalog>.<schema>.<model_name> <version>
+   databricks registered-models delete <catalog>.<schema>.<model_name>
+   ```
+
+   In `dev`, `<model_name>` has the prefix `dev_<your_user_name>_`. Also drop the `<model_name>_payload` inference table.
+
 To serve a new model version, do steps 2 to 4 again with the new version number.
 To roll back, deploy again with the prior version number.
 Use `-t prod` for the `prod` target.

@@ -29,8 +29,3 @@ databricks bundle validate -t dev -o json | jq -r '.resources.jobs.presets_demo.
 | `dev` | `[dev presets <user>]` | `PAUSED` | `4` |
 | `staging` | `[staging]` | `PAUSED` | `2` |
 | `prod` | `[prod]` | `UNPAUSED` | `1` |
-
-## Notes
-
-* Environment lists append on override. Select another base environment with `environment_key` on a task.
-* The CLI profile must point to the same host as that target's `workspace.host`.

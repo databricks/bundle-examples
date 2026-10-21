@@ -30,7 +30,6 @@ resources:
               - "{{job.parameters.batch_size}}"
 
       # Serverless environments. Prefer environment_version over deprecated client.
-      # Job clusters merge by job_cluster_key the same way tasks merge by task_key.
       environments:
         - environment_key: default
           spec:

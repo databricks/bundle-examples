@@ -1,6 +1,8 @@
 # Presets and multi-workspace targets
 
-This Declarative Automation Bundles example shows `presets` on `dev`, `staging`, and `prod` targets with different `workspace.host` placeholders and optional `profile` values. It also shows target overrides for tasks, environments, and a staging-only job parameter.
+This Declarative Automation Bundles example shows `presets` on `dev`, `staging`, and `prod` targets.
+Each target uses a different `workspace.host` placeholder and an optional `profile`.
+It also shows target overrides for tasks, environments, and a staging-only job parameter.
 
 For more information, see the [deployment modes documentation](https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes).
 
@@ -36,3 +38,5 @@ databricks bundle validate -t dev -o json | jq -r '.resources.jobs.presets_demo.
 * Environment lists append on override. Select another base environment with `environment_key` on a task. You cannot unset a field with an empty override.
 * `source_linked_deployment` works in the workspace UI. The CLI warns that it is available only there and deploys file copies.
 * `pipelines_development` only affects pipelines. This bundle has none.
+* Run `databricks bundle destroy -t <target>` to remove a target.
+* The CLI profile must point to the same host as that target's `workspace.host`.

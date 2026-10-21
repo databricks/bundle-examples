@@ -1,0 +1,50 @@
+# This is a Declarative Automation Bundle definition for run_as_service_principal.
+# See https://docs.databricks.com/dev-tools/bundles/run-as.html for documentation.
+bundle:
+  name: run_as_service_principal
+
+include:
+  - resources/*.yml
+
+variables:
+  service_principal_application_id:
+    description: >-
+      Application ID (a UUID) of the service principal that runs the prod job.
+      Find it in the workspace admin settings under Identity and access > Service principals.
+  deployer_group:
+    description: Workspace group whose members (and CI) can deploy and manage the prod bundle
+    default: bundle-deployers
+  viewer_group:
+    description: Workspace group that can view the prod job and its runs
+    default: users
+
+# The workspace host is not set here. Use a profile (--profile / -p) or the
+# DATABRICKS_HOST environment variable, so the same file works locally and in CI.
+
+targets:
+  dev:
+    # Development mode prefixes resource names with "[dev <user>]", pauses
+    # schedules, and runs everything as the deploying user.
+    # Do not set run_as here: dev deployments are per-user by design.
+    mode: development
+    default: true
+    variables:
+      # Dev does not use run_as, so this value is never read. The variable has no
+      # default on purpose: a prod deploy fails fast if you forget to set it.
+      service_principal_application_id: not-used-in-dev
+
+  prod:
+    mode: production
+    workspace:
+      # Deploy to a single, explicit location. When CI deploys as the service
+      # principal, current_user is the service principal, so this resolves to
+      # its home folder and there is exactly one copy of the prod deployment.
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      service_principal_name: ${var.service_principal_application_id}
+    permissions:
+      # Grant access to groups only. No individual user gets CAN_MANAGE.
+      - group_name: ${var.deployer_group}
+        level: CAN_MANAGE
+      - group_name: ${var.viewer_group}
+        level: CAN_VIEW

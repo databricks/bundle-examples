@@ -1,0 +1,19 @@
+resources:
+  jobs:
+    whoami:
+      name: run_as_service_principal_whoami
+      description: Prints the identity that runs the job, so you can see the effect of run_as.
+
+      # No trigger or schedule: run the job on demand with `databricks bundle run whoami`.
+
+      tasks:
+        - task_key: whoami
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/whoami.py
+
+      environments:
+        - environment_key: default
+          # See https://docs.databricks.com/api/workspace/jobs/create#environments-spec
+          spec:
+            environment_version: "4"

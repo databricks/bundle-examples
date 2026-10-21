@@ -50,10 +50,3 @@ For configuration details, see the [job notifications documentation](https://doc
    databricks bundle destroy -t dev
    databricks bundle destroy -t prod
    ```
-
-## Notes
-
-- The base job has empty recipient lists, so the `dev` target sends no notifications.
-- The `prod` target adds `notification_email` and `notification_destination_id` recipients.
-- `max_retries: 1` starts one retry after a failed attempt. The final failure notification follows that retry.
-- The streaming backlog rule needs a streaming task and is Public Preview.

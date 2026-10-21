@@ -36,4 +36,4 @@ See [Azure DevOps authentication](https://docs.databricks.com/aws/en/dev-tools/a
 - The setup-cli SHA pins CLI `1.20.0`. The bundle accepts CLI `>= 1.20.0`.
 - After copying the pipeline, set `bundleDirectory` to your bundle path.
 - Deploy `staging` and `prod` only from CI as the service principal.
-- The bundle deploys under `/Workspace/bundle-examples`. Grant CI `CAN_MANAGE` there, or change `root_path`.
+- The bundle deploys under `/Workspace/bundle-examples`. Give the CI service principal `CAN_MANAGE` on that folder. Or, change `root_path` in `databricks.yml`.

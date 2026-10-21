@@ -16,7 +16,7 @@ For more information, refer to the [Model Serving documentation](https://docs.da
 ## Usage
 
 The endpoint needs a model version, but a new model has no versions.
-Thus, the first deploy has two steps.
+Thus, the first deploy has two deploy phases: steps 1 and 4.
 
 1. Deploy only the model, the experiment, and the training job:
 
@@ -57,6 +57,6 @@ Use `-t prod` for the `prod` target.
 ## Notes
 
 * `entity_version` takes a version number, not an alias. Keep `model_version` equal to the `champion` version.
-* The workspace can reject AI Gateway `rate_limits` on a custom model endpoint. If the deploy fails, remove `rate_limits`.
+* AI Gateway rate limits on a custom model endpoint support only queries per minute (QPM). The endpoint must not be route-optimized. If the deploy rejects `rate_limits`, remove them.
 * In `dev`, the endpoint scales to zero. The first request after an idle period can take minutes.
 * `databricks bundle destroy` removes the endpoint, the job, the experiment, and the model with all its versions. Drop the `<prefix>_payload` inference table manually.

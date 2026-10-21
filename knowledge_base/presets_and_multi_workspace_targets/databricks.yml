@@ -8,8 +8,7 @@ include:
   - resources/*.yml
 
 targets:
-  # Development target. mode: development applies defaults; presets override most of them.
-  # Exception: mode: development rejects presets.trigger_pause_status: UNPAUSED.
+  # Development target.
   dev:
     default: true
     mode: development
@@ -19,7 +18,6 @@ targets:
       # profile: my-dev
       root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
     presets:
-      # Development mode requires the username (or ${workspace.current_user.short_name}) in the prefix.
       name_prefix: "[dev presets ${workspace.current_user.short_name}] "
       tags:
         env: dev

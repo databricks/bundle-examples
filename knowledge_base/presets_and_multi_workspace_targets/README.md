@@ -33,10 +33,5 @@ databricks bundle validate -t dev -o json | jq -r '.resources.jobs.presets_demo.
 ## Notes
 
 * The bundle deploys under `/Workspace/bundle-examples`. Create that folder and limit who can manage it, or change `root_path`.
-* `mode: development` rejects `presets.trigger_pause_status: UNPAUSED`. A job may still set `schedule.pause_status: UNPAUSED`. Development mode also adds a `dev=<your_short_name>` tag beside `env` and `team`.
-* Tasks merge by `task_key`. Job clusters merge by `job_cluster_key`. Job parameters merge by `name`.
-* Environment lists append on override. Select another base environment with `environment_key` on a task. You cannot unset a field with an empty override.
-* `source_linked_deployment` works in the workspace UI. The CLI warns that it is available only there and deploys file copies.
-* `pipelines_development` only affects pipelines. This bundle has none.
-* Run `databricks bundle destroy -t <target>` to remove a target.
+* Environment lists append on override. Select another base environment with `environment_key` on a task.
 * The CLI profile must point to the same host as that target's `workspace.host`.

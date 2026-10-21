@@ -1,0 +1,7 @@
+resources:
+  registered_models:
+    model:
+      catalog_name: ${var.catalog}
+      schema_name: ${var.schema}
+      name: ${var.model_name}
+      comment: Iris classifier served by the model_serving_endpoint example (${bundle.target} target)

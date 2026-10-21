@@ -1,0 +1,60 @@
+# This is a Declarative Automation Bundle definition for model_serving_endpoint.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: model_serving_endpoint
+  engine: direct
+
+variables:
+  catalog:
+    description: Existing Unity Catalog catalog for the model and the inference table
+    default: main
+  schema:
+    description: Existing Unity Catalog schema for the model and the inference table
+    default: default
+  model_name:
+    description: Name of the Unity Catalog registered model (without catalog and schema)
+    default: iris_classifier
+  model_version:
+    description: >-
+      Model version that the endpoint serves. Serving endpoints take a version number,
+      not an alias. Set it to the version that holds the `champion` alias.
+    default: "1"
+  endpoint_name:
+    description: Name of the serving endpoint. Must be unique in the workspace.
+    default: iris-classifier
+  consumers_group:
+    description: Workspace group that gets CAN_QUERY on the endpoint
+    default: users
+  workload_size:
+    description: Provisioned concurrency range of the served model (Small, Medium, Large)
+    default: Small
+  scale_to_zero:
+    description: Scale the served model down to zero when it gets no traffic
+    default: true
+  rate_limit_calls:
+    description: Maximum calls per minute for the full endpoint
+    default: 100
+  rate_limit_user_calls:
+    description: Maximum calls per minute for each user
+    default: 20
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE
+    variables:
+      workload_size: Medium
+      scale_to_zero: false
+      rate_limit_calls: 1000
+      rate_limit_user_calls: 100

@@ -1,0 +1,36 @@
+resources:
+  jobs:
+    train_model:
+      name: train_model
+
+      parameters:
+        - name: model_full_name
+          default: ${var.catalog}.${var.schema}.${resources.registered_models.model.name}
+        - name: alias
+          default: champion
+        - name: experiment_name
+          default: ${resources.experiments.train_model_experiment.name}
+
+      tasks:
+        - task_key: train
+          description: Train a small scikit-learn model, register a new version in Unity Catalog, and set the alias
+          environment_key: serverless_env
+          spark_python_task:
+            python_file: ../src/train_model.py
+            parameters:
+              - --model-full-name
+              - "{{job.parameters.model_full_name}}"
+              - --alias
+              - "{{job.parameters.alias}}"
+              - --experiment-name
+              - "{{job.parameters.experiment_name}}"
+
+      environments:
+        - environment_key: serverless_env
+          spec:
+            environment_version: "4"
+            dependencies:
+              - mlflow>=3.1
+              - scikit-learn
+
+      max_concurrent_runs: 1

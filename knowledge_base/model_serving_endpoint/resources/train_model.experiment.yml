@@ -1,0 +1,4 @@
+resources:
+  experiments:
+    train_model_experiment:
+      name: ${workspace.root_path}/train_model

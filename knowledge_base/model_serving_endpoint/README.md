@@ -31,8 +31,9 @@ Thus, the first deploy has two deploy phases: steps 1 and 4.
    ```
 
 3. Read the version number in the job output, for example `--var model_version=1`.
+   The job sets the `champion` alias on this version.
 
-4. Deploy the full bundle with that version:
+4. Deploy the full bundle. Set `model_version` to the `champion` version:
 
    ```sh
    databricks bundle deploy --var model_version=1
@@ -53,10 +54,3 @@ Thus, the first deploy has two deploy phases: steps 1 and 4.
 To serve a new model version, do steps 2 to 4 again with the new version number.
 To roll back, deploy again with the prior version number.
 Use `-t prod` for the `prod` target.
-
-## Notes
-
-* `entity_version` takes a version number, not an alias. Keep `model_version` equal to the `champion` version.
-* AI Gateway rate limits on a custom model endpoint support only queries per minute (QPM). The endpoint must not be route-optimized. If the deploy rejects `rate_limits`, remove them.
-* In `dev`, the endpoint scales to zero. The first request after an idle period can take minutes.
-* `databricks bundle destroy` removes the endpoint, the job, the experiment, and the model with all its versions. Drop the `<prefix>_payload` inference table manually.

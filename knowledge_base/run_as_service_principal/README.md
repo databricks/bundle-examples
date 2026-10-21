@@ -37,6 +37,9 @@ For more information, see the [run_as documentation](https://docs.databricks.com
    SDK display_name:      <service principal display name>
    ```
 
+7. Remove the dev resources: `databricks bundle destroy -t dev --profile <profile>`
+8. In CI, remove the prod resources: `databricks bundle destroy -t prod`
+
 | Target | Runs as |
 | --- | --- |
 | `dev` | The user who deploys |

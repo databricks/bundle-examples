@@ -15,7 +15,6 @@ targets:
   staging:
     mode: production
     workspace:
-      # The CI service principal needs CAN_MANAGE on /Workspace/bundle-examples.
       root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
   prod:
     mode: production

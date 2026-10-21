@@ -28,7 +28,7 @@ Select the workspace with `--profile <profile>` or the `DATABRICKS_HOST` environ
 6. In CI, run the job in prod: `databricks bundle run -t prod whoami`
 7. Read the job output to see which identity ran the job.
 
-Expected output in prod (in dev, the lines show your user name):
+Output in prod (in dev, the lines show your user name):
 
 ```
 current_user():        <application-id>
@@ -44,8 +44,8 @@ SDK display_name:      <service principal display name>
 ## Notes
 
 * Do not set `run_as` in dev. The CLI accepts it, but each developer then needs the `Service Principal: User` role.
-* Deploy `prod` only as the service principal, from CI. Use OAuth M2M: set `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID`, and `DATABRICKS_CLIENT_SECRET`. Do not use personal access tokens. The `root_path` then resolves to the home folder of the service principal, so one prod copy exists. A deploy by a person makes a separate copy in the home folder of that person.
+* In CI, deploy `prod` as the service principal with OAuth M2M. Set `DATABRICKS_HOST`, `DATABRICKS_CLIENT_ID`, and `DATABRICKS_CLIENT_SECRET`. Do not use personal access tokens.
+* Each deployer needs the `Service Principal: User` role. The `Service Principal: Manager` role is not sufficient. Without it, the deploy fails with `Cannot bind the service principal provided in 'run_as' field`.
+* Deploy `prod` from one identity. Another identity that is not a workspace admin cannot take over the job. The deploy fails with `only workspace admins can change the owner of a job`.
 * A new deploy to the same target updates the same resources. With the same variable, `databricks bundle destroy -t prod` removes only the job of this bundle.
-* If the deployer is not in the deployer group, `validate -t prod` shows a recommendation. It asks you to add the deployment identity to `permissions`. Add that identity to the deployer group.
-* `validate -t prod` can show the warning `workspace folder has permissions not configured in bundle`. The deployer owns its home folder. The deploy continues.
 * The bundle works on AWS, Azure, and GCP with serverless compute. We did not test classic compute. The bundle contains no secrets: the OAuth M2M secret stays in the CI secret store. The job has no schedule.

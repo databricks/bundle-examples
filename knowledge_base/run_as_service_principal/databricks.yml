@@ -32,15 +32,19 @@ targets:
       # Dev does not use run_as, so this value is never read. The variable has no
       # default on purpose: a prod deploy fails fast if you forget to set it.
       service_principal_application_id: not-used-in-dev
+    workspace:
+      # Each developer gets a separate dev copy under the shared example folder.
+      # Change root_path to deploy somewhere else.
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
 
   prod:
     mode: production
     workspace:
-      # Deploy prod only as the service principal (from CI). Then current_user is
-      # the service principal, this resolves to its home folder, and there is
-      # exactly one prod copy. A deploy by a person creates a separate copy under
-      # that person's home folder.
-      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+      # One stable prod copy. Deploy it from one identity (CI as the service
+      # principal): a different identity that is not a workspace admin cannot
+      # take over ownership of the job. The deploying identity needs CAN_MANAGE
+      # on /Workspace/bundle-examples. Change root_path to deploy somewhere else.
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
     run_as:
       service_principal_name: ${var.service_principal_application_id}
     permissions:

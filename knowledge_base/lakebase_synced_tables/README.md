@@ -11,6 +11,7 @@ See the [Lakebase Autoscaling documentation](https://docs.databricks.com/aws/en/
 - A source Delta table with change data feed enabled and an `id` primary key column.
 - A standard catalog and schema for pipeline storage.
 - A new project ID. The bundle creates and purges its project during deployment and cleanup.
+- The `psql` client, for the row count in step 5.
 
 ## Usage
 
@@ -47,7 +48,7 @@ See the [Lakebase Autoscaling documentation](https://docs.databricks.com/aws/en/
    ```sh
    databricks postgres get-synced-table "synced_tables/${BUNDLE_VAR_destination_table}_dev"
    databricks postgres get-synced-table "synced_tables/${BUNDLE_VAR_destination_table}_prod"
-   databricks psql --project "${BUNDLE_VAR_project_id}-dev" --branch production --endpoint primary -- -d databricks_postgres -c "SELECT count(*) FROM example.synced_source_table_dev;"
+   databricks psql --project "${BUNDLE_VAR_project_id}-dev" --branch production --endpoint primary -- -d databricks_postgres -c "SELECT count(*) FROM ${BUNDLE_VAR_destination_table#*.}_dev;"
    ```
 
 6. Remove the resources for each deployed target.

@@ -25,7 +25,7 @@ sync:
     - generated/payload.txt
   # Keep this local file out of the workspace upload.
   exclude:
-    - local_only/secret.txt
+    - local_only/notes.txt
 
 targets:
   dev:

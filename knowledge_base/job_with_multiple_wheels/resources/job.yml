@@ -13,7 +13,7 @@ resources:
             - whl: ../my_custom_wheel2/dist/*.whl
 
           new_cluster:
-            node_type_id: ${var.node_type_id}
+            node_type_id: i3.xlarge
             num_workers: 0
             spark_version: 16.4.x-scala2.12
             spark_conf:

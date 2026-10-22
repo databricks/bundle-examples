@@ -25,7 +25,7 @@ resources:
         - job_cluster_key: default
           new_cluster:
             spark_version: 15.4.x-scala2.12
-            node_type_id: ${var.node_type_id}
+            node_type_id: i3.xlarge
             data_security_mode: SINGLE_USER
             num_workers: 0
             spark_conf:

@@ -13,6 +13,6 @@ resources:
             - whl: ../dist/*.whl
 
           new_cluster:
-            node_type_id: ${var.node_type_id}
+            node_type_id: i3.xlarge
             num_workers: 1
             spark_version: 16.4.x-scala2.12

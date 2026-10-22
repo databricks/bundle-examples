@@ -18,11 +18,6 @@ artifacts:
     build: poetry build
     path: ./my_custom_wheel2
 
-variables:
-  node_type_id:
-    description: "Classic cluster node type (AWS: i3.xlarge; Azure: Standard_DS3_v2)"
-    default: i3.xlarge
-
 targets:
   dev:
     default: true

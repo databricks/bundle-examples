@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    read_generated:
+      name: read_generated
+      description: Reads the gitignored file that sync.include uploaded.
+
+      tasks:
+        - task_key: read_payload
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/read_generated.py
+            parameters:
+              - ${workspace.file_path}/generated/payload.txt
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

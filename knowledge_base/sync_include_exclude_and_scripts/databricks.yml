@@ -1,0 +1,43 @@
+# sync.include / sync.exclude and lifecycle scripts.
+# CLI 1.20.0 schema: lifecycle hooks live under experimental.scripts (string commands).
+# Top-level scripts is a map of {content} for `databricks bundle run <name>`.
+# Hook names: preinit, postinit, prebuild, postbuild, predeploy, postdeploy.
+bundle:
+  name: sync_include_exclude_and_scripts
+  databricks_cli_version: ">= 1.20.0"
+
+include:
+  - resources/*.yml
+
+# Named scripts: run with `databricks bundle run generate_payload`.
+scripts:
+  generate_payload:
+    content: python3 scripts/generate_payload.py
+
+# Lifecycle hooks run during deploy. A non-zero exit fails the deploy.
+experimental:
+  scripts:
+    predeploy: python3 scripts/generate_payload.py
+
+sync:
+  # Upload this path even though .gitignore ignores generated/.
+  include:
+    - generated/payload.txt
+  # Keep this local file out of the workspace upload.
+  exclude:
+    - local_only/secret.txt
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
+    permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE

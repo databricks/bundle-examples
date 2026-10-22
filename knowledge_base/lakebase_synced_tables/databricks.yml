@@ -16,17 +16,12 @@ variables:
     description: Standard catalog for pipeline storage
   pipeline_storage_schema:
     description: Schema for pipeline storage
-  branch_id:
-    default: production
-
 targets:
   dev:
     default: true
     mode: development
     workspace:
       root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
-    variables:
-      branch_id: development
   prod:
     mode: production
     workspace:

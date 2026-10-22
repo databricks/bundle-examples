@@ -9,7 +9,7 @@ resources:
   postgres_branches:
     target_branch:
       parent: ${resources.postgres_projects.synced_tables.id}
-      branch_id: ${var.branch_id}
+      branch_id: production
       no_expiry: true
       replace_existing: true
       purge_on_delete: true
@@ -23,6 +23,14 @@ resources:
       autoscaling_limit_min_cu: 0.5
       autoscaling_limit_max_cu: 1
       suspend_timeout_duration: 60s
+
+  postgres_snapshot_schedules:
+    daily_snapshots:
+      branch: ${resources.postgres_branches.target_branch.id}
+      schedule:
+        - daily_schedule:
+            hour: 0
+          retention: 3600s
 
   postgres_synced_tables:
     example:

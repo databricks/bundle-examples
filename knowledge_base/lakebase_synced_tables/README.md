@@ -47,6 +47,7 @@ See the [Lakebase Autoscaling documentation](https://docs.databricks.com/aws/en/
    ```sh
    databricks postgres get-synced-table "synced_tables/${BUNDLE_VAR_destination_table}_dev"
    databricks postgres get-synced-table "synced_tables/${BUNDLE_VAR_destination_table}_prod"
+   databricks psql --project "${BUNDLE_VAR_project_id}-dev" --branch production --endpoint primary -- -d databricks_postgres -c "SELECT count(*) FROM example.synced_source_table_dev;"
    ```
 
 6. Remove the resources for each deployed target.

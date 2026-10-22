@@ -1,0 +1,21 @@
+bundle:
+  name: mcp_and_model_services
+  # AI Gateway services can only be deployed with the direct deployment engine.
+  engine: direct
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Existing Unity Catalog catalog for the services schema.
+    default: main
+  mcp_connection:
+    description: Schema-level HTTP connection to an MCP server, as catalog.schema.connection.
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}

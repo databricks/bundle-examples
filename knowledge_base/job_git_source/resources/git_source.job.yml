@@ -8,6 +8,11 @@ resources:
         git_branch: ${var.git_branch}
       tasks:
         - task_key: hello
+          environment_key: default
           notebook_task:
             notebook_path: knowledge_base/development_cluster/src/hello.py
             source: GIT
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

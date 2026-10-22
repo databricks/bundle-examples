@@ -11,7 +11,7 @@ See the [Git source documentation](https://docs.databricks.com/aws/en/jobs/how-t
 ## Prerequisites
 
 * Install Databricks CLI v1.20.0 or above.
-* Configure the `dabs-examples` authentication profile.
+* Configure Databricks CLI authentication.
 * Use a workspace that supports serverless jobs.
 
 ## Usage
@@ -19,31 +19,36 @@ See the [Git source documentation](https://docs.databricks.com/aws/en/jobs/how-t
 1. Validate the development target.
 
    ```sh
-   databricks bundle validate -t dev --profile dabs-examples
+   databricks bundle validate -t dev
    ```
 
 2. Deploy and run the job.
 
    ```sh
-   databricks bundle deploy -t dev --profile dabs-examples
-   databricks bundle run -t dev git_source --profile dabs-examples
+   databricks bundle deploy -t dev
+   databricks bundle run -t dev git_source
    ```
 
 3. Override a Git setting when needed.
 
    ```sh
-   databricks bundle deploy -t dev --var git_branch=main --profile dabs-examples
+   databricks bundle deploy -t dev --var git_branch=main
    ```
 
 4. Remove the development deployment.
 
    ```sh
-   databricks bundle destroy -t dev --auto-approve --profile dabs-examples
+   databricks bundle destroy -t dev --auto-approve
    ```
 
-5. Deploy production from the `main` branch, then remove it.
+5. Deploy production from the `main` branch.
 
    ```sh
-   databricks bundle deploy -t prod --profile dabs-examples
-   databricks bundle destroy -t prod --auto-approve --profile dabs-examples
+   databricks bundle deploy -t prod
+   ```
+
+6. Remove the production deployment.
+
+   ```sh
+   databricks bundle destroy -t prod --auto-approve
    ```

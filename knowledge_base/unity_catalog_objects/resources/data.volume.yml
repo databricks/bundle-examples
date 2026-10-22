@@ -1,0 +1,12 @@
+resources:
+  volumes:
+    landing:
+      name: landing
+      catalog_name: ${resources.catalogs.uc_demo.name}
+      schema_name: ${resources.schemas.data.name}
+      volume_type: MANAGED
+      comment: Managed volume for marker files from the write job.
+      grants:
+        - principal: ${var.grant_group}
+          privileges:
+            - READ_VOLUME

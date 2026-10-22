@@ -1,0 +1,15 @@
+resources:
+  jobs:
+    write_marker:
+      name: write_marker
+      tasks:
+        - task_key: write
+          spark_python_task:
+            python_file: ../src/write_marker.py
+            parameters:
+              - /Volumes/${resources.catalogs.uc_demo.name}/${resources.schemas.data.name}/${resources.volumes.landing.name}/marker.txt
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

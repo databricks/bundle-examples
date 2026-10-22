@@ -1,0 +1,34 @@
+# Bundle-managed Unity Catalog catalog, schema, volume, grants, and a write job.
+# Catalogs require the direct deployment engine (default in CLI >= 1.20).
+bundle:
+  name: unity_catalog_objects
+  engine: direct
+  databricks_cli_version: ">= 1.20.0"
+
+include:
+  - resources/*.yml
+
+variables:
+  grant_group:
+    description: Group that receives USE_CATALOG, USE_SCHEMA, and READ_VOLUME.
+    default: users
+  # Catalog names allow only alphanumeric characters and underscores.
+  catalog_name:
+    description: Unique catalog name that includes the target and deploying user.
+    default: uc_objects_${bundle.target}_${workspace.current_user.short_name}
+  # Required when the metastore has no default managed storage root.
+  catalog_storage_root:
+    description: Cloud storage root URL for managed tables in the catalog.
+    default: abfss://container@storageaccount.dfs.core.windows.net/
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}

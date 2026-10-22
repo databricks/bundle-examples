@@ -16,32 +16,25 @@ variables:
   cluster_policy_id:
     description: Cluster policy ID resolved by name
     lookup:
-      cluster_policy: kb6-example-cluster-policy
+      cluster_policy: my-cluster-policy
 
   service_principal_id:
     description: Service principal application ID resolved by name
     lookup:
-      service_principal: kb6-example-sp
+      service_principal: my-service-principal
 
   cluster_id:
     description: All-purpose cluster ID resolved by name
     lookup:
-      cluster: kb6-example-cluster
+      cluster: my-cluster
 
   job_id:
     description: Job ID resolved by name
     lookup:
-      job: kb6-example-job
-
-  metastore_id:
-    description: >-
-      Metastore ID resolved by name. Lookup needs account admin.
-      Otherwise set BUNDLE_VAR_metastore_id to the metastore UUID.
-    lookup:
-      metastore: your-metastore-name
+      job: my-job
 
   # Complex map used as the serverless task environment. Override per target
-  # or with .databricks/bundle/<target>/variable-overrides.json (not BUNDLE_VAR_*).
+  # or with .databricks/bundle/<target>/variable-overrides.json.
   environment_spec:
     description: Serverless environment spec for the Python task
     type: complex

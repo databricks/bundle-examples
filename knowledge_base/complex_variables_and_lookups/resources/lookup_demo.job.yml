@@ -14,8 +14,6 @@ resources:
           default: ${var.cluster_id}
         - name: job_id
           default: ${var.job_id}
-        - name: metastore_id
-          default: ${var.metastore_id}
 
       tasks:
         - task_key: print_lookups
@@ -32,8 +30,6 @@ resources:
               - "{{job.parameters.cluster_id}}"
               - --job-id
               - "{{job.parameters.job_id}}"
-              - --metastore-id
-              - "{{job.parameters.metastore_id}}"
           environment_key: default
 
       environments:

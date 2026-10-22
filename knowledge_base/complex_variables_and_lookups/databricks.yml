@@ -1,0 +1,67 @@
+# Complex variables and lookups.
+# Replace each lookup name with a resource that exists in your workspace.
+# See https://docs.databricks.com/dev-tools/bundles/variables.html
+bundle:
+  name: complex_variables_and_lookups
+
+include:
+  - resources/*.yml
+
+variables:
+  warehouse_id:
+    description: SQL warehouse ID resolved by name
+    lookup:
+      warehouse: Serverless Starter Warehouse
+
+  cluster_policy_id:
+    description: Cluster policy ID resolved by name
+    lookup:
+      cluster_policy: kb6-example-cluster-policy
+
+  service_principal_id:
+    description: Service principal application ID resolved by name
+    lookup:
+      service_principal: kb6-example-sp
+
+  cluster_id:
+    description: All-purpose cluster ID resolved by name
+    lookup:
+      cluster: kb6-example-cluster
+
+  job_id:
+    description: Job ID resolved by name
+    lookup:
+      job: kb6-example-job
+
+  metastore_id:
+    description: >-
+      Metastore ID resolved by name. Lookup needs account admin.
+      Otherwise set BUNDLE_VAR_metastore_id to the metastore UUID.
+    lookup:
+      metastore: your-metastore-name
+
+  # Complex map used as the serverless task environment. Override per target
+  # or with .databricks/bundle/<target>/variable-overrides.json (not BUNDLE_VAR_*).
+  environment_spec:
+    description: Serverless environment spec for the Python task
+    type: complex
+    default:
+      environment_version: "4"
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+    variables:
+      environment_spec:
+        environment_version: "3"
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
+    variables:
+      environment_spec:
+        environment_version: "4"

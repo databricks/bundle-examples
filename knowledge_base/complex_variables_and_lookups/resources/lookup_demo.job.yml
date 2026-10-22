@@ -1,0 +1,41 @@
+resources:
+  jobs:
+    lookup_demo:
+      name: Complex variables and lookups demo
+
+      parameters:
+        - name: warehouse_id
+          default: ${var.warehouse_id}
+        - name: cluster_policy_id
+          default: ${var.cluster_policy_id}
+        - name: service_principal_id
+          default: ${var.service_principal_id}
+        - name: cluster_id
+          default: ${var.cluster_id}
+        - name: job_id
+          default: ${var.job_id}
+        - name: metastore_id
+          default: ${var.metastore_id}
+
+      tasks:
+        - task_key: print_lookups
+          spark_python_task:
+            python_file: ../src/main.py
+            parameters:
+              - --warehouse-id
+              - "{{job.parameters.warehouse_id}}"
+              - --cluster-policy-id
+              - "{{job.parameters.cluster_policy_id}}"
+              - --service-principal-id
+              - "{{job.parameters.service_principal_id}}"
+              - --cluster-id
+              - "{{job.parameters.cluster_id}}"
+              - --job-id
+              - "{{job.parameters.job_id}}"
+              - --metastore-id
+              - "{{job.parameters.metastore_id}}"
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec: ${var.environment_spec}

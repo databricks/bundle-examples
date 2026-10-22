@@ -1,0 +1,12 @@
+resources:
+  model_provider_services:
+    anthropic:
+      parent: schemas/${resources.schemas.ai_services.id}
+      model_provider_service_id: anthropic
+      comment: Anthropic provider with relayed authentication.
+      config:
+        provider_type: EXTERNAL_MODEL_PROVIDER_TYPE_ANTHROPIC
+        allow_all_targets: true
+        anthropic:
+          # Each request supplies its own Anthropic credential. No key is stored.
+          relayed: {}

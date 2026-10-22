@@ -10,5 +10,4 @@ resources:
             - name: primary
               destination_type: DESTINATION_TYPE_PAY_PER_TOKEN_FOUNDATION_MODEL
               pay_per_token_config:
-                # Any pay-per-token model in system.ai works here.
-                model: models/system.ai.databricks-claude-sonnet-4-6
+                model: models/${var.chat_model}

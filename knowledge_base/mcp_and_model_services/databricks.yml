@@ -9,7 +9,9 @@ include:
 variables:
   catalog:
     description: Existing Unity Catalog catalog for the services schema.
-    default: main
+  chat_model:
+    # Example: system.ai.databricks-claude-sonnet-4-6
+    description: Pay-per-token foundation model in system.ai, as catalog.schema.model.
   mcp_connection:
     description: Schema-level HTTP connection to an MCP server, as catalog.schema.connection.
 
@@ -18,4 +20,4 @@ targets:
     mode: development
     default: true
     workspace:
-      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+      root_path: /Workspace/bundle-examples/${bundle.name}/dev/${workspace.current_user.short_name}

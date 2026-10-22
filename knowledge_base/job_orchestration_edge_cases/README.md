@@ -10,7 +10,7 @@ For configuration details, see the [run if documentation](https://docs.databrick
 
 - Databricks CLI v1.20.0 or above
 - Configure a Databricks CLI profile for the target workspace.
-- Use a workspace that supports serverless jobs environment version `4`.
+- Use a workspace that supports serverless jobs environment version `6`.
 
 ## Usage
 

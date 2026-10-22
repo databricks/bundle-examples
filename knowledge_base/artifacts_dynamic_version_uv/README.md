@@ -2,7 +2,8 @@
 
 This Declarative Automation Bundles example builds a Python wheel with `uv build` and runs it in a serverless job.
 The `presets.artifacts_dynamic_version` setting adds a build timestamp to the wheel version on each deploy.
-Each deploy installs the new wheel, and you do not need to bump the version in `pyproject.toml`.
+Each deploy installs the new wheel.
+The base version in `pyproject.toml` stays `0.1.0`.
 
 For more information, see the [artifacts documentation](https://docs.databricks.com/aws/en/dev-tools/bundles/settings#artifacts).
 

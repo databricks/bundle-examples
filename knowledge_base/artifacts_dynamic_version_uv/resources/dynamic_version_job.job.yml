@@ -1,0 +1,17 @@
+resources:
+  jobs:
+    dynamic_version_job:
+      name: dynamic_version_job
+      tasks:
+        - task_key: main
+          environment_key: default
+          python_wheel_task:
+            package_name: dynamic_version_demo
+            entry_point: main
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "6"
+            dependencies:
+              - ../dist/*.whl

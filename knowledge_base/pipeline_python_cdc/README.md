@@ -43,6 +43,7 @@ For more information, see the [AUTO CDC documentation](https://docs.databricks.c
 7. Deploy the bundle to prod: `databricks bundle deploy -t prod --profile <profile>`
 8. Remove the dev resources: `databricks bundle destroy -t dev --profile <profile>`
 9. Remove the prod resources: `databricks bundle destroy -t prod --profile <profile>`
+10. Drop the tables: `DROP TABLE IF EXISTS <catalog>.<schema>.customers_scd1` and `DROP TABLE IF EXISTS <catalog>.<schema>.customers_scd2`
 
 | Target | Pipeline mode |
 | --- | --- |

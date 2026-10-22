@@ -1,0 +1,13 @@
+bundle:
+  name: direct_engine_migration
+
+include:
+  - resources/*.yml
+
+workspace:
+  root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+
+targets:
+  dev:
+    default: true
+    mode: development

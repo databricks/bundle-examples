@@ -4,10 +4,9 @@ bundle:
 include:
   - resources/*.yml
 
-workspace:
-  root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
-
 targets:
   dev:
     default: true
     mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/dev/${workspace.current_user.short_name}

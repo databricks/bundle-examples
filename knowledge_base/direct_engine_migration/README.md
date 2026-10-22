@@ -1,12 +1,13 @@
 # Direct engine migration
 
-This Declarative Automation Bundles example migrates a serverless job from the Terraform engine to the direct engine. See the [direct engine documentation](https://docs.databricks.com/dev-tools/bundles/direct).
+This Declarative Automation Bundles example migrates a serverless job from the Terraform engine to the direct engine.
+
+See the [direct engine documentation](https://docs.databricks.com/dev-tools/bundles/direct).
 
 ## Prerequisites
 
-* Databricks CLI v1.19.x for the initial Terraform deployment
-* Databricks CLI v1.20.0 or above for migration and later commands
-* A Databricks workspace configuration profile named `dabs-examples`
+* Databricks CLI v1.19.x for the Terraform deployment. Version 1.20.0 removes the Terraform engine.
+* Databricks CLI v1.20.0 or above for the migration
 
 ## Usage
 
@@ -14,44 +15,46 @@ This Declarative Automation Bundles example migrates a serverless job from the T
 | --- | --- | --- |
 | Terraform | `.databricks/bundle/dev/terraform/terraform.tfstate` | `<root_path>/state/terraform.tfstate` |
 | Direct | `.databricks/bundle/dev/resources.json` | `<root_path>/state/resources.json` |
-
-1. Use Databricks CLI v1.19.x to validate the bundle with the Terraform engine.
+1. Use Databricks CLI v1.19.x to deploy with the Terraform engine.
 
    ```text
-   DATABRICKS_BUNDLE_ENGINE=terraform databricks bundle validate --profile dabs-examples
+   DATABRICKS_BUNDLE_ENGINE=terraform databricks bundle deploy
    ```
 
-2. Deploy and run the job with the Terraform engine.
+2. Record the job ID with the Terraform engine.
 
    ```text
-   DATABRICKS_BUNDLE_ENGINE=terraform databricks bundle deploy --profile dabs-examples
-   DATABRICKS_BUNDLE_ENGINE=terraform databricks bundle run direct_engine_migration --profile dabs-examples
+   DATABRICKS_BUNDLE_ENGINE=terraform databricks bundle summary --output json
    ```
 
-3. Record the job ID and inspect `.databricks/bundle/dev/terraform/terraform.tfstate`.
+3. Upgrade to Databricks CLI v1.20.0 or above. Migrate the local state. `databricks bundle deploy` also migrates the state automatically.
 
    ```text
-   DATABRICKS_BUNDLE_ENGINE=terraform databricks bundle summary --output json --profile dabs-examples
+   databricks bundle deployment migrate
    ```
 
-4. Upgrade to Databricks CLI v1.20.0 or above. Migrate the local state.
+4. Confirm that the migration plan has zero changes.
 
    ```text
-   DATABRICKS_BUNDLE_ENGINE=direct databricks bundle deployment migrate --profile dabs-examples
+   databricks bundle plan
    ```
 
-5. Inspect the direct state at `.databricks/bundle/dev/resources.json`.
-
-6. Confirm that the plan has zero changes. Deploy and run the same job ID.
+5. Deploy and run the job. Confirm that the job ID is unchanged.
 
    ```text
-   DATABRICKS_BUNDLE_ENGINE=direct databricks bundle plan --profile dabs-examples
-   DATABRICKS_BUNDLE_ENGINE=direct databricks bundle deploy --profile dabs-examples
-   DATABRICKS_BUNDLE_ENGINE=direct databricks bundle run direct_engine_migration --profile dabs-examples
+   databricks bundle deploy
+   databricks bundle run direct_engine_migration
+   databricks bundle summary --output json
+   ```
+
+6. Confirm that the deployed bundle still has zero changes.
+
+   ```text
+   databricks bundle plan
    ```
 
 7. Remove the job and workspace files.
 
    ```text
-   DATABRICKS_BUNDLE_ENGINE=direct databricks bundle destroy --auto-approve --profile dabs-examples
+   databricks bundle destroy --auto-approve
    ```

@@ -14,7 +14,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest",
-    "databricks-bundles==1.18.0",
+    "databricks-bundles==1.20.0",
 ]
 
 [build-system]

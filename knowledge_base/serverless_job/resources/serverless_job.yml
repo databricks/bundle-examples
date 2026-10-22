@@ -24,6 +24,6 @@ resources:
           # Full documentation of this spec can be found at:
           # https://docs.databricks.com/api/workspace/jobs/create#environments-spec
           spec:
-            environment_version: "4"
+            environment_version: "6"
             dependencies:
               - cowsay

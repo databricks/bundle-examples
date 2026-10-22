@@ -11,6 +11,6 @@ resources:
       environments:
         - environment_key: default
           spec:
-            environment_version: "4"
+            environment_version: "6"
             dependencies:
               - cowsay

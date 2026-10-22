@@ -1,0 +1,7 @@
+resources:
+  volumes:
+    # Landing zone for the generated change feed (JSON files).
+    changes:
+      catalog_name: ${var.catalog}
+      schema_name: ${var.schema}
+      name: changes

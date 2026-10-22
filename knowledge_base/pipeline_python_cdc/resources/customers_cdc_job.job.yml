@@ -1,0 +1,48 @@
+resources:
+  jobs:
+    customers_cdc_job:
+      name: customers_cdc_job
+
+      parameters:
+        # Set to "true" to recompute all tables from the full change feed.
+        - name: full_refresh
+          default: "false"
+
+      tasks:
+        # Write a small change feed: inserts, updates, a delete, and an out-of-order update.
+        - task_key: generate_changes
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/generate_changes.py
+            parameters:
+              - ${resources.pipelines.customers_cdc.configuration.source_path}
+
+        # pipeline_task.full_refresh takes a literal bool, so branch on the job parameter.
+        - task_key: check_full_refresh
+          depends_on:
+            - task_key: generate_changes
+          condition_task:
+            op: EQUAL_TO
+            left: "{{job.parameters.full_refresh}}"
+            right: "true"
+
+        - task_key: full_refresh
+          depends_on:
+            - task_key: check_full_refresh
+              outcome: "true"
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.customers_cdc.id}
+            full_refresh: true
+
+        - task_key: refresh
+          depends_on:
+            - task_key: check_full_refresh
+              outcome: "false"
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.customers_cdc.id}
+            full_refresh: false
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

@@ -15,6 +15,7 @@ See the [direct engine documentation](https://docs.databricks.com/dev-tools/bund
 | --- | --- | --- |
 | Terraform | `.databricks/bundle/dev/terraform/terraform.tfstate` | `<root_path>/state/terraform.tfstate` |
 | Direct | `.databricks/bundle/dev/resources.json` | `<root_path>/state/resources.json` |
+
 1. Use Databricks CLI v1.19.x to deploy with the Terraform engine.
 
    ```text

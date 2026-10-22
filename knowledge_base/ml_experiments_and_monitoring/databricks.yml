@@ -19,9 +19,6 @@ variables:
     description: Email address that gets monitor failure notifications.
     default: ${workspace.current_user.userName}
 
-workspace:
-  host: https://myworkspace.databricks.com
-
 targets:
   dev:
     default: true

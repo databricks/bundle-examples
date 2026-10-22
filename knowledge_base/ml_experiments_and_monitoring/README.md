@@ -21,7 +21,7 @@ For more information, please refer to the [documentation](https://docs.databrick
 | `job_runs.train_on_deploy` | Runs the training job during deploy. |
 | `quality_monitors.predictions` | Monitors the inference table and sends email on failure. |
 
-1. Update the `host` field in `databricks.yml` to your workspace URL. Set the `catalog`, `schema`, and `consumers_group` variables.
+1. Set the `catalog`, `schema`, and `consumers_group` variables in `databricks.yml`.
 
 2. Deploy the bundle. The deploy runs the training job once, then creates the monitor:
 

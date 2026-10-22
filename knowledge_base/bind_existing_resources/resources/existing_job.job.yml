@@ -16,7 +16,7 @@ resources:
       environments:
         - environment_key: default
           spec:
-            environment_version: "4"
+            environment_version: "6"
       max_concurrent_runs: 1
       queue:
         enabled: true

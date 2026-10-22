@@ -19,12 +19,12 @@ For more information, see the [sync settings documentation](https://docs.databri
 PAYLOAD_TEXT= databricks bundle deploy -t dev --profile <profile>
 ```
 
-4. List the generated file and confirm `local_only/notes.txt` is absent:
+4. List the uploaded files. Confirm that `generated/payload.txt` is present and `local_only/` is absent:
 
 ```bash
-databricks workspace list \
-  /Workspace/bundle-examples/sync_include_exclude_and_scripts/dev/<short-name>/files/generated \
-  --profile <profile>
+FILES=/Workspace/bundle-examples/sync_include_exclude_and_scripts/dev/<short-name>/files
+databricks workspace list $FILES --profile <profile>
+databricks workspace list $FILES/generated --profile <profile>
 ```
 
 5. Run the job: `databricks bundle run -t dev read_generated --profile <profile>`

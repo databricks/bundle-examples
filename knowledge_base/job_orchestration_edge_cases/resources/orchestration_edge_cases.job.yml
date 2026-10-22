@@ -1,0 +1,85 @@
+resources:
+  jobs:
+    orchestration_edge_cases:
+      name: Job orchestration edge cases
+      description: Demonstrates run_if, retries, queueing, and for_each with a failed iteration.
+
+      # Allow one active run. Queue extra runs instead of skipping them.
+      max_concurrent_runs: 1
+      queue:
+        enabled: true
+
+      tasks:
+        # Each input is a JSON object. Access its fields with {{input.<field>}}.
+        - task_key: process_items
+          for_each_task:
+            inputs: '[{"name": "alpha", "fail": false}, {"name": "beta", "fail": true}, {"name": "gamma", "fail": false}]'
+            concurrency: 3
+            task:
+              task_key: process_item
+              environment_key: default
+              spark_python_task:
+                python_file: ../src/process_item.py
+                parameters:
+                  - --name
+                  - "{{input.name}}"
+                  - --fail
+                  - "{{input.fail}}"
+              # Retry a failed iteration once after 10 seconds.
+              timeout_seconds: 300
+              max_retries: 1
+              min_retry_interval_millis: 10000
+              retry_on_timeout: true
+
+        # An empty input list runs zero iterations and succeeds.
+        - task_key: process_no_items
+          for_each_task:
+            inputs: "[]"
+            task:
+              task_key: process_no_item
+              environment_key: default
+              spark_python_task:
+                python_file: ../src/process_item.py
+                parameters:
+                  - --name
+                  - "{{input.name}}"
+
+        # Runs only if all dependencies succeed (the default ALL_SUCCESS).
+        - task_key: publish
+          depends_on:
+            - task_key: process_items
+            - task_key: process_no_items
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/step.py
+            parameters:
+              - publish
+
+        # Runs after all dependencies finish, whatever their result.
+        - task_key: cleanup
+          depends_on:
+            - task_key: process_items
+            - task_key: process_no_items
+          run_if: ALL_DONE
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/step.py
+            parameters:
+              - cleanup
+
+        # Runs only if at least one dependency fails.
+        - task_key: alert_on_failure
+          depends_on:
+            - task_key: process_items
+            - task_key: process_no_items
+          run_if: AT_LEAST_ONE_FAILED
+          environment_key: default
+          spark_python_task:
+            python_file: ../src/step.py
+            parameters:
+              - alert_on_failure
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"

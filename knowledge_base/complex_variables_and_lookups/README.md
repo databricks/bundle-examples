@@ -19,7 +19,7 @@ For more information, see the [variables documentation](https://docs.databricks.
 
    ```bash
    mkdir -p .databricks/bundle/dev
-   printf '%s\n' '{"environment_spec":{"environment_version":"4"}}' > .databricks/bundle/dev/variable-overrides.json
+   printf '%s\n' '{"environment_spec":{"environment_version":"6"}}' > .databricks/bundle/dev/variable-overrides.json
    ```
 
 3. Optional: override a lookup ID: `export BUNDLE_VAR_warehouse_id=<warehouse-id>`

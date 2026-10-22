@@ -39,7 +39,7 @@ variables:
     description: Serverless environment spec for the Python task
     type: complex
     default:
-      environment_version: "4"
+      environment_version: "6"
 
 targets:
   dev:
@@ -49,7 +49,7 @@ targets:
       root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
     variables:
       environment_spec:
-        environment_version: "3"
+        environment_version: "5"
 
   prod:
     mode: production
@@ -57,4 +57,4 @@ targets:
       root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
     variables:
       environment_spec:
-        environment_version: "4"
+        environment_version: "6"

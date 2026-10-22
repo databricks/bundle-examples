@@ -6,33 +6,33 @@ This Declarative Automation Bundles example shows combined bundle and resource p
 
 * Databricks CLI v1.20.0 or above.
 * Workspace administrator access.
-* A temporary workspace group name.
+* A workspace group for your team.
 * Existing `<schema>_dev` and `<schema>_prod` Unity Catalog schemas for the pipelines.
 
 ## Usage
 
-1. Create a temporary group.
+1. Create a workspace group for your team.
 
-   `databricks groups create --display-name bundle-permissions-test --profile dabs-examples`
+   `databricks groups create --display-name data-engineering-team --profile dabs-examples`
 
 2. Validate and deploy each target.
 
-   `databricks bundle validate -t dev --var "temporary_group=bundle-permissions-test,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
+   `databricks bundle validate -t dev --var "team_group=data-engineering-team,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
 
-   `databricks bundle deploy -t dev --var "temporary_group=bundle-permissions-test,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
+   `databricks bundle deploy -t dev --var "team_group=data-engineering-team,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
 
    Repeat both commands with `-t prod`.
 
-| Target | `users` from bundle | Temporary group on job | Temporary group on pipeline |
+| Target | `users` from bundle | Team group on job | Team group on pipeline |
 | --- | --- | --- | --- |
 | dev | `CAN_VIEW` | `CAN_MANAGE_RUN` | `CAN_RUN` |
 | prod | `CAN_VIEW` | `CAN_MANAGE` | `CAN_MANAGE` |
 
 3. Run the job and pipeline for each target.
 
-   `databricks bundle run permission_job -t dev --var "temporary_group=bundle-permissions-test,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
+   `databricks bundle run permission_job -t dev --var "team_group=data-engineering-team,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
 
-   `databricks bundle run permission_pipeline -t dev --var "temporary_group=bundle-permissions-test,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
+   `databricks bundle run permission_pipeline -t dev --var "team_group=data-engineering-team,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
 
    Repeat both commands with `-t prod`.
 
@@ -40,16 +40,18 @@ This Declarative Automation Bundles example shows combined bundle and resource p
 
    `databricks permissions get jobs <id> --profile dabs-examples`
 
+   `databricks permissions get pipelines <id> --profile dabs-examples`
+
 5. Rename `permission_job` in both YAML files and deploy again to replace the job.
 
    Set `lifecycle.prevent_destroy` to `true` to block this replacement or cleanup.
 
 6. Restore `lifecycle.prevent_destroy` to `false` and destroy both targets.
 
-   `databricks bundle destroy -t dev --auto-approve --var "temporary_group=bundle-permissions-test,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
+   `databricks bundle destroy -t dev --auto-approve --var "team_group=data-engineering-team,catalog_name=<catalog>,schema_name=<schema>" --profile dabs-examples`
 
    Repeat the command with `-t prod`.
 
-7. Delete the temporary group.
+7. Delete the example team group.
 
    `databricks groups delete <group-id> --profile dabs-examples`

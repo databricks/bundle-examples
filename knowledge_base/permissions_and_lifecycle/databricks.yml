@@ -5,8 +5,8 @@ include:
   - resources/*.yml
 
 variables:
-  temporary_group:
-    description: Temporary group used to test resource permissions
+  team_group:
+    description: Workspace group for your team
   catalog_name:
     description: Unity Catalog catalog containing the pipeline schema
   schema_name:
@@ -27,12 +27,12 @@ targets:
         permission_job:
           permissions:
             - level: CAN_MANAGE_RUN
-              group_name: ${var.temporary_group}
+              group_name: ${var.team_group}
       pipelines:
         permission_pipeline:
           permissions:
             - level: CAN_RUN
-              group_name: ${var.temporary_group}
+              group_name: ${var.team_group}
 
   prod:
     mode: production
@@ -43,10 +43,10 @@ targets:
         permission_job:
           permissions:
             - level: CAN_MANAGE
-              group_name: ${var.temporary_group}
+              group_name: ${var.team_group}
       pipelines:
         permission_pipeline:
           permissions:
             - level: CAN_MANAGE
-              group_name: ${var.temporary_group}
+              group_name: ${var.team_group}
 

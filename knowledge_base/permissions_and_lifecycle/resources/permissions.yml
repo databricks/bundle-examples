@@ -6,7 +6,7 @@ resources:
         prevent_destroy: false
       permissions:
         - level: CAN_MANAGE_RUN
-          group_name: ${var.temporary_group}
+          group_name: ${var.team_group}
       tasks:
         - task_key: permission_check
           spark_python_task:
@@ -24,7 +24,7 @@ resources:
         prevent_destroy: false
       permissions:
         - level: CAN_RUN
-          group_name: ${var.temporary_group}
+          group_name: ${var.team_group}
       serverless: true
       catalog: ${var.catalog_name}
       target: ${var.schema_name}_${bundle.target}

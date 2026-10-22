@@ -5,6 +5,12 @@ workspace:
   host: https://myworkspace.cloud.databricks.com
   artifact_path: /Volumes/my/artifact/path
 
+
+variables:
+  node_type_id:
+    description: "Classic cluster node type (AWS: i3.xlarge; Azure: Standard_DS3_v2)"
+    default: i3.xlarge
+
 artifacts:
   my_java_code:
     path: ./print_args
@@ -19,9 +25,9 @@ resources:
       tasks:
         - task_key: TestSparkJarTask
           new_cluster:
-            node_type_id: i3.xlarge
+            node_type_id: ${var.node_type_id}
             num_workers: 1
-            spark_version: 14.3.x-scala2.12
+            spark_version: 16.4.x-scala2.12
           spark_jar_task:
             main_class_name: PrintArgs
           libraries:

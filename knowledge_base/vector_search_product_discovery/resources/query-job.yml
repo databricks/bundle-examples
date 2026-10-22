@@ -20,7 +20,7 @@ resources:
       environments:
         - environment_key: serverless_env
           spec:
-            client: "3"
+            environment_version: "4"
             dependencies:
               - databricks-vectorsearch
 

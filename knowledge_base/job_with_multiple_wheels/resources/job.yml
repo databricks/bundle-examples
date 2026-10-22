@@ -13,9 +13,9 @@ resources:
             - whl: ../my_custom_wheel2/dist/*.whl
 
           new_cluster:
-            node_type_id: i3.xlarge
+            node_type_id: ${var.node_type_id}
             num_workers: 0
-            spark_version: 14.3.x-scala2.12
+            spark_version: 16.4.x-scala2.12
             spark_conf:
                 "spark.databricks.cluster.profile": "singleNode"
                 "spark.master": "local[*, 4]"

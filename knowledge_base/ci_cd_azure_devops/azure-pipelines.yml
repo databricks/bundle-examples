@@ -1,0 +1,71 @@
+trigger:
+  branches:
+    include: [main]
+
+pr:
+  branches:
+    include: [main]
+
+variables:
+  bundleDirectory: knowledge_base/ci_cd_azure_devops
+
+stages:
+  - stage: Validate
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    jobs:
+      - job: Validate
+        steps:
+          - bash: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/9b64c94a6d2b2e830592d80e9f14c26d32b42ad7/install.sh | sh
+            displayName: Install Databricks CLI
+          - bash: databricks bundle validate -t dev
+            displayName: Validate bundle
+            workingDirectory: $(bundleDirectory)
+            env:
+              DATABRICKS_AUTH_TYPE: azure-devops-oidc
+              DATABRICKS_HOST: $(DATABRICKS_HOST)
+              DATABRICKS_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+  - stage: Staging
+    dependsOn: []
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: DeployStaging
+        environment: staging
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - bash: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/9b64c94a6d2b2e830592d80e9f14c26d32b42ad7/install.sh | sh
+                  displayName: Install Databricks CLI
+                - bash: databricks bundle deploy -t staging
+                  displayName: Deploy staging
+                  workingDirectory: $(bundleDirectory)
+                  env:
+                    DATABRICKS_AUTH_TYPE: azure-devops-oidc
+                    DATABRICKS_HOST: $(DATABRICKS_HOST)
+                    DATABRICKS_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
+                    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+  - stage: Prod
+    dependsOn: Staging
+    condition: succeeded()
+    jobs:
+      - deployment: DeployProd
+        environment: prod
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - bash: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/9b64c94a6d2b2e830592d80e9f14c26d32b42ad7/install.sh | sh
+                  displayName: Install Databricks CLI
+                - bash: databricks bundle deploy -t prod
+                  displayName: Deploy production
+                  workingDirectory: $(bundleDirectory)
+                  env:
+                    DATABRICKS_AUTH_TYPE: azure-devops-oidc
+                    DATABRICKS_HOST: $(DATABRICKS_HOST)
+                    DATABRICKS_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
+                    SYSTEM_ACCESSTOKEN: $(System.AccessToken)

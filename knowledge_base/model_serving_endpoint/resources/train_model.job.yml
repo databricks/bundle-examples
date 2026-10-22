@@ -28,7 +28,7 @@ resources:
       environments:
         - environment_key: serverless_env
           spec:
-            environment_version: "4"
+            environment_version: "6"
             dependencies:
               - mlflow>=3.1
               - scikit-learn

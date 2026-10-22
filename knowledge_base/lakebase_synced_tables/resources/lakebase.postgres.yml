@@ -1,7 +1,7 @@
 resources:
   postgres_projects:
     synced_tables:
-      project_id: ${var.project_id}
+      project_id: ${var.project_id}-${bundle.target}
       display_name: Lakebase synced tables example
       pg_version: 17
       purge_on_delete: true
@@ -24,14 +24,9 @@ resources:
       autoscaling_limit_max_cu: 1
       suspend_timeout_duration: 60s
 
-  postgres_snapshot_schedules:
-    target_schedule:
-      branch: ${resources.postgres_branches.target_branch.id}
-      schedule: []
-
   postgres_synced_tables:
     example:
-      synced_table_id: ${var.destination_table}
+      synced_table_id: ${var.destination_table}_${bundle.target}
       source_table_full_name: ${var.source_table}
       branch: ${resources.postgres_branches.target_branch.id}
       postgres_database: databricks_postgres

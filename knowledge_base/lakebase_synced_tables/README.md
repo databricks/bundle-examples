@@ -1,8 +1,6 @@
 # Lakebase synced tables
 
-This Declarative Automation Bundles example syncs a Unity Catalog Delta table to Lakebase Postgres. It also creates a target-specific branch, endpoint, and disabled snapshot schedule.
-
-The `postgres_*` resources use Lakebase Autoscaling. Legacy `database_instances` resources configure Lakebase Provisioned.
+This Declarative Automation Bundles example syncs a Unity Catalog Delta table to Lakebase Postgres. Each target creates its own project, branch, endpoint, and synced table.
 
 See the [Lakebase Autoscaling documentation](https://docs.databricks.com/aws/en/oltp/) for more information.
 
@@ -10,8 +8,9 @@ See the [Lakebase Autoscaling documentation](https://docs.databricks.com/aws/en/
 
 - Databricks CLI v1.20.0 or above.
 - A workspace with Lakebase Autoscaling and serverless pipelines.
-- A source Delta table with an `id` primary key column.
+- A source Delta table with change data feed enabled and an `id` primary key column.
 - A standard catalog and schema for pipeline storage.
+- A new project ID. The bundle creates and purges its project during deployment and cleanup.
 
 ## Usage
 
@@ -31,19 +30,26 @@ See the [Lakebase Autoscaling documentation](https://docs.databricks.com/aws/en/
    databricks bundle validate
    ```
 
-3. Deploy the development branch, endpoint, schedule, and synced table.
+3. Deploy the development project and synced table.
 
    ```sh
    databricks bundle deploy
    ```
 
-4. Deploy the production target when required.
+4. Deploy the production project and synced table.
 
    ```sh
    databricks bundle deploy -t prod
    ```
 
-5. Remove the resources for each deployed target.
+5. Verify the development and production sync status.
+
+   ```sh
+   databricks postgres get-synced-table "synced_tables/${BUNDLE_VAR_destination_table}_dev"
+   databricks postgres get-synced-table "synced_tables/${BUNDLE_VAR_destination_table}_prod"
+   ```
+
+6. Remove the resources for each deployed target.
 
    ```sh
    databricks bundle destroy --auto-approve

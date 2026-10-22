@@ -1,0 +1,24 @@
+resources:
+  jobs:
+    existing_job:
+      name: Existing job
+      tasks:
+        - task_key: hello
+          disabled: false
+          email_notifications: {}
+          environment_key: default
+          notebook_task:
+            notebook_path: ../src/hello.py
+            source: WORKSPACE
+          run_if: ALL_SUCCESS
+          timeout_seconds: 0
+      email_notifications: {}
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "4"
+      max_concurrent_runs: 1
+      queue:
+        enabled: true
+      timeout_seconds: 0
+      webhook_notifications: {}

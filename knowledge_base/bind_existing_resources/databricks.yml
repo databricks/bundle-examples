@@ -1,0 +1,31 @@
+# This is a Declarative Automation Bundle definition for bind_existing_resources.
+# See https://docs.databricks.com/dev-tools/bundles/migrate-resources.html for documentation.
+bundle:
+  name: bind_existing_resources
+
+include:
+  - resources/*.yml
+
+variables:
+  warehouse_id:
+    description: SQL warehouse that runs the dashboard queries
+    lookup:
+      warehouse: Serverless Starter Warehouse
+  dashboard_parent_path:
+    description: Workspace folder of the existing dashboard, for example /Workspace/Users/<user>/<folder>
+
+# The workspace host is not set here. Use a profile (--profile / -p) or the
+# DATABRICKS_HOST environment variable.
+
+targets:
+  dev:
+    # Development mode adds a "[dev <user>]" prefix to the bound job name and pauses its schedules.
+    mode: development
+    default: true
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}

@@ -1,0 +1,9 @@
+resources:
+  dashboards:
+    existing_dashboard:
+      display_name: "Existing dashboard"
+      # Generated as a literal warehouse ID. Replaced with a variable so the bundle works in any workspace.
+      warehouse_id: ${var.warehouse_id}
+      # The parent path cannot change. Keep the folder of the existing dashboard, or deploy recreates it with a new ID.
+      parent_path: ${var.dashboard_parent_path}
+      file_path: ../src/existing_dashboard.lvdash.json

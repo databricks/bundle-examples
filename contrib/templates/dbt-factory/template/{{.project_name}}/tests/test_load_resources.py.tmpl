@@ -152,19 +152,42 @@ TAGGED_PROJECT = {
     "models/legacy.sql": "select 1 as id",
     "models/schema.yml": (
         "version: 2\nmodels:\n  - name: stg_orders\n    columns:\n      - name: order_id\n        data_tests: [not_null]\n"
+        "  - name: orders\n    columns:\n      - name: order_id\n        data_tests:\n          - relationships:\n"
+        "              arguments:\n                to: ref('stg_orders')\n                field: order_id\n"
     ),
 }
+RELATIONSHIPS_TEST = "relationships_orders_order_id__order_id__ref_stg_orders__test"
 
 
 @pytest.fixture
-def tagged_manifest(tmp_path, monkeypatch):
+def parse_tagged_project(tmp_path, monkeypatch):
+    """Returns a function that points the hook at the manifest dbt parses from TAGGED_PROJECT with `changes` applied."""
+
+    def parse(changes: dict[str, str] | None = None) -> None:
+        for path, content in {**TAGGED_PROJECT, **(changes or {})}.items():
+            (tmp_path / path).parent.mkdir(parents=True, exist_ok=True)
+            (tmp_path / path).write_text(content)
+        args = ["parse", "--quiet", "--project-dir", str(tmp_path), "--profiles-dir", str(tmp_path)]
+        result = dbtRunner().invoke(args)
+        assert result.success, result.exception
+        monkeypatch.setattr(resources, "MANIFEST_PATH", str(tmp_path / "target" / "manifest.json"))
+
+    return parse
+
+
+@pytest.fixture
+def tagged_manifest(parse_tagged_project):
     """Points the hook at the manifest dbt parses from a project tagging its models `staging`, `marts` or nothing."""
-    for path, content in TAGGED_PROJECT.items():
-        (tmp_path / path).parent.mkdir(parents=True, exist_ok=True)
-        (tmp_path / path).write_text(content)
-    result = dbtRunner().invoke(["parse", "--quiet", "--project-dir", str(tmp_path), "--profiles-dir", str(tmp_path)])
-    assert result.success, result.exception
-    monkeypatch.setattr(resources, "MANIFEST_PATH", str(tmp_path / "target" / "manifest.json"))
+    parse_tagged_project()
+
+
+def _placed_tasks(jobs: dict, tags: tuple[str, ...]) -> dict[str, set[str]]:
+    """The task keys of each per-tag job, checking that no task depends on a task of another job."""
+    placed = {tag: {task["task_key"] for task in jobs[f"{resources.JOB_NAME}_{tag}"]["tasks"]} for tag in tags}
+    for tag, keys in placed.items():
+        for task in jobs[f"{resources.JOB_NAME}_{tag}"]["tasks"]:
+            assert {d["task_key"] for d in task.get("depends_on", [])} <= keys
+    return placed
 
 
 def test_split_by_tags_runs_one_job_per_tag_from_the_job(tagged_manifest, monkeypatch):
@@ -198,23 +221,81 @@ def test_split_by_tags_runs_one_job_per_tag_from_the_job(tagged_manifest, monkey
         assert job["environments"][0]["spec"]["base_environment"] == resources.SERVERLESS_ENV_PATH
 {{- end}}
 
-    # Each model runs in the job of its tag and tests follow what they test; no task depends on another job's task.
-    placed = {
-        tag: {task["task_key"] for task in jobs[f"{name}_{tag}"]["tasks"]} for tag in ("staging", "marts", "default")
-    }
-    assert placed == {
+    # Each model runs in the job of its tag, and a test runs in the last job of what it tests.
+    assert _placed_tasks(jobs, ("staging", "marts", "default")) == {
         "staging": {"stg_orders_model", "not_null_stg_orders_order_id_test"},
-        "marts": {"orders_model"},
+        "marts": {"orders_model", RELATIONSHIPS_TEST},
         "default": {"legacy_model"},
     }
-    for tag, keys in placed.items():
-        for task in jobs[f"{name}_{tag}"]["tasks"]:
-            assert {d["task_key"] for d in task.get("depends_on", [])} <= keys
+
+
+def test_split_by_tags_runs_bundled_tests_in_the_job_of_their_resource(tagged_manifest, monkeypatch):
+    monkeypatch.setattr(resources, "SPLIT_BY_TAGS", ["staging", "marts"])
+    monkeypatch.setattr(resources, "BUNDLE_TESTS", True)
+    jobs = {key: job.as_dict() for key, job in resources.build_jobs("dev").items()}
+
+    assert _placed_tasks(jobs, ("staging", "marts", "default")) == {
+        "staging": {"stg_orders_model", "stg_orders_test"},
+        "marts": {"orders_model", RELATIONSHIPS_TEST},
+        "default": {"legacy_model"},
+    }
+
+
+def test_split_by_a_glob_runs_one_job_per_matching_tag(tagged_manifest, monkeypatch):
+    monkeypatch.setattr(resources, "SPLIT_BY_TAGS", ["sta*", "mar*"])
+    name = resources.JOB_NAME
+    assert set(resources.build_jobs("dev")) == {name, f"{name}_staging", f"{name}_marts", f"{name}_default"}
+
+
+def test_split_job_names_replace_characters_a_task_key_cannot_hold(parse_tagged_project, monkeypatch):
+    parse_tagged_project({"models/legacy.sql": "{{`{{`}} config(tags=['finance-core']) {{`}}`}}\nselect 1 as id"})
+    monkeypatch.setattr(resources, "SPLIT_BY_TAGS", ["finance-core"])
+    jobs = {key: job.as_dict() for key, job in resources.build_jobs("dev").items()}
+
+    name = resources.JOB_NAME
+    assert set(jobs) == {name, f"{name}_finance_core", f"{name}_default"}
+    assert {task["task_key"] for task in jobs[name]["tasks"]} == {"finance_core", "default"}
+    assert _placed_tasks(jobs, ("finance_core",)) == {"finance_core": {"legacy_model"}}
 
 
 def test_split_by_a_tag_no_resource_carries_fails_instead_of_deploying(monkeypatch):
     monkeypatch.setattr(resources, "SPLIT_BY_TAGS", ["no_such_tag"])
     with pytest.raises(ValueError, match="matches no tag"):
+        resources.build_jobs("dev")
+
+
+@pytest.mark.parametrize(
+    "changes, split_by_tags, error",
+    [
+        pytest.param(
+            {"models/legacy.sql": "{{`{{`}} config(tags=['staging', 'marts']) {{`}}`}}\nselect 1 as id"},
+            ["staging", "marts"],
+            "carries the split tags marts, staging",
+            id="resource-with-two-split-tags",
+        ),
+        pytest.param(
+            {"models/legacy.sql": "{{`{{`}} config(tags=['staging']) {{`}}`}}\nselect * from {{`{{`}} ref('orders') {{`}}`}}"},
+            ["staging", "marts"],
+            "would depend on each other",
+            id="jobs-in-a-cycle",
+        ),
+        pytest.param(
+            {
+                "models/legacy.sql": "{{`{{`}} config(tags=['finance_core']) {{`}}`}}\nselect 1 as id",
+                "models/ledger.sql": "{{`{{`}} config(tags=['finance-core']) {{`}}`}}\nselect 1 as id",
+            },
+            ["finance*"],
+            "would both run as job 'finance_core'",
+            id="tags-naming-the-same-job",
+        ),
+    ],
+)
+def test_split_that_cannot_be_placed_fails_instead_of_deploying(
+    parse_tagged_project, monkeypatch, changes, split_by_tags, error
+):
+    parse_tagged_project(changes)
+    monkeypatch.setattr(resources, "SPLIT_BY_TAGS", split_by_tags)
+    with pytest.raises(ValueError, match=error):
         resources.build_jobs("dev")
 
 

@@ -155,8 +155,11 @@ A few knobs are exposed as constants at the top of `resources/__init__.py`:
 * `EXTRA_DBT_COMMAND_OPTIONS` — extra options appended to every generated dbt command.
 * `SPLIT_BY_TAGS` — split the job into one job per dbt tag listed here (exact tags or globs such as
   `"domain_*"`). Each resource runs in the `dbt_factory_job_<tag>` job of its tag, or in
-  `dbt_factory_job_default` if it carries none, and tests run in the job of what they test.
-  `dbt_factory_job` then runs those jobs in dependency order and keeps the schedule. Default `[]`
+  `dbt_factory_job_default` if it carries none, and tests run in the job of what they test. In job
+  names, characters other than letters, digits and `_` in a tag become `_` (`finance-core` runs in
+  `dbt_factory_job_finance_core`). `dbt_factory_job` then runs those jobs in dependency order and keeps
+  the schedule. A job waits for whole upstream jobs, not just for the models it needs, so when any task
+  of a job fails, none of the jobs downstream of it run. Default `[]`
   (one job). Use it when a project outgrows the 1,000-task limit of a job. It works like the CLI's
   `--split-by-tag`; see [Splitting into several jobs](https://github.com/mwojtyczka/databricks-dbt-factory#splitting-into-several-jobs)
   for the full rules, including which splits are refused.

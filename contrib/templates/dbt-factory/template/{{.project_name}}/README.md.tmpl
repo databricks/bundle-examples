@@ -16,9 +16,9 @@ It combines two pieces:
   YAML is checked in** — the task graph is generated on the fly from the manifest.
 
 {{ if eq .use_serverless "no" -}}
-This project runs on a **job cluster** (classic compute) using the **notebook task type**. A single
-job cluster is created once per run and **shared by every task**, then torn down when the run
-finishes. It is defined in `resources/__init__.py` (the `job_clusters` block in `build_job`) — see
+This project runs on a **job cluster** (classic compute) using the **notebook task type**. A job
+cluster is created once per job run and **shared by every task of the job**, then torn down when the
+run finishes. It is defined in `resources/__init__.py` (the `job_clusters` block in `_job`) — see
 [Sizing the job cluster](#sizing-the-job-cluster) below.
 {{- else -}}
 This project uses **serverless compute** and the **notebook task type** for the fastest task
@@ -140,9 +140,13 @@ SPLIT_BY_TAGS = ["staging", "marts"]
 ```
 
 Each resource then runs in the `{{.project_name}}_job_<tag>` job of its tag, or in
-`{{.project_name}}_job_default` if it carries none, and tests run in the job of what they test.
+`{{.project_name}}_job_default` if it carries none, and tests run in the job of what they test. In job
+names, characters other than letters, digits and `_` in a tag become `_`, so tag `finance-core` runs
+in `{{.project_name}}_job_finance_core`.
 `{{.project_name}}_job` becomes the job that runs those jobs in dependency order: it keeps the
 schedule, and each per-tag job gets the {{if eq .use_serverless "no"}}job cluster{{else}}serverless environment{{end}}.
+A job waits for whole upstream jobs, not just for the models it needs: when any task of a job fails,
+none of the jobs downstream of it run.
 Use it when a project outgrows the 1,000-task limit of a job. It works like the `--split-by-tag`
 option of the databricks-dbt-factory CLI; see
 [Splitting into several jobs](https://github.com/mwojtyczka/databricks-dbt-factory#splitting-into-several-jobs)

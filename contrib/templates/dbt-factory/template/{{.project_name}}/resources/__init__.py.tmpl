@@ -43,7 +43,7 @@ MANIFEST_PATH = os.environ.get("DBT_MANIFEST_PATH", "target/manifest.json")
 JOB_NAME = "{{.project_name}}_job"
 
 {{ if eq .use_serverless "no" -}}
-# Key of the job cluster (defined in build_job below) that every task runs on.
+# Key of the job cluster (defined in _job below) that every task runs on.
 JOB_CLUSTER_KEY = "dbt_cluster"
 {{- else -}}
 # Key of the serverless environment (defined on the job below).

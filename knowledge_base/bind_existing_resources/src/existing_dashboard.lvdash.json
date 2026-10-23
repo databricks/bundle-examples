@@ -1,0 +1,18 @@
+{
+  "datasets": [
+    {
+      "displayName": "trips",
+      "name": "d1",
+      "queryLines": [
+        "SELECT * FROM samples.nyctaxi.trips LIMIT 10"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "displayName": "Trips",
+      "name": "p1",
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ]
+}

@@ -1,12 +1,13 @@
 import heapq
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field, replace
 from pathlib import PurePosixPath, PureWindowsPath
 from typing import cast
 
 from databricks_dbt_factory.dbt_task import DbtTask
+from databricks_dbt_factory.job_partition import JobPartition, TaskPlacement, partition_tasks
 from databricks_dbt_factory.task_factory import TaskFactory, TestTaskFactory
-from databricks_dbt_factory.utils import DYNAMIC_VALUE_REFERENCE, build_task_key_maps
+from databricks_dbt_factory.utils import DYNAMIC_VALUE_REFERENCE, MAX_JOB_TASKS, build_task_key_maps
 
 # The `unique_id` prefixes of resources a test can be attached to.
 _DBT_TEST_TARGET_PREFIXES = ("model.", "seed.", "snapshot.", "source.")
@@ -108,13 +109,17 @@ class DbtFactory:
         Raises:
             ValueError: If the generated job would exceed Databricks' 1,000-task limit.
         """
-        tasks = self._create_tasks(dbt_manifest)
-        if len(tasks) > 1_000:
+        tasks, _ = self._create_tasks(dbt_manifest)
+        if len(tasks) > MAX_JOB_TASKS:
             raise ValueError(
-                f"Databricks jobs support at most 1,000 tasks; this manifest generates {len(tasks):,}. "
-                f"Reduce the generated resources or enable test bundling."
+                f"Databricks jobs support at most {MAX_JOB_TASKS:,} tasks; this manifest generates {len(tasks):,}. "
+                f"Reduce the generated resources, enable test bundling, or split the job by tag."
             )
         return [task.to_dict() for task in tasks]
+
+    def create_partitions(self, dbt_manifest: dict, split_by_tags: Sequence[str]) -> list[JobPartition]:
+        """Generates the tasks split into one job per dbt tag matching `split_by_tags`; see `partition_tasks`."""
+        return partition_tasks(*self._create_tasks(dbt_manifest), split_by_tags)
 
     _GATEABLE_TYPES = frozenset({"model", "seed", "snapshot"})
     _DBT_TEST_TARGET_PREFIXES = _DBT_TEST_TARGET_PREFIXES
@@ -678,7 +683,7 @@ class DbtFactory:
             f"resources, so the task could run another task's resource."
         )
 
-    def _create_tasks(self, dbt_manifest: dict) -> list[DbtTask]:
+    def _create_tasks(self, dbt_manifest: dict) -> tuple[list[DbtTask], dict[str, TaskPlacement]]:
         """
         Builds `DbtTask` instances from the manifest, applying the bundling and gating policies.
 
@@ -686,7 +691,8 @@ class DbtFactory:
             dbt_manifest (dict): Parsed dbt manifest content.
 
         Returns:
-            list[DbtTask]: `DbtTask` instances (not yet rendered to dicts).
+            tuple[list[DbtTask], dict[str, TaskPlacement]]: `DbtTask` instances (not yet rendered to dicts), and
+            the placement of each by task key.
         """
         dbt_nodes = self._enabled_only(dbt_manifest.get("nodes", {}))
         dbt_sources = self._enabled_only(dbt_manifest.get("sources", {}))
@@ -752,7 +758,23 @@ class DbtFactory:
         elif "test" in self.task_factories:
             tasks.extend(self._build_unit_test_tasks(dbt_unit_tests, task_keys, peers))
 
-        return tasks
+        return tasks, self._placements(peers, task_keys, bundled_test_keys)
+
+    @staticmethod
+    def _placements(
+        peers: dict, task_keys: dict[str, str], bundled_test_keys: dict[str, str]
+    ) -> dict[str, TaskPlacement]:
+        """Places each task by its resource's tags; tests, and the bundles running them, follow their dependencies."""
+        bundles = set(bundled_test_keys.values())
+        placements = {}
+        for full_name, task_key in (*task_keys.items(), *bundled_test_keys.items()):
+            info = peers[full_name]
+            placements[task_key] = TaskPlacement(
+                f"{info.get('resource_type')} {info.get('name')!r} ({info.get('original_file_path')})",
+                frozenset(info.get("tags") or ()),
+                task_key in bundles or info["resource_type"] in {"test", "unit_test"},
+            )
+        return placements
 
     @staticmethod
     def _enabled_only(entries: dict) -> dict:

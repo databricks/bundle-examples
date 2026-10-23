@@ -3,7 +3,8 @@ Offline test for the PyDABs integration in resources/__init__.py.
 
 Exercises the whole glue path against the committed dbt manifest (no Databricks workspace
 required): reading the manifest, wiring the factory, generating notebook tasks, and registering
-the job on a Resources object (which runs Job.from_dict, validating the task dict schema).
+the job on a Resources object (which runs Job.from_dict, validating the task dict schema). The
+split by tag runs against a small tagged project that dbt parses offline.
 """
 
 import json
@@ -15,6 +16,7 @@ import pytest
 import yaml
 {{- end}}
 from databricks.bundles.core import Bundle
+from dbt.cli.main import dbtRunner
 
 import resources
 from databricks_dbt_factory.utils import generate_task_key
@@ -33,6 +35,13 @@ pytestmark = pytest.mark.skipif(
 def _chdir_to_project_root(monkeypatch):
     # resources.MANIFEST_PATH is relative to the bundle root, as it is at deploy time.
     monkeypatch.chdir(PROJECT_ROOT)
+
+
+def _jobs_running_dbt(jobs: dict) -> list:
+    """The generated jobs whose tasks run dbt: the job itself, or with SPLIT_BY_TAGS the per-tag jobs it runs."""
+    dbt_jobs = [job for job in jobs.values() if any(task.notebook_task for task in job.tasks)]
+    assert dbt_jobs, "no generated job runs dbt"
+    return dbt_jobs
 
 
 def test_build_tasks_covers_every_buildable_node():
@@ -78,16 +87,16 @@ def test_tasks_pin_dbt_databricks_as_a_library():
 
 
 def test_job_cluster_is_defined_on_the_job():
-    job = resources.build_job("dev")
-    assert len(job.job_clusters) == 1
-    assert job.job_clusters[0].job_cluster_key == resources.JOB_CLUSTER_KEY
+    for job in _jobs_running_dbt(resources.build_jobs("dev")):
+        assert len(job.job_clusters) == 1
+        assert job.job_clusters[0].job_cluster_key == resources.JOB_CLUSTER_KEY
 
 
 def test_load_resources_registers_the_job():
     result = resources.load_resources(Bundle(target="dev"))
     assert resources.JOB_NAME in result.jobs
-    job = result.jobs[resources.JOB_NAME]
-    assert job.job_clusters[0].job_cluster_key == resources.JOB_CLUSTER_KEY
+    for job in _jobs_running_dbt(result.jobs):
+        assert job.job_clusters[0].job_cluster_key == resources.JOB_CLUSTER_KEY
 {{- else -}}
 def test_generated_tasks_are_serverless_notebook_tasks():
     tasks = resources._build_tasks("dev")
@@ -109,16 +118,16 @@ def test_environment_pins_installed_dbt_databricks():
     assert spec["dependencies"] == [f"dbt-databricks=={version('dbt-databricks')}"]
 
     # The generated job points its serverless environment at the synced env file.
-    job = resources.build_job("dev")
-    assert job.environments[0].spec.base_environment == resources.SERVERLESS_ENV_PATH
+    for job in _jobs_running_dbt(resources.build_jobs("dev")):
+        assert job.environments[0].spec.base_environment == resources.SERVERLESS_ENV_PATH
 
 
 def test_load_resources_registers_the_job():
     result = resources.load_resources(Bundle(target="dev"))
     try:
         assert resources.JOB_NAME in result.jobs
-        job = result.jobs[resources.JOB_NAME]
-        assert job.environments[0].environment_key == resources.ENVIRONMENT_KEY
+        for job in _jobs_running_dbt(result.jobs):
+            assert job.environments[0].environment_key == resources.ENVIRONMENT_KEY
 
         # load_resources writes the base-environment file to the bundle root for
         # the bundle to sync; it pins dbt-databricks to the installed version.
@@ -130,6 +139,83 @@ def test_load_resources_registers_the_job():
     finally:
         (PROJECT_ROOT / resources.SERVERLESS_ENV_FILE).unlink(missing_ok=True)
 {{- end}}
+
+
+TAGGED_PROJECT = {
+    "dbt_project.yml": 'name: probe\nprofile: probe\nversion: "1.0"\nconfig-version: 2\n',
+    "profiles.yml": (
+        "probe:\n  target: dev\n  outputs:\n    dev:\n      type: databricks\n      host: example.databricks.com\n"
+        "      http_path: /sql/1.0/warehouses/x\n      token: dummy\n      schema: default\n"
+    ),
+    "models/stg_orders.sql": "{{`{{`}} config(tags=['staging']) {{`}}`}}\nselect 1 as order_id",
+    "models/orders.sql": "{{`{{`}} config(tags=['marts']) {{`}}`}}\nselect * from {{`{{`}} ref('stg_orders') {{`}}`}}",
+    "models/legacy.sql": "select 1 as id",
+    "models/schema.yml": (
+        "version: 2\nmodels:\n  - name: stg_orders\n    columns:\n      - name: order_id\n        data_tests: [not_null]\n"
+    ),
+}
+
+
+@pytest.fixture
+def tagged_manifest(tmp_path, monkeypatch):
+    """Points the hook at the manifest dbt parses from a project tagging its models `staging`, `marts` or nothing."""
+    for path, content in TAGGED_PROJECT.items():
+        (tmp_path / path).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / path).write_text(content)
+    result = dbtRunner().invoke(["parse", "--quiet", "--project-dir", str(tmp_path), "--profiles-dir", str(tmp_path)])
+    assert result.success, result.exception
+    monkeypatch.setattr(resources, "MANIFEST_PATH", str(tmp_path / "target" / "manifest.json"))
+
+
+def test_split_by_tags_runs_one_job_per_tag_from_the_job(tagged_manifest, monkeypatch):
+    monkeypatch.setattr(resources, "SPLIT_BY_TAGS", ["staging", "marts"])
+    monkeypatch.setattr(resources, "BUNDLE_TESTS", False)  # the layout below names each test's own task
+    jobs = {key: job.as_dict() for key, job in resources.build_jobs("dev").items()}
+
+    name = resources.JOB_NAME
+    assert set(jobs) == {name, f"{name}_staging", f"{name}_marts", f"{name}_default"}
+    run_jobs = {task["task_key"]: task for task in jobs[name]["tasks"]}
+    assert {key: task["run_job_task"]["job_id"] for key, task in run_jobs.items()} == {
+        tag: f"${{`{{`}}resources.jobs.{name}_{tag}.id{{`}}`}}" for tag in ("staging", "marts", "default")
+    }
+    assert {key: [d["task_key"] for d in task.get("depends_on", [])] for key, task in run_jobs.items()} == {
+        "staging": [],
+        "marts": ["staging"],
+        "default": [],
+    }
+
+    # The job keeps the schedule and runs no dbt itself; the per-tag jobs get the compute instead.
+    assert jobs[name]["trigger"] and not {"environments", "job_clusters"} & set(jobs[name])
+    for tag in ("staging", "marts", "default"):
+        job = jobs[f"{name}_{tag}"]
+        assert "trigger" not in job
+        assert job["queue"] == {"enabled": True}
+{{- if eq .use_serverless "no"}}
+        assert job["job_clusters"][0]["job_cluster_key"] == resources.JOB_CLUSTER_KEY
+        for task in job["tasks"]:
+            assert task["libraries"] == [{"pypi": {"package": f"dbt-databricks=={version('dbt-databricks')}"}}]
+{{- else}}
+        assert job["environments"][0]["spec"]["base_environment"] == resources.SERVERLESS_ENV_PATH
+{{- end}}
+
+    # Each model runs in the job of its tag and tests follow what they test; no task depends on another job's task.
+    placed = {
+        tag: {task["task_key"] for task in jobs[f"{name}_{tag}"]["tasks"]} for tag in ("staging", "marts", "default")
+    }
+    assert placed == {
+        "staging": {"stg_orders_model", "not_null_stg_orders_order_id_test"},
+        "marts": {"orders_model"},
+        "default": {"legacy_model"},
+    }
+    for tag, keys in placed.items():
+        for task in jobs[f"{name}_{tag}"]["tasks"]:
+            assert {d["task_key"] for d in task.get("depends_on", [])} <= keys
+
+
+def test_split_by_a_tag_no_resource_carries_fails_instead_of_deploying(monkeypatch):
+    monkeypatch.setattr(resources, "SPLIT_BY_TAGS", ["no_such_tag"])
+    with pytest.raises(ValueError, match="matches no tag"):
+        resources.build_jobs("dev")
 
 
 def test_dependency_pin_rejects_non_pypi_versions(monkeypatch):

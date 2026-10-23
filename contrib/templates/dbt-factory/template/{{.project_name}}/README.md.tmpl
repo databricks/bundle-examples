@@ -86,7 +86,7 @@ are selected per bundle target via `--target ${bundle.target}`.
 **You must size the cluster yourself by editing a file — there is no `bundle init` prompt for it.**
 The job cluster ships with default settings; to change them, open
 [`resources/__init__.py`](resources/__init__.py) and edit the `job_clusters` block inside
-`build_job`:
+`_job`:
 
 ```python
 "new_cluster": {
@@ -103,7 +103,8 @@ models as SQL to the **SQL warehouse** set by `http_path` in `dbt_profiles/profi
 warehouse — not this cluster — executes the queries. Because the tasks are I/O-bound (submit SQL,
 wait), the default is a **single-node** cluster: adding workers does **not** speed dbt up. Bump
 `node_type_id` only if orchestration itself needs more headroom, and size the **SQL warehouse** for
-your query load. All tasks share this one cluster for the whole run.
+your query load. All tasks of a job share this one cluster for the whole run; with `SPLIT_BY_TAGS`
+(below), each per-tag job gets its own.
 
 **When to do this:** the cluster is created from this block at `databricks bundle deploy` time (not
 at `bundle init`). So edit it **before your first deploy** (`make deploy` / `databricks bundle
@@ -128,6 +129,24 @@ the bundle generates and syncs each deploy. `pyproject.toml` is the single sourc
 the version there, re-run `make setup`, and the next deploy uses it — so what runs in Databricks
 matches what you tested with.
 {{- end}}
+
+### Splitting into several jobs
+
+To split the job into one job per dbt tag, list the tags in `SPLIT_BY_TAGS` in
+`resources/__init__.py`, each an exact tag or a glob such as `"domain_*"`:
+
+```python
+SPLIT_BY_TAGS = ["staging", "marts"]
+```
+
+Each resource then runs in the `{{.project_name}}_job_<tag>` job of its tag, or in
+`{{.project_name}}_job_default` if it carries none, and tests run in the job of what they test.
+`{{.project_name}}_job` becomes the job that runs those jobs in dependency order: it keeps the
+schedule, and each per-tag job gets the {{if eq .use_serverless "no"}}job cluster{{else}}serverless environment{{end}}.
+Use it when a project outgrows the 1,000-task limit of a job. It works like the `--split-by-tag`
+option of the databricks-dbt-factory CLI; see
+[Splitting into several jobs](https://github.com/mwojtyczka/databricks-dbt-factory#splitting-into-several-jobs)
+for the full rules, including which splits are refused.
 
 ## Tests
 

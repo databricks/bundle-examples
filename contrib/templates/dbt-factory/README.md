@@ -89,6 +89,9 @@ $ databricks bundle run <project_name>_job
 | `environment_key` | Key of the serverless environment used by the generated job (serverless only). |
 | `extra_dbt_command_options` | Extra options appended to every generated dbt command. |
 
+To split the job into one job per dbt tag once your models carry tags, set `SPLIT_BY_TAGS` in the
+generated `resources/__init__.py` (see the generated project's README, "Splitting into several jobs").
+
 ### Compute
 
 The generated job supports two compute types, chosen by the `use_serverless` prompt:

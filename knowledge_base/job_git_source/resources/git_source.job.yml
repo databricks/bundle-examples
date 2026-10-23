@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    git_source:
+      name: Job with Git source
+      git_source:
+        git_url: ${var.git_url}
+        git_provider: ${var.git_provider}
+        git_branch: ${var.git_branch}
+      tasks:
+        - task_key: hello
+          environment_key: default
+          notebook_task:
+            notebook_path: knowledge_base/development_cluster/src/hello.py
+            source: GIT
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "6"

@@ -1,0 +1,16 @@
+resources:
+  pipelines:
+    customers_cdc:
+      name: customers_cdc
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      continuous: ${var.continuous}
+
+      # Read in the pipeline code with spark.conf.get("source_path").
+      configuration:
+        source_path: ${resources.volumes.changes.volume_path}/customers
+
+      libraries:
+        - file:
+            path: ../src/customers_cdc.py

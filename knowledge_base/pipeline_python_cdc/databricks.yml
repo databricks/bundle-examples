@@ -1,0 +1,37 @@
+# This is a Declarative Automation Bundle definition for pipeline_python_cdc.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: pipeline_python_cdc
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Existing Unity Catalog catalog for the pipeline tables
+    default: main
+  schema:
+    description: Existing schema in the catalog for the pipeline tables
+    default: pipeline_python_cdc
+  continuous:
+    description: Run the pipeline continuously (true) or on trigger (false)
+    default: false
+
+# The workspace host is not set here. Use a profile (--profile / -p) or the
+# DATABRICKS_HOST environment variable.
+
+targets:
+  dev:
+    # Development mode prefixes resource names and pauses schedules.
+    mode: development
+    default: true
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
+    variables:
+      # Prod processes new changes as soon as they arrive.
+      continuous: true

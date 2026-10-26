@@ -20,7 +20,8 @@ resources:
       environments:
         - environment_key: serverless_env
           spec:
-            client: "3"
+            # Stay on 4: databricks-vectorsearch needs protobuf 5.x, environment 6 ships protobuf 6.
+            environment_version: "4"
             dependencies:
               - databricks-vectorsearch
 

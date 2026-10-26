@@ -15,7 +15,7 @@ resources:
           new_cluster:
             node_type_id: i3.xlarge
             num_workers: 0
-            spark_version: 14.3.x-scala2.12
+            spark_version: 18.x-scala2.13
             spark_conf:
                 "spark.databricks.cluster.profile": "singleNode"
                 "spark.master": "local[*, 4]"

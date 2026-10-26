@@ -4,7 +4,7 @@ resources:
       name: "Example of a pipeline with a schema"
 
       catalog: ${resources.schemas.example_schema.catalog_name}
-      target: ${resources.schemas.example_schema.name}
+      schema: ${resources.schemas.example_schema.name}
 
       libraries:
         - file:

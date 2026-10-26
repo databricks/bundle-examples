@@ -14,7 +14,7 @@ resources:
         - environment_key: default
 
           spec:
-            client: "1"
+            environment_version: "6"
             dependencies:
               # Relative local path reference to the private wheel package.
               # This references alone is sufficient to upload it on deployment.

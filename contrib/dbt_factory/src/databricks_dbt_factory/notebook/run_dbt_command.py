@@ -68,9 +68,10 @@ prebuilt_manifest_path = os.path.join("target", "partial_parse.msgpack")
 if os.path.exists(prebuilt_manifest_path):
     try:
         from dbt.contracts.graph.manifest import Manifest
+        from dbt.parser.manifest import extended_mashumuro_decoder
 
         with open(prebuilt_manifest_path, "rb") as f:
-            manifest = Manifest.from_msgpack(f.read())
+            manifest = Manifest.from_msgpack(f.read(), decoder=extended_mashumuro_decoder)
         manifest.build_flat_graph()
         print(f"[dbt-factory] injecting pre-built manifest from {prebuilt_manifest_path} (skipping dbt parse)")
     except Exception as e:

@@ -3,8 +3,9 @@ PyDABs integration for databricks-dbt-factory.
 
 At ``databricks bundle deploy`` time the Databricks CLI calls :func:`load_resources`, which
 reads the dbt manifest and expands it into a Databricks job with one task per dbt object
-(model / seed / snapshot / test) using the vendored ``databricks_dbt_factory`` core. No
-per-model YAML is generated or checked in — the job graph is built on the fly from the manifest.
+(model / seed / snapshot / test), optionally split into one job per dbt tag, using the vendored
+``databricks_dbt_factory`` core. No per-model YAML is generated or checked in — the job graph is
+built on the fly from the manifest.
 
 This module is the only integration glue: it configures the vendored ``databricks_dbt_factory``
 core (under ``src/databricks_dbt_factory``) for {{if eq .use_serverless "no"}}notebook tasks on a job cluster{{else}}serverless notebook tasks{{end}} and returns a
@@ -22,6 +23,7 @@ from databricks.bundles.jobs import Job
 
 from databricks_dbt_factory.dbt_factory import DbtFactory
 from databricks_dbt_factory.dbt_task import DbtTaskOptions, TaskType
+from databricks_dbt_factory.job_partition import JobPartition
 from databricks_dbt_factory.task_factory import (
     DbtDependencyResolver,
     ModelTaskFactory,
@@ -41,7 +43,7 @@ MANIFEST_PATH = os.environ.get("DBT_MANIFEST_PATH", "target/manifest.json")
 JOB_NAME = "{{.project_name}}_job"
 
 {{ if eq .use_serverless "no" -}}
-# Key of the job cluster (defined in build_job below) that every task runs on.
+# Key of the job cluster (defined in _job below) that every task runs on.
 JOB_CLUSTER_KEY = "dbt_cluster"
 {{- else -}}
 # Key of the serverless environment (defined on the job below).
@@ -60,10 +62,16 @@ BUNDLE_TESTS = {{if eq .bundle_tests "yes"}}True{{else}}False{{end}}
 # `printf "%q"` renders a safely-quoted string literal so values containing quotes stay valid Python.
 EXTRA_DBT_COMMAND_OPTIONS = {{ printf "%q" .extra_dbt_command_options }}
 
+# Split the job into one job per dbt tag matching these patterns, each an exact tag or a glob such as
+# "domain_*"; resources without a matching tag run in a `default` job. The JOB_NAME job then runs those
+# jobs in dependency order. Empty keeps one job. Works like the databricks-dbt-factory CLI's
+# --split-by-tag; see "Splitting into several jobs" in its README for how tests are placed and what is refused.
+SPLIT_BY_TAGS = []
+
 {{ if eq .use_serverless "yes" -}}
 # Serverless base-environment file, generated at deploy time from the pinned
 # dbt-databricks version and synced with the bundle. The generated job points its
-# serverless environment at this file (see build_job) so Databricks pre-builds the
+# serverless environment at this file (see _job) so Databricks pre-builds the
 # environment once instead of installing dbt on every task. `${workspace.file_path}`
 # is substituted by the CLI at deploy time to the bundle's synced files root.
 SERVERLESS_ENV_FILE = "dbt_serverless_env.yaml"
@@ -79,8 +87,8 @@ PROJECT_DIRECTORY = os.path.relpath(".", os.path.dirname(RUNNER_NOTEBOOK_PATH))
 PROFILES_DIRECTORY = "dbt_profiles"
 
 
-def _build_tasks(target: str) -> list[dict]:
-    """Reads the dbt manifest and returns the list of Databricks task dicts (one per dbt node)."""
+def _build_factory(target: str) -> DbtFactory:
+    """Configures the factory to generate {{if eq .use_serverless "no"}}notebook tasks on a job cluster{{else}}serverless notebook tasks{{end}} that run the given dbt target."""
     resolver = DbtDependencyResolver()
     task_options = DbtTaskOptions(
         {{- if eq .use_serverless "no"}}
@@ -102,10 +110,29 @@ def _build_tasks(target: str) -> list[dict]:
         "test": TestTaskFactory(resolver, task_options, dbt_options),
     }
 
-    factory = DbtFactory(task_factories, bundle_tests=BUNDLE_TESTS)
-    manifest = read_dbt_manifest(MANIFEST_PATH)
+    return DbtFactory(task_factories, bundle_tests=BUNDLE_TESTS)
+
+
+def _build_tasks(target: str) -> list[dict]:
+    """Reads the dbt manifest and returns the list of Databricks task dicts (one per dbt node)."""
 {{- if eq .use_serverless "no"}}
-    tasks = factory.create_tasks(manifest)
+    return _add_dbt_library(_build_factory(target).create_tasks(read_dbt_manifest(MANIFEST_PATH)))
+{{- else}}
+    return _build_factory(target).create_tasks(read_dbt_manifest(MANIFEST_PATH))
+{{- end}}
+
+
+def _build_partitions(target: str) -> list[JobPartition]:
+    """Reads the dbt manifest and returns its tasks split into one job per tag matching SPLIT_BY_TAGS."""
+{{- if eq .use_serverless "no"}}
+    partitions = _build_factory(target).create_partitions(read_dbt_manifest(MANIFEST_PATH), SPLIT_BY_TAGS)
+    for partition in partitions:
+        _add_dbt_library(partition.tasks)
+    return partitions
+
+
+def _add_dbt_library(tasks: list[dict]) -> list[dict]:
+    """Adds dbt-databricks to the libraries of every task, and returns the tasks."""
     # A job cluster does not get the serverless base environment, so dbt-databricks must be
     # installed on the cluster. Listing it as a library on every task installs it once on the
     # shared job cluster (idempotent) and guarantees it is present no matter which task the
@@ -115,7 +142,7 @@ def _build_tasks(target: str) -> list[dict]:
         task["libraries"] = [library]
     return tasks
 {{- else}}
-    return factory.create_tasks(manifest)
+    return _build_factory(target).create_partitions(read_dbt_manifest(MANIFEST_PATH), SPLIT_BY_TAGS)
 {{- end}}
 
 
@@ -185,82 +212,109 @@ def _write_serverless_environment_file() -> None:
 
 
 {{ end -}}
-def build_job(target: str) -> Job:
+# How SPLIT_BY_TAGS shares out the job settings, as the databricks-dbt-factory CLI's --split-by-tag does:
+# the JOB_NAME job keeps the schedule, triggers, notifications and health rules, the per-tag jobs keep
+# the compute, and all of them keep everything else (such as the queue).
+_ORCHESTRATOR_ONLY = frozenset(
+    {
+        "schedule",
+        "trigger",
+        "continuous",
+        "email_notifications",
+        "webhook_notifications",
+        "notification_settings",
+        "health",
+    }
+)
+_SPLIT_JOB_ONLY = frozenset({"environments", "job_clusters"})
+
+
+def _job(name: str, tasks: list[dict], without: frozenset[str] = frozenset()) -> Job:
+    """Builds a job that runs `tasks` with the settings below, leaving out those named in `without`."""
+    settings = {
+        "name": name,
+        "queue": {"enabled": True},
+        "trigger": {
+            # Run this job every day, exactly one day from the last run;
+            # see https://docs.databricks.com/api/workspace/jobs/create#trigger
+            "periodic": {"interval": 1, "unit": "DAYS"},
+        },
+        "tasks": tasks,
 {{- if eq .use_serverless "no"}}
-    """Builds the Databricks job that runs the dbt project on a job cluster via notebook tasks."""
-    return Job.from_dict(
-        {
-            "name": JOB_NAME,
-            "queue": {"enabled": True},
-            "trigger": {
-                # Run this job every day, exactly one day from the last run;
-                # see https://docs.databricks.com/api/workspace/jobs/create#trigger
-                "periodic": {"interval": 1, "unit": "DAYS"},
-            },
-            "tasks": _build_tasks(target),
-            # The job cluster every task runs on. It only orchestrates — each task runs the runner
-            # notebook, which submits SQL to the warehouse in dbt_profiles/profiles.yml and waits —
-            # so it is a single-node cluster by default: extra workers do not speed dbt up (the
-            # warehouse runs the queries). Bump node_type_id if orchestration itself needs more
-            # headroom, and scale the SQL warehouse for query load. Changes take effect on the next
-            # `databricks bundle deploy`.
-            "job_clusters": [
-                {
-                    "job_cluster_key": JOB_CLUSTER_KEY,
-                    "new_cluster": {
-                        # `spark_version` holds the Databricks Runtime version. "18.x-scala2.13" is
-                        # DBR 18 LTS; its ".x" auto-updates to the latest maintenance release. Use a
-                        # specific release (e.g. "18.2.x-scala2.13") only if you want to pin it.
-                        "spark_version": "18.x-scala2.13",
-                        "node_type_id": "{{smallest_node_type}}",
-                        # Single node (driver only): no workers, since the tasks are I/O-bound
-                        # orchestration, not Spark compute.
-                        "num_workers": 0,
-                        "spark_conf": {
-                            "spark.databricks.cluster.profile": "singleNode",
-                            "spark.master": "local[*]",
-                        },
-                        "custom_tags": {"ResourceClass": "SingleNode"},
+        # The job cluster every task runs on. It only orchestrates — each task runs the runner
+        # notebook, which submits SQL to the warehouse in dbt_profiles/profiles.yml and waits —
+        # so it is a single-node cluster by default: extra workers do not speed dbt up (the
+        # warehouse runs the queries). Bump node_type_id if orchestration itself needs more
+        # headroom, and scale the SQL warehouse for query load. Changes take effect on the next
+        # `databricks bundle deploy`. With SPLIT_BY_TAGS, each per-tag job gets its own cluster.
+        "job_clusters": [
+            {
+                "job_cluster_key": JOB_CLUSTER_KEY,
+                "new_cluster": {
+                    # `spark_version` holds the Databricks Runtime version. "18.x-scala2.13" is
+                    # DBR 18 LTS; its ".x" auto-updates to the latest maintenance release. Use a
+                    # specific release (e.g. "18.2.x-scala2.13") only if you want to pin it.
+                    "spark_version": "18.x-scala2.13",
+                    "node_type_id": "{{smallest_node_type}}",
+                    # Single node (driver only): no workers, since the tasks are I/O-bound
+                    # orchestration, not Spark compute.
+                    "num_workers": 0,
+                    "spark_conf": {
+                        "spark.databricks.cluster.profile": "singleNode",
+                        "spark.master": "local[*]",
                     },
-                }
-            ],
-        }
-    )
+                    "custom_tags": {"ResourceClass": "SingleNode"},
+                },
+            }
+        ],
 {{- else}}
-    """Builds the Databricks job that runs the dbt project on serverless via notebook tasks."""
-    return Job.from_dict(
-        {
-            "name": JOB_NAME,
-            "queue": {"enabled": True},
-            "trigger": {
-                # Run this job every day, exactly one day from the last run;
-                # see https://docs.databricks.com/api/workspace/jobs/create#trigger
-                "periodic": {"interval": 1, "unit": "DAYS"},
-            },
-            "tasks": _build_tasks(target),
-            "environments": [
-                {
-                    "environment_key": ENVIRONMENT_KEY,
-                    # Pre-built base env (synced with the bundle), not inline deps —
-                    # the two are mutually exclusive; the file pins dbt-databricks.
-                    "spec": {"base_environment": SERVERLESS_ENV_PATH},
-                }
-            ],
-        }
-    )
+        "environments": [
+            {
+                "environment_key": ENVIRONMENT_KEY,
+                # Pre-built base env (synced with the bundle), not inline deps —
+                # the two are mutually exclusive; the file pins dbt-databricks.
+                "spec": {"base_environment": SERVERLESS_ENV_PATH},
+            }
+        ],
 {{- end}}
+    }
+    return Job.from_dict({key: value for key, value in settings.items() if key not in without})
+
+
+def build_jobs(target: str) -> dict[str, Job]:
+    """
+    Builds the Databricks jobs that run the dbt project on {{if eq .use_serverless "no"}}a job cluster{{else}}serverless{{end}} via notebook tasks, by resource key.
+
+    That is the JOB_NAME job, or with SPLIT_BY_TAGS one `<JOB_NAME>_<tag>` job per tag plus the JOB_NAME
+    job, which runs each of them once the jobs it depends on have succeeded.
+    """
+    if not SPLIT_BY_TAGS:
+        return {JOB_NAME: _job(JOB_NAME, _build_tasks(target))}
+    jobs, run_jobs = {}, []
+    for partition in _build_partitions(target):
+        key = f"{JOB_NAME}_{partition.name}"
+        jobs[key] = _job(key, partition.tasks, without=_ORCHESTRATOR_ONLY)
+        run_jobs.append(
+            {
+                "task_key": partition.name,
+                "depends_on": [{"task_key": upstream} for upstream in partition.depends_on],
+                "run_job_task": {"job_id": f"${{`{{`}}resources.jobs.{key}.id{{`}}`}}"},
+            }
+        )
+    return {JOB_NAME: _job(JOB_NAME, run_jobs, without=_SPLIT_JOB_ONLY), **jobs}
 
 
 def load_resources(bundle: Bundle) -> Resources:
     """
     Called by the Databricks CLI during `bundle deploy` to load resources defined in Python.
 
-    Reads the dbt manifest{{if eq .use_serverless "no"}} and registers the generated job{{else}}, writes the serverless base-environment file (synced with the bundle),
-    and registers the generated job{{end}}. After deployment this function is not used.
+    Reads the dbt manifest{{if eq .use_serverless "no"}} and registers the generated jobs{{else}}, writes the serverless base-environment file (synced with the bundle),
+    and registers the generated jobs{{end}}. After deployment this function is not used.
     """
 {{- if eq .use_serverless "yes"}}
     _write_serverless_environment_file()
 {{- end}}
     resources = Resources()
-    resources.add_job(JOB_NAME, build_job(bundle.target))
+    for key, job in build_jobs(bundle.target).items():
+        resources.add_job(key, job)
     return resources

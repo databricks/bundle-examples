@@ -9,6 +9,9 @@ DYNAMIC_VALUE_REFERENCE = re.compile(r"\{\{[^{}]+\}\}")
 # Databricks caps task keys at 100 characters (letters, numbers, underscores, hyphens).
 MAX_TASK_KEY_LENGTH = 100
 
+# Databricks caps jobs at 1,000 tasks.
+MAX_JOB_TASKS = 1_000
+
 # dbt resource types whose task key is `<resource_name>_<type>` (the type doubles as the suffix).
 _SUFFIXED_TYPES = frozenset({"model", "seed", "snapshot"})
 

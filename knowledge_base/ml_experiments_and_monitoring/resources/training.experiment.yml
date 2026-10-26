@@ -1,0 +1,5 @@
+resources:
+  experiments:
+    training:
+      # MLflow experiment that stores the training runs.
+      name: ${workspace.root_path}/training

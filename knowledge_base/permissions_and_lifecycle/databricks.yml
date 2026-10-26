@@ -1,0 +1,52 @@
+bundle:
+  name: permissions_and_lifecycle
+
+include:
+  - resources/*.yml
+
+variables:
+  team_group:
+    description: Workspace group for your team
+  catalog_name:
+    description: Unity Catalog catalog containing the pipeline schema
+  schema_name:
+    description: Existing schema used by the pipeline
+
+permissions:
+  - level: CAN_VIEW
+    group_name: users
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+    resources:
+      jobs:
+        permission_job:
+          permissions:
+            - level: CAN_MANAGE_RUN
+              group_name: ${var.team_group}
+      pipelines:
+        permission_pipeline:
+          permissions:
+            - level: CAN_RUN
+              group_name: ${var.team_group}
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
+    resources:
+      jobs:
+        permission_job:
+          permissions:
+            - level: CAN_MANAGE
+              group_name: ${var.team_group}
+      pipelines:
+        permission_pipeline:
+          permissions:
+            - level: CAN_MANAGE
+              group_name: ${var.team_group}
+

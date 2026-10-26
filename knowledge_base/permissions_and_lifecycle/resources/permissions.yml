@@ -1,0 +1,34 @@
+resources:
+  jobs:
+    permission_job:
+      name: permissions lifecycle job
+      lifecycle:
+        prevent_destroy: false
+      permissions:
+        - level: CAN_MANAGE_RUN
+          group_name: ${var.team_group}
+      tasks:
+        - task_key: permission_check
+          spark_python_task:
+            python_file: ../src/main.py
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "6"
+
+  pipelines:
+    permission_pipeline:
+      name: permissions lifecycle pipeline
+      lifecycle:
+        prevent_destroy: false
+      permissions:
+        - level: CAN_RUN
+          group_name: ${var.team_group}
+      serverless: true
+      catalog: ${var.catalog_name}
+      target: ${var.schema_name}_${bundle.target}
+      libraries:
+        - file:
+            path: ../src/pipeline.py
+

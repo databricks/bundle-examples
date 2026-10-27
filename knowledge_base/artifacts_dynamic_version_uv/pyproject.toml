@@ -1,0 +1,13 @@
+[project]
+name = "dynamic_version_demo"
+# Keep this version fixed. The bundle adds a build timestamp on each deploy.
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+main = "dynamic_version_demo.main:main"
+
+[build-system]
+requires = ["uv_build>=0.10.0,<0.11"]
+build-backend = "uv_build"

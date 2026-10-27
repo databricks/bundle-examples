@@ -1,0 +1,30 @@
+bundle:
+  name: artifacts_dynamic_version_uv
+  databricks_cli_version: ">= 1.20.0"
+
+include:
+  - resources/*.yml
+
+artifacts:
+  default:
+    type: whl
+    build: uv build --wheel
+    path: .
+
+# Append a build timestamp to the wheel version on each deploy.
+# Clusters and serverless environments then install the new wheel without a version bump.
+# To enable this for one artifact only, set `dynamic_version: true` on that artifact.
+presets:
+  artifacts_dynamic_version: true
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}

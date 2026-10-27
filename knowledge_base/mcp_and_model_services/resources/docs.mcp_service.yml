@@ -1,0 +1,10 @@
+resources:
+  mcp_services:
+    docs:
+      parent: schemas/${resources.schemas.ai_services.id}
+      mcp_service_id: docs
+      comment: Exposes the tools of an external MCP server.
+      config:
+        source_connection:
+          # The connection holds the MCP server URL and credentials.
+          name: connections/${var.mcp_connection}

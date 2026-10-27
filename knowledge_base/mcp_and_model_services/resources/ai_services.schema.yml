@@ -1,0 +1,5 @@
+resources:
+  schemas:
+    ai_services:
+      catalog_name: ${var.catalog}
+      name: ai_services

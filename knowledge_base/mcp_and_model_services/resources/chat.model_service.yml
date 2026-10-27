@@ -1,0 +1,13 @@
+resources:
+  model_services:
+    chat:
+      parent: schemas/${resources.schemas.ai_services.id}
+      model_service_id: chat
+      comment: Routes chat requests to a Databricks foundation model.
+      config:
+        routing:
+          destinations:
+            - name: primary
+              destination_type: DESTINATION_TYPE_PAY_PER_TOKEN_FOUNDATION_MODEL
+              pay_per_token_config:
+                model: models/${var.chat_model}

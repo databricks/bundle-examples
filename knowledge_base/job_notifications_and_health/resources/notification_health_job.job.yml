@@ -1,0 +1,55 @@
+resources:
+  jobs:
+    notification_health_job:
+      name: Job notifications and health
+      description: Demonstrates notifications, health rules, timeouts, and retries.
+
+      parameters:
+        - name: sleep_seconds
+          default: "0"
+        - name: fail
+          default: "false"
+
+      email_notifications:
+        on_failure: []
+        on_duration_warning_threshold_exceeded: []
+        on_streaming_backlog_exceeded: []
+
+      webhook_notifications:
+        on_failure: []
+        on_duration_warning_threshold_exceeded: []
+        on_streaming_backlog_exceeded: []
+
+      notification_settings:
+        no_alert_for_skipped_runs: true
+        no_alert_for_canceled_runs: true
+
+      health:
+        rules:
+          - metric: RUN_DURATION_SECONDS
+            op: GREATER_THAN
+            value: 60
+          # This preview metric applies only when the job runs a stream.
+          - metric: STREAMING_BACKLOG_RECORDS
+            op: GREATER_THAN
+            value: 1000
+
+      tasks:
+        - task_key: controllable_task
+          spark_python_task:
+            python_file: ../src/main.py
+            parameters:
+              - --sleep-seconds
+              - "{{job.parameters.sleep_seconds}}"
+              - --fail
+              - "{{job.parameters.fail}}"
+          environment_key: default
+          timeout_seconds: 120
+          max_retries: 1
+          min_retry_interval_millis: 10000
+          retry_on_timeout: true
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "6"

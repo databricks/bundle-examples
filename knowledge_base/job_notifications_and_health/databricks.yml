@@ -1,0 +1,42 @@
+bundle:
+  name: job_notifications_and_health
+
+include:
+  - resources/*.job.yml
+
+variables:
+  notification_email:
+    description: Email address that receives job notifications.
+    default: replace-me@example.com
+  notification_destination_id:
+    description: ID of a configured webhook notification destination.
+    default: 00000000-0000-0000-0000-000000000000
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
+    resources:
+      jobs:
+        notification_health_job:
+          email_notifications:
+            on_failure:
+              - ${var.notification_email}
+            on_duration_warning_threshold_exceeded:
+              - ${var.notification_email}
+            on_streaming_backlog_exceeded:
+              - ${var.notification_email}
+          webhook_notifications:
+            on_failure:
+              - id: ${var.notification_destination_id}
+            on_duration_warning_threshold_exceeded:
+              - id: ${var.notification_destination_id}
+            on_streaming_backlog_exceeded:
+              - id: ${var.notification_destination_id}

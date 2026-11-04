@@ -1,0 +1,40 @@
+resources:
+  model_serving_endpoints:
+    model_endpoint:
+      name: ${var.endpoint_name}
+
+      config:
+        served_entities:
+          - name: iris-classifier
+            # A Unity Catalog model needs the full three-level name.
+            entity_name: ${var.catalog}.${var.schema}.${resources.registered_models.model.name}
+            # The endpoint takes a version number, not an alias such as `champion`.
+            entity_version: ${var.model_version}
+            workload_size: ${var.workload_size}
+            scale_to_zero_enabled: ${var.scale_to_zero}
+
+      ai_gateway:
+        rate_limits:
+          - key: endpoint
+            calls: ${var.rate_limit_calls}
+            renewal_period: minute
+          - key: user
+            calls: ${var.rate_limit_user_calls}
+            renewal_period: minute
+        # Log requests and responses to <catalog>.<schema>.<prefix>_payload.
+        inference_table_config:
+          enabled: true
+          catalog_name: ${var.catalog}
+          schema_name: ${var.schema}
+          table_name_prefix: ${resources.registered_models.model.name}
+        # Write usage to the system.serving system tables.
+        usage_tracking_config:
+          enabled: true
+
+      tags:
+        - key: example
+          value: model_serving_endpoint
+
+      permissions:
+        - group_name: ${var.consumers_group}
+          level: CAN_QUERY

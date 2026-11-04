@@ -1,0 +1,32 @@
+bundle:
+  name: ml_experiments_and_monitoring
+  databricks_cli_version: ">= 1.20.0"
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Catalog for the model and the inference table.
+    default: main
+  schema:
+    description: Existing schema for the model, the inference table, and the monitor output.
+    default: ml_monitoring
+  consumers_group:
+    description: Account group that can use the registered model.
+    default: ml-consumers
+  notification_email:
+    description: Email address that gets monitor failure notifications.
+    default: ${workspace.current_user.userName}
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}

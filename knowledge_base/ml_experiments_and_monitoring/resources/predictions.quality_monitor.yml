@@ -1,0 +1,23 @@
+resources:
+  quality_monitors:
+    predictions:
+      # Lakehouse Monitoring on the inference table that the training job writes.
+      table_name: ${resources.job_runs.train_on_deploy.job_parameters.inference_table}
+      output_schema_name: ${var.catalog}.${var.schema}
+      assets_dir: ${workspace.root_path}/monitoring
+      inference_log:
+        problem_type: PROBLEM_TYPE_CLASSIFICATION
+        timestamp_col: timestamp
+        model_id_col: model_version
+        prediction_col: prediction
+        label_col: label
+        granularities:
+          - 1 day
+      # Refresh daily at 06:00 UTC. Development mode turns off this schedule.
+      schedule:
+        quartz_cron_expression: 0 0 6 * * ?
+        timezone_id: UTC
+      notifications:
+        on_failure:
+          email_addresses:
+            - ${var.notification_email}

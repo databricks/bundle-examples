@@ -1,0 +1,7 @@
+resources:
+  job_runs:
+    # Run training during deploy, so the inference table exists before the monitor is created.
+    train_on_deploy:
+      job_id: ${resources.jobs.train.id}
+      job_parameters:
+        inference_table: ${var.catalog}.${var.schema}.${resources.registered_models.iris.name}_predictions

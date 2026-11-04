@@ -1,0 +1,12 @@
+resources:
+  registered_models:
+    iris:
+      # Unity Catalog model. The training job registers versions and sets the "champion" alias.
+      catalog_name: ${var.catalog}
+      schema_name: ${var.schema}
+      name: iris_classifier
+      comment: Iris classifier trained by the ml_experiments_and_monitoring example.
+      grants:
+        - principal: ${var.consumers_group}
+          privileges:
+            - EXECUTE

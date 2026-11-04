@@ -1,0 +1,30 @@
+resources:
+  jobs:
+    train:
+      name: Train iris classifier
+
+      parameters:
+        - name: experiment_name
+          default: ${resources.experiments.training.name}
+        - name: model_name
+          default: ${var.catalog}.${var.schema}.${resources.registered_models.iris.name}
+        - name: inference_table
+          default: ${var.catalog}.${var.schema}.${resources.registered_models.iris.name}_predictions
+
+      tasks:
+        - task_key: train
+          spark_python_task:
+            python_file: ../src/train.py
+            parameters:
+              - "{{job.parameters.experiment_name}}"
+              - "{{job.parameters.model_name}}"
+              - "{{job.parameters.inference_table}}"
+          environment_key: default
+
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "6"
+            dependencies:
+              - mlflow>=3
+              - scikit-learn

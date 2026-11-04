@@ -1,0 +1,31 @@
+bundle:
+  name: job_git_source
+  databricks_cli_version: ">= 1.20.0"
+
+include:
+  - resources/*.yml
+
+variables:
+  git_url:
+    description: Git repository URL for the job source.
+    default: https://github.com/databricks/bundle-examples
+  git_provider:
+    description: Git provider for the job source.
+    default: gitHub
+  git_branch:
+    description: Git branch for the job source.
+    default: main
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+  prod:
+    mode: production
+    bundle:
+      git:
+        branch: main
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}

@@ -10,11 +10,9 @@ job-config: &job-config
           notebook_path: ../../src/notebook.py
     max_concurrent_runs: 1
     timeout_seconds: 3600
-    trigger:
-      type: "cron"
-      cron:
-        quartz_cron_expression: "0 0 12 * * ?"
-        timezone_id: "UTC"
+    schedule:
+      quartz_cron_expression: "0 0 12 * * ?"
+      timezone_id: "UTC"
 
 targets:
   dev:

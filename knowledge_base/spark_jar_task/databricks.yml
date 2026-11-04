@@ -21,7 +21,7 @@ resources:
           new_cluster:
             node_type_id: i3.xlarge
             num_workers: 1
-            spark_version: 14.3.x-scala2.12
+            spark_version: 18.x-scala2.13
           spark_jar_task:
             main_class_name: PrintArgs
           libraries:

@@ -1,0 +1,46 @@
+resources:
+  postgres_projects:
+    synced_tables:
+      project_id: ${var.project_id}-${bundle.target}
+      display_name: Lakebase synced tables example
+      pg_version: 17
+      purge_on_delete: true
+
+  postgres_branches:
+    target_branch:
+      parent: ${resources.postgres_projects.synced_tables.id}
+      branch_id: production
+      no_expiry: true
+      replace_existing: true
+      purge_on_delete: true
+
+  postgres_endpoints:
+    target_endpoint:
+      parent: ${resources.postgres_branches.target_branch.id}
+      endpoint_id: primary
+      endpoint_type: ENDPOINT_TYPE_READ_WRITE
+      replace_existing: true
+      autoscaling_limit_min_cu: 0.5
+      autoscaling_limit_max_cu: 1
+      suspend_timeout_duration: 60s
+
+  postgres_snapshot_schedules:
+    daily_snapshots:
+      branch: ${resources.postgres_branches.target_branch.id}
+      schedule:
+        - daily_schedule:
+            hour: 0
+          retention: 3600s
+
+  postgres_synced_tables:
+    example:
+      synced_table_id: ${var.destination_table}_${bundle.target}
+      source_table_full_name: ${var.source_table}
+      branch: ${resources.postgres_branches.target_branch.id}
+      postgres_database: databricks_postgres
+      primary_key_columns:
+        - id
+      scheduling_policy: TRIGGERED
+      new_pipeline_spec:
+        storage_catalog: ${var.pipeline_storage_catalog}
+        storage_schema: ${var.pipeline_storage_schema}

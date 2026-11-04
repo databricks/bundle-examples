@@ -1,0 +1,28 @@
+bundle:
+  name: lakebase-synced-tables
+  databricks_cli_version: ">= 1.20.0"
+
+include:
+  - resources/*.yml
+
+variables:
+  project_id:
+    description: Unique Lakebase project ID
+  source_table:
+    description: Three-part name of the source Delta table
+  destination_table:
+    description: Three-part name of the destination synced table
+  pipeline_storage_catalog:
+    description: Standard catalog for pipeline storage
+  pipeline_storage_schema:
+    description: Schema for pipeline storage
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}

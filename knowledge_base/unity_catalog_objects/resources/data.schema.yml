@@ -1,0 +1,13 @@
+resources:
+  schemas:
+    data:
+      name: data
+      catalog_name: ${resources.catalogs.uc_demo.name}
+      comment: Data-holding schema with prevent_destroy.
+      grants:
+        - principal: ${var.grant_group}
+          privileges:
+            - USE_SCHEMA
+      # Client-side guard: destroy fails while true. Set false, then destroy.
+      lifecycle:
+        prevent_destroy: true

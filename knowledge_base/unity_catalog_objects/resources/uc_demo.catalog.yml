@@ -1,0 +1,11 @@
+resources:
+  catalogs:
+    uc_demo:
+      # Managed catalog. Set catalog_storage_root when the metastore has no default root.
+      name: ${var.catalog_name}
+      storage_root: ${var.catalog_storage_root}
+      comment: Bundle-managed catalog for the unity_catalog_objects example.
+      grants:
+        - principal: ${var.grant_group}
+          privileges:
+            - USE_CATALOG

@@ -1,0 +1,60 @@
+# Complex variables and lookups.
+# Replace each lookup name with a resource that exists in your workspace.
+# See https://docs.databricks.com/dev-tools/bundles/variables.html
+bundle:
+  name: complex_variables_and_lookups
+
+include:
+  - resources/*.yml
+
+variables:
+  warehouse_id:
+    description: SQL warehouse ID resolved by name
+    lookup:
+      warehouse: Serverless Starter Warehouse
+
+  cluster_policy_id:
+    description: Cluster policy ID resolved by name
+    lookup:
+      cluster_policy: my-cluster-policy
+
+  service_principal_id:
+    description: Service principal application ID resolved by name
+    lookup:
+      service_principal: my-service-principal
+
+  cluster_id:
+    description: All-purpose cluster ID resolved by name
+    lookup:
+      cluster: my-cluster
+
+  job_id:
+    description: Job ID resolved by name
+    lookup:
+      job: my-job
+
+  # Complex map used as the serverless task environment. Override per target
+  # or with .databricks/bundle/<target>/variable-overrides.json.
+  environment_spec:
+    description: Serverless environment spec for the Python task
+    type: complex
+    default:
+      environment_version: "6"
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}/${workspace.current_user.short_name}
+    variables:
+      environment_spec:
+        environment_version: "5"
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/bundle-examples/${bundle.name}/${bundle.target}
+    variables:
+      environment_spec:
+        environment_version: "6"

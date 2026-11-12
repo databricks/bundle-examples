@@ -1,0 +1,10 @@
+resources:
+  alerts:
+    high_value_orders:
+      permissions:
+        - level: CAN_MANAGE
+          user_name: user@company.com
+
+      warehouse_id: ${var.warehouse_id}
+      display_name: "High Value Urgent Orders Alert"
+      file_path: ./high_value_orders.dbalert.json

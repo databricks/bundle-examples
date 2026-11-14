@@ -1,0 +1,44 @@
+# This is a Databricks Asset Bundle for {{.project_name}}.
+bundle:
+  name: "{{.project_name}}"
+
+variables:
+  catalog_name:
+    description: "Name of the UC catalog to use"
+    default: "default_catalog"
+  schema_name:
+    description: "Name of the UC schema to use"
+    default: "sentiment_agent_project"
+  model_name:
+    description: "Name of the UC model to use"
+    default: "sentiment_agent"
+  experiment_name:
+    description: "Name of experiment"
+    default: "/Users/${workspace.current_user.userName}/${bundle.target}_sentiment_agent"
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: {{.workspace_host_dev}}
+    variables:
+      catalog_name: {{.catalog_name_dev}}
+
+  prod:
+    mode: production
+    workspace:
+      host: {{.workspace_host_prod}}
+      root_path: /Shared/.bundle/prod/${bundle.name}
+    variables:
+      catalog_name: {{.catalog_name_prod}}
+    {{- if not is_service_principal}}
+    run_as:
+      # This runs as {{user_name}} in production. Alternatively,
+      # a service principal could be used here using service_principal_name
+      # (see Databricks documentation).
+      user_name: {{user_name}}
+    {{end -}}

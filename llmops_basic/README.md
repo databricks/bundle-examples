@@ -1,0 +1,44 @@
+# llmops_basic
+
+End-to-end LLMOps project for sentiment analysis of reviews using Databricks.
+
+## Overview
+
+This example demonstrates a complete LLMOps pipeline for building, evaluating, and deploying a sentiment analysis model.
+
+**Pipeline stages:**
+- Data preparation
+- Model build and evaluation with MLflow
+- Model deployment to serving endpoint
+- Batch inference
+
+## Requirements
+
+- Databricks CLI (v0.218.0+)
+- Unity Catalog enabled
+- Required permissions on the catalog:
+  - `USE CATALOG` - to access the catalog
+  - `CREATE SCHEMA` - to create schemas
+
+## Quick Start
+
+**Deploy:**
+```bash
+databricks bundle deploy -t dev
+```
+
+**Run pipeline:**
+```bash
+databricks bundle run model_preprocessing -t dev
+databricks bundle run model_build_evaluation -t dev
+databricks bundle run model_endpoint_deploy -t dev
+databricks bundle run model_inference -t dev
+```
+
+## Configuration
+
+- **Dev Catalog**: `dev_catalog`
+- **Prod Catalog**: `prod_catalog`
+
+Edit `databricks.yml` to customize catalog names, schema name, model name, and experiment settings.
+

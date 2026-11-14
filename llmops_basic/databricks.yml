@@ -1,0 +1,43 @@
+# This is a Databricks Asset Bundle for llmops_basic.
+bundle:
+  name: "llmops_basic"
+
+variables:
+  catalog_name:
+    description: "Name of the UC catalog to use"
+    default: "default_catalog"
+  schema_name:
+    description: "Name of the UC schema to use"
+    default: "sentiment_agent_project"
+  model_name:
+    description: "Name of the UC model to use"
+    default: "sentiment_agent"
+  experiment_name:
+    description: "Name of experiment"
+    default: "/Users/${workspace.current_user.userName}/${bundle.target}_sentiment_agent"
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://your-workspace.azuredatabricks.net/
+    variables:
+      catalog_name: dev_catalog
+
+  prod:
+    mode: production
+    workspace:
+      host: https://your-workspace.azuredatabricks.net/
+      root_path: /Shared/.bundle/prod/${bundle.name}
+    variables:
+      catalog_name: prod_catalog
+    run_as:
+      # This runs as user@company.com in production. Alternatively,
+      # a service principal could be used here using service_principal_name
+      # (see Databricks documentation).
+      user_name: user@company.com
+    

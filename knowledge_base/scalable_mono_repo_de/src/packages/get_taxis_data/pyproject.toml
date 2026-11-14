@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "get-taxis-data"
+version = "0.1.0"
+description = "Python package that gets pre-loaded taxi data from your Databricks workspace."
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+packages = [
+    { include = "get_taxis_data" }
+]
+
+[tool.poetry.scripts]
+main = "get_taxis_data.main:get_taxis_data"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

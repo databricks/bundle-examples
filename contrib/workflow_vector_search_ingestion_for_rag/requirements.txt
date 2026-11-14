@@ -1,0 +1,4 @@
+databricks-vectorsearch
+transformers
+langchain-text-splitters
+tiktoken

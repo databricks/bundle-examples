@@ -7,7 +7,7 @@
       "order": 1,
       "default": "main",
       "pattern": "^[a-z_][a-z0-9_-]{0,254}$",
-      "pattern_match_failure_message": "Name must only consist of letters, numbers, dashes, and underscores."
+      "pattern_match_failure_message": "Name must only consist of lowercase letters, numbers, dashes, and underscores."
     },
     "schema_name": {
       "type": "string",
@@ -15,8 +15,1246 @@
       "order": 2,
       "default": "filepushschema",
       "pattern": "^[a-z_][a-z0-9_-]{0,254}$",
-      "pattern_match_failure_message": "Name must only consist of letters, numbers, dashes, and underscores."
+      "pattern_match_failure_message": "Schema name must only consist of lowercase letters, numbers, dashes and underscores."
+    },
+    "table_1_name": {
+      "type": "string",
+      "description": "\n=== Table 1 Configuration ===\n\nTable name\nTable 1 - Name",
+      "order": 10,
+      "default": "table1",
+      "pattern": "^[a-z_][a-z0-9_-]{0,254}$",
+      "pattern_match_failure_message": "Table name must only consist of lowercase letters, numbers, underscores, and dashes."
+    },
+    "table_1_format": {
+      "type": "string",
+      "description": "\nFile format (csv, json, avro, or parquet)\nTable 1 - Format",
+      "order": 11,
+      "default": "csv",
+      "enum": ["csv", "json", "avro", "parquet"]
+    },
+    "table_1_csv_header": {
+      "skip_prompt_if": {
+        "properties": {
+          "table_1_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nDoes the CSV file have a header row?\nTable 1 - CSV Header",
+      "order": 12,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_1_csv_delimiter": {
+      "skip_prompt_if": {
+        "properties": {
+          "table_1_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nField delimiter character\nTable 1 - CSV Delimiter",
+      "order": 13,
+      "default": ",",
+      "enum": [",", ";", "|", "\t"]
+    },
+    "table_1_csv_escape": {
+      "skip_prompt_if": {
+        "properties": {
+          "table_1_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nEscape character\nTable 1 - CSV Escape",
+      "order": 14,
+      "default": "\"",
+      "enum": ["\"", "\\"]
+    },
+    "table_1_csv_multiline": {
+      "skip_prompt_if": {
+        "properties": {
+          "table_1_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nAllow multiline values?\nTable 1 - CSV Multiline",
+      "order": 15,
+      "default": "false",
+      "enum": ["true", "false"]
+    },
+    "table_1_json_allow_comments": {
+      "skip_prompt_if": {
+        "properties": {
+          "table_1_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nAllow comments in JSON?\nTable 1 - JSON Allow Comments",
+      "order": 12,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_1_json_allow_single_quotes": {
+      "skip_prompt_if": {
+        "properties": {
+          "table_1_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nAllow single quotes?\nTable 1 - JSON Allow Single Quotes",
+      "order": 13,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_1_json_infer_timestamp": {
+      "skip_prompt_if": {
+        "properties": {
+          "table_1_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nInfer timestamp format?\nTable 1 - JSON Infer Timestamp",
+      "order": 14,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_1_json_multiline": {
+      "skip_prompt_if": {
+        "properties": {
+          "table_1_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nAllow multiline JSON?\nTable 1 - JSON Multiline",
+      "order": 15,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_1_schema_hints": {
+      "type": "string",
+      "description": "\n[Optional] Schema hints (e.g., 'id int, name string'). Leave empty for auto-detection.\nTable 1 - Schema Hints",
+      "order": 16,
+      "default": ""
+    },
+    "table_1_schema_evolution_mode": {
+      "type": "string",
+      "description": "\nSchema evolution mode\nTable 1 - Schema Evolution Mode",
+      "order": 17,
+      "default": "addNewColumns",
+      "enum": ["addNewColumns", "rescue", "none"]
+    },
+    "add_table_2": {
+      "type": "string",
+      "description": "\nWould you like to add another table?\nAdd Table 2",
+      "order": 19,
+      "default": "yes",
+      "enum": ["yes", "no"]
+    },
+    "table_2_name": {
+      "skip_prompt_if": {
+        "properties": {
+          "add_table_2": {
+            "const": "no"
+          }
+        }
+      },
+      "type": "string",
+      "description": "\n=== Table 2 Configuration ===\n\nTable name\nTable 2 - Name",
+      "order": 20,
+      "default": "table2",
+      "pattern": "^[a-z_][a-z0-9_-]{0,254}$",
+      "pattern_match_failure_message": "Table name must only consist of lowercase letters, numbers, underscores, and dashes."
+    },
+    "table_2_format": {
+      "skip_prompt_if": {
+        "properties": {
+          "add_table_2": {
+            "const": "no"
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nFile format\nTable 2 - Format",
+      "order": 21,
+      "default": "json",
+      "enum": ["csv", "json", "avro", "parquet"]
+    },
+    "table_2_csv_header": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_2_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nDoes the CSV file have a header row?\nTable 2 - CSV Header",
+      "order": 22,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_2_csv_delimiter": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_2_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nField delimiter character\nTable 2 - CSV Delimiter",
+      "order": 23,
+      "default": ",",
+      "enum": [",", ";", "|", "\t"]
+    },
+    "table_2_csv_escape": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_2_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nEscape character\nTable 2 - CSV Escape",
+      "order": 24,
+      "default": "\"",
+      "enum": ["\"", "\\"]
+    },
+    "table_2_csv_multiline": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_2_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow multiline values?\nTable 2 - CSV Multiline",
+      "order": 25,
+      "default": "false",
+      "enum": ["true", "false"]
+    },
+    "table_2_json_allow_comments": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_2_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow comments in JSON?\nTable 2 - JSON Allow Comments",
+      "order": 22,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_2_json_allow_single_quotes": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_2_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow single quotes?\nTable 2 - JSON Allow Single Quotes",
+      "order": 23,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_2_json_infer_timestamp": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_2_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nInfer timestamp format?\nTable 2 - JSON Infer Timestamp",
+      "order": 24,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_2_json_multiline": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_2_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow multiline JSON?\nTable 2 - JSON Multiline",
+      "order": 25,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_2_schema_hints": {
+      "skip_prompt_if": {
+        "properties": {
+          "num_tables": {
+            "const": "1"
+          }
+        }
+      },
+      "type": "string",
+      "description": "\n[Optional] Schema hints. Leave empty for auto-detection.\nTable 2 - Schema Hints",
+      "order": 26,
+      "default": ""
+    },
+    "table_2_schema_evolution_mode": {
+      "skip_prompt_if": {
+        "properties": {
+          "num_tables": {
+            "const": "1"
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nSchema evolution mode\nTable 2 - Schema Evolution Mode",
+      "order": 27,
+      "default": "addNewColumns",
+      "enum": ["addNewColumns", "rescue", "none"]
+    },
+    "add_table_3": {
+      "skip_prompt_if": {
+        "properties": {
+          "add_table_2": {
+            "const": "no"
+          }
+        }
+      },
+      "type": "string",
+      "description": "\nWould you like to add another table?\nAdd Table 3",
+      "order": 29,
+      "default": "no",
+      "enum": ["yes", "no"]
+    },
+    "table_3_name": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\n=== Table 3 Configuration ===\n\nTable name\nTable 3 - Name",
+      "order": 30,
+      "default": "table3",
+      "pattern": "^[a-z_][a-z0-9_-]{0,254}$",
+      "pattern_match_failure_message": "Table name must only consist of lowercase letters, numbers, underscores, and dashes."
+    },
+    "table_3_format": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nFile format\nTable 3 - Format",
+      "order": 31,
+      "default": "avro",
+      "enum": ["csv", "json", "avro", "parquet"]
+    },
+    "table_3_csv_header": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_3_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nDoes the CSV file have a header row?\nTable 3 - CSV Header",
+      "order": 32,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_3_csv_delimiter": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_3_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nField delimiter character\nTable 3 - CSV Delimiter",
+      "order": 33,
+      "default": ",",
+      "enum": [",", ";", "|", "\t"]
+    },
+    "table_3_csv_escape": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_3_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nEscape character\nTable 3 - CSV Escape",
+      "order": 34,
+      "default": "\"",
+      "enum": ["\"", "\\"]
+    },
+    "table_3_csv_multiline": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_3_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow multiline values?\nTable 3 - CSV Multiline",
+      "order": 35,
+      "default": "false",
+      "enum": ["true", "false"]
+    },
+    "table_3_json_allow_comments": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_3_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow comments in JSON?\nTable 3 - JSON Allow Comments",
+      "order": 32,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_3_json_allow_single_quotes": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_3_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow single quotes?\nTable 3 - JSON Allow Single Quotes",
+      "order": 33,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_3_json_infer_timestamp": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_3_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nInfer timestamp format?\nTable 3 - JSON Infer Timestamp",
+      "order": 34,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_3_json_multiline": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_3_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow multiline JSON?\nTable 3 - JSON Multiline",
+      "order": 35,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_3_schema_hints": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\n[Optional] Schema hints. Leave empty for auto-detection.\nTable 3 - Schema Hints",
+      "order": 36,
+      "default": ""
+    },
+    "table_3_schema_evolution_mode": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nSchema evolution mode\nTable 3 - Schema Evolution Mode",
+      "order": 37,
+      "default": "addNewColumns",
+      "enum": ["addNewColumns", "rescue", "none"]
+    },
+    "add_table_4": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nWould you like to add another table?\nAdd Table 4",
+      "order": 39,
+      "default": "no",
+      "enum": ["yes", "no"]
+    },
+    "table_4_name": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\n=== Table 4 Configuration ===\n\nTable name\nTable 4 - Name",
+      "order": 40,
+      "default": "table4",
+      "pattern": "^[a-z_][a-z0-9_-]{0,254}$",
+      "pattern_match_failure_message": "Table name must only consist of lowercase letters, numbers, underscores, and dashes."
+    },
+    "table_4_format": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nFile format\nTable 4 - Format",
+      "order": 41,
+      "default": "parquet",
+      "enum": ["csv", "json", "avro", "parquet"]
+    },
+    "table_4_csv_header": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_4_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nDoes the CSV file have a header row?\nTable 4 - CSV Header",
+      "order": 42,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_4_csv_delimiter": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_4_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nField delimiter character\nTable 4 - CSV Delimiter",
+      "order": 43,
+      "default": ",",
+      "enum": [",", ";", "|", "\t"]
+    },
+    "table_4_csv_escape": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_4_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nEscape character\nTable 4 - CSV Escape",
+      "order": 44,
+      "default": "\"",
+      "enum": ["\"", "\\"]
+    },
+    "table_4_csv_multiline": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_4_format": {
+            "enum": ["json", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow multiline values?\nTable 4 - CSV Multiline",
+      "order": 45,
+      "default": "false",
+      "enum": ["true", "false"]
+    },
+    "table_4_json_allow_comments": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_4_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow comments in JSON?\nTable 4 - JSON Allow Comments",
+      "order": 42,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_4_json_allow_single_quotes": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_4_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow single quotes?\nTable 4 - JSON Allow Single Quotes",
+      "order": 43,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_4_json_infer_timestamp": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_4_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nInfer timestamp format?\nTable 4 - JSON Infer Timestamp",
+      "order": 44,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_4_json_multiline": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+          "table_4_format": {
+            "enum": ["csv", "avro", "parquet"]
+          }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nAllow multiline JSON?\nTable 4 - JSON Multiline",
+      "order": 45,
+      "default": "true",
+      "enum": ["true", "false"]
+    },
+    "table_4_schema_hints": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\n[Optional] Schema hints. Leave empty for auto-detection.\nTable 4 - Schema Hints",
+      "order": 46,
+      "default": ""
+    },
+    "table_4_schema_evolution_mode": {
+      "skip_prompt_if": {
+        "anyOf": [
+          {
+            "properties": {
+              "add_table_2": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_3": {
+                "const": "no"
+              }
+            }
+          },
+          {
+            "properties": {
+              "add_table_4": {
+                "const": "no"
+              }
+            }
+          }
+        ]
+      },
+      "type": "string",
+      "description": "\nSchema evolution mode\nTable 4 - Schema Evolution Mode",
+      "order": 47,
+      "default": "addNewColumns",
+      "enum": ["addNewColumns", "rescue", "none"]
     }
   },
-  "success_message": "\nBundle folder '{{.catalog_name}}.{{.schema_name}}' has been created. Please refer to the README.md for next steps."
+  "success_message": "\nBundle folder '{{.catalog_name}}.{{.schema_name}}' has been created with your configured tables.\n\nPlease refer to the README.md for next steps."
 }
